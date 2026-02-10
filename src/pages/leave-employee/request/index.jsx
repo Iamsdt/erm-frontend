@@ -108,13 +108,15 @@ const RequestLeavePage = () => {
     return count
   }
 
+  const handleSubmit = form.handleSubmit(onSubmit)
+
   return (
     <RequestLeaveUI
       form={form}
       subType={subType}
       estimatedDays={calcDays()}
       isSubmitting={isSubmitting}
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={handleSubmit}
     />
   )
 }

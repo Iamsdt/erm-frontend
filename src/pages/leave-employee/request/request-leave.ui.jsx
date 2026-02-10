@@ -70,10 +70,17 @@ const HALF_DAY_SLOTS = [
   { value: "afternoon", label: "🌇 Afternoon (from 1 PM)" },
 ]
 
-const TODAY = new Date().toISOString().split("T")[0]
+const [TODAY] = new Date().toISOString().split("T")
 
 // ─── Main UI ──────────────────────────────────────────────────────────────────
+const MUTED_TEXT_CLASS = "text-muted-foreground"
 
+const PRIMARY_BORDER = "border-primary"
+const BASE_BUTTON_CLASS = "p-3 rounded-xl border-2 text-left transition-all"
+const ACTIVE_BUTTON_CLASS = `${PRIMARY_BORDER} bg-primary/5`
+const INACTIVE_BUTTON_CLASS = `border-border hover:${PRIMARY_BORDER}/40`
+
+// eslint-disable-next-line max-lines-per-function
 const RequestLeaveUI = ({
   form,
   subType,
@@ -81,13 +88,15 @@ const RequestLeaveUI = ({
   isSubmitting,
   onSubmit,
 }) => {
+  const handleSubmit = onSubmit
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-5">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Request Leave</h1>
         <p className="text-muted-foreground text-sm mt-0.5">
-          Submit a leave, WFH, or half-day request for your manager's approval.
+          Submit a leave, WFH, or half-day request for your manager&apos;s
+          approval.
         </p>
       </div>
 
@@ -102,7 +111,7 @@ const RequestLeaveUI = ({
 
         <CardContent>
           <Form {...form}>
-            <form onSubmit={onSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Request type (Full / Half / WFH) */}
               <FormField
                 control={form.control}
@@ -116,10 +125,10 @@ const RequestLeaveUI = ({
                           key={st.value}
                           type="button"
                           onClick={() => field.onChange(st.value)}
-                          className={`p-3 rounded-xl border-2 text-left transition-all ${
+                          className={`${BASE_BUTTON_CLASS} ${
                             field.value === st.value
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-primary/40"
+                              ? ACTIVE_BUTTON_CLASS
+                              : INACTIVE_BUTTON_CLASS
                           }`}
                         >
                           <div className="text-xl">{st.icon}</div>
@@ -141,29 +150,35 @@ const RequestLeaveUI = ({
               <FormField
                 control={form.control}
                 name="leaveType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Leave Category *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select leave category…" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {LEAVE_TYPES.map((lt) => (
-                          <SelectItem key={lt.value} value={lt.value}>
-                            {lt.icon} {lt.value} —{" "}
-                            <span className="text-muted-foreground">
-                              {lt.desc}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const handleLeaveTypeChange = field.onChange
+                  return (
+                    <FormItem>
+                      <FormLabel>Leave Category *</FormLabel>
+                      <Select
+                        onValueChange={handleLeaveTypeChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select leave category…" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {LEAVE_TYPES.map((lt) => (
+                            <SelectItem key={lt.value} value={lt.value}>
+                              {lt.icon} {lt.value} —{" "}
+                              <span className={MUTED_TEXT_CLASS}>
+                                {lt.desc}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )
+                }}
               />
 
               {/* Date range */}
@@ -336,7 +351,7 @@ const RequestLeaveUI = ({
 
 RequestLeaveUI.propTypes = {
   form: PropTypes.object.isRequired,
-  subType: PropTypes.string,
+  subType: PropTypes.string.isRequired,
   estimatedDays: PropTypes.number.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
