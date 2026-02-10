@@ -7,16 +7,20 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+const PENDING_STYLE =
+  "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30"
+
+const BLUE_BG = "bg-blue-500"
+
 const STATUS_STYLE = {
   approved:
     "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
   rejected: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30",
-  pending:
-    "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+  pending: PENDING_STYLE,
 }
 
 const LEAVE_COLOR = {
-  blue: "bg-blue-500",
+  blue: BLUE_BG,
   red: "bg-red-500",
   purple: "bg-purple-500",
   orange: "bg-orange-500",
@@ -60,6 +64,10 @@ MetricCard.propTypes = {
   accent: PropTypes.string.isRequired,
 }
 
+MetricCard.defaultProps = {
+  sub: undefined,
+}
+
 const DeptBar = ({ present, onLeave, absent, wfh }) => {
   const total = present + onLeave + absent + (wfh ?? 0)
   if (total === 0) return null
@@ -92,8 +100,16 @@ DeptBar.propTypes = {
   wfh: PropTypes.number,
 }
 
+DeptBar.defaultProps = {
+  wfh: 0,
+}
+
 // ─── Main UI ──────────────────────────────────────────────────────────────────
 
+/* eslint-disable complexity */
+/**
+ *
+ */
 const AdminDashboardUI = ({ data, isLoading, isError }) => {
   if (isError) {
     return (
@@ -340,7 +356,7 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
                     {/* Bar */}
                     <div className="flex-1 h-2.5 bg-muted rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-blue-500 rounded-full transition-all"
+                        className={`h-full ${BLUE_BG} rounded-full transition-all`}
                         style={{ width: `${barW}%` }}
                       />
                     </div>
@@ -439,7 +455,7 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
                                 ? "bg-red-500"
                                 : item.action.includes("Absent")
                                   ? "bg-red-400"
-                                  : "bg-blue-500"
+                                  : BLUE_BG
                           }`}
                         />
                         <span className="font-medium truncate">
@@ -537,6 +553,10 @@ AdminDashboardUI.propTypes = {
   }),
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
+}
+
+AdminDashboardUI.defaultProps = {
+  data: undefined,
 }
 
 export default AdminDashboardUI

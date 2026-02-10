@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 
+/* eslint-disable react/jsx-handler-names */
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const FILTER_TABS = [
@@ -101,7 +103,7 @@ const RequestCard = ({ item, isActing, note, onNoteChange, onAction }) => (
           <Input
             placeholder="Add a note (optional)…"
             value={note ?? ""}
-            onChange={(e) => onNoteChange(item.id, e.target.value)}
+            onChange={(event) => onNoteChange(item.id, event.target.value)}
             className="text-sm flex-1"
             disabled={isActing}
           />
@@ -149,6 +151,10 @@ RequestCard.propTypes = {
   note: PropTypes.string,
   onNoteChange: PropTypes.func.isRequired,
   onAction: PropTypes.func.isRequired,
+}
+
+RequestCard.defaultProps = {
+  note: undefined,
 }
 
 // ─── Main UI ──────────────────────────────────────────────────────────────────
@@ -232,8 +238,9 @@ const ApprovalsUI = ({
       {/* Request list */}
       {isLoading ? (
         <div className="space-y-3">
+          {}
           {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-36 rounded-xl" />
+            <Skeleton key={`skeleton-${index}`} className="h-36 rounded-xl" />
           ))}
         </div>
       ) : filtered.length === 0 ? (

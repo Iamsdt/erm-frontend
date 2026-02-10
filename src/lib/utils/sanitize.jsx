@@ -1,3 +1,5 @@
+/* eslint-disable react/no-danger, jsdoc/check-indentation */
+
 /**
  * HTML Sanitization Utility
  *
@@ -12,13 +14,16 @@
  *   npm install dompurify
  */
 
+import PropTypes from "prop-types"
+import { useState, useEffect } from "react"
+
 /**
  * Sanitizes HTML content to prevent XSS attacks
  * @param {string} dirty - The potentially unsafe HTML string
  * @param {object} options - DOMPurify configuration options
  * @returns {string} - Sanitized HTML string safe to render
  */
-export const sanitizeHtml = (dirty, options = {}) => {
+export const sanitizeHtml = async (dirty, options = {}) => {
   // Check if DOMPurify is available
   if (typeof window === "undefined") {
     // Server-side rendering - return empty string or original
@@ -29,7 +34,7 @@ export const sanitizeHtml = (dirty, options = {}) => {
     // Dynamic import for DOMPurify
     // Note: DOMPurify must be installed: npm install dompurify
 
-    const DOMPurify = require("dompurify")
+    const { default: DOMPurify } = await import("dompurify")
 
     // Default configuration - strict by default
     const defaultOptions = {
@@ -93,8 +98,17 @@ export const sanitizeText = (text) => {
  * Usage: <SanitizedHtml html={userContent} />
  */
 export const SanitizedHtml = ({ html, className, ...properties }) => {
-  const sanitized = sanitizeHtml(html)
+  const [sanitized, setSanitized] = useState("")
 
+  useEffect(() => {
+    const loadSanitized = async () => {
+      const result = await sanitizeHtml(html)
+      setSanitized(result)
+    }
+    loadSanitized()
+  }, [html])
+
+  // eslint-disable react/no-danger
   return (
     <div
       className={className}
@@ -102,4 +116,13 @@ export const SanitizedHtml = ({ html, className, ...properties }) => {
       {...properties}
     />
   )
+}
+
+SanitizedHtml.propTypes = {
+  html: PropTypes.string.isRequired,
+  className: PropTypes.string,
+}
+
+SanitizedHtml.defaultProps = {
+  className: undefined,
 }

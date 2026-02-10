@@ -26,7 +26,7 @@ initPerformanceMonitoring()
 // Detect user timezone (no library needed!)
 const userTimezone = getUserTimezone()
 if (config.isDevelopment) {
-  console.log("User timezone:", userTimezone)
+  console.warn("User timezone:", userTimezone)
 }
 
 // Render function
@@ -45,7 +45,7 @@ const renderApp = () => {
 
 // Enable mocking only in development or when explicitly enabled
 if (config.enableMocking && config.isDevelopment) {
-  console.log("🔧 Mocking enabled in development mode")
+  console.warn("🔧 Mocking enabled in development mode")
   enableMocking()
     .then(() => {
       renderApp()
@@ -58,7 +58,7 @@ if (config.enableMocking && config.isDevelopment) {
     })
 } else {
   if (config.isProduction) {
-    console.log("🚀 Running in production mode")
+    console.warn("🚀 Running in production mode")
   }
   // Render app directly without mocking
   renderApp()

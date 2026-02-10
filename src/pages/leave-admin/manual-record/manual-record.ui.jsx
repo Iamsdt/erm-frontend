@@ -269,14 +269,14 @@ ManualRecordUI.propTypes = {
   form: PropTypes.object.isRequired,
   employees: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      department: PropTypes.string,
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      department: PropTypes.string.isRequired,
     })
   ).isRequired,
   isLoadingEmps: PropTypes.bool.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
-  recordType: PropTypes.string,
+  recordType: PropTypes.string.isRequired,
   onSubmit: PropTypes.func.isRequired,
 }
 

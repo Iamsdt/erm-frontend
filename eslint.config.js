@@ -43,6 +43,8 @@ export default [
                 btoa: "readonly",
                 URL: "readonly",
                 AbortController: "readonly",
+                performance: "readonly",
+                PerformanceObserver: "readonly",
                 module: "readonly",
                 alert: "readonly",
             },

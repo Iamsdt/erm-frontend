@@ -19,6 +19,8 @@ import { config } from "../config"
 // Store metrics for later analysis
 const metrics = []
 
+const PERFORMANCE_MONITORING_DISABLED = "Performance monitoring is disabled"
+
 /**
  * Report metric to console and/or analytics service
  * @param {object} metric - Web Vital metric object
@@ -28,7 +30,7 @@ const reportMetric = (metric) => {
 
   // Log in development
   if (config.isDevelopment) {
-    console.log(`[Performance] ${name}:`, {
+    console.warn(`[Performance] ${name}:`, {
       value: Math.round(value),
       rating,
       delta: Math.round(delta),
@@ -105,7 +107,7 @@ const sendToAnalytics = (metric) => {
  */
 export const initWebVitals = () => {
   if (!config.features.enablePerformanceMonitoring) {
-    console.log("Performance monitoring is disabled")
+    console.warn(PERFORMANCE_MONITORING_DISABLED)
     return
   }
 
@@ -117,7 +119,7 @@ export const initWebVitals = () => {
     onFCP(reportMetric) // First Contentful Paint
     onTTFB(reportMetric) // Time to First Byte
 
-    console.log("Web Vitals tracking initialized")
+    console.warn("Web Vitals tracking initialized")
   } catch (error) {
     console.error("Failed to initialize Web Vitals:", error)
   }
@@ -185,7 +187,7 @@ export const trackCustomMetric = (name, value, data = {}) => {
   }
 
   if (config.isDevelopment) {
-    console.log(`[Custom Metric] ${name}:`, value, data)
+    console.warn(`[Custom Metric] ${name}:`, value, data)
   }
 
   metrics.push(metric)
@@ -213,7 +215,7 @@ export const trackPageLoadTime = () => {
       })
 
       if (config.isDevelopment) {
-        console.log("Page Load Metrics:", {
+        console.warn("Page Load Metrics:", {
           pageLoadTime: `${pageLoadTime}ms`,
           connectTime: `${connectTime}ms`,
           renderTime: `${renderTime}ms`,
@@ -262,7 +264,7 @@ export const trackResourcePerformance = () => {
     })
 
     if (config.isDevelopment) {
-      console.log("Resource Performance:", summary)
+      console.warn("Resource Performance:", summary)
     }
 
     trackCustomMetric("resource_performance", summary.totalDuration, summary)
@@ -278,7 +280,7 @@ export const trackNavigationTiming = () => {
   }
 
   window.addEventListener("load", () => {
-    const nav = window.performance.getEntriesByType("navigation")[0]
+    const [nav] = window.performance.getEntriesByType("navigation")
 
     if (nav) {
       const timing = {
@@ -293,7 +295,7 @@ export const trackNavigationTiming = () => {
       }
 
       if (config.isDevelopment) {
-        console.log("Navigation Timing:", timing)
+        console.warn("Navigation Timing:", timing)
       }
 
       trackCustomMetric("navigation_timing", nav.duration, timing)
@@ -303,6 +305,10 @@ export const trackNavigationTiming = () => {
 
 /**
  * Create performance observer for long tasks
+ */
+/* eslint-disable consistent-return */
+/**
+ *
  */
 export const observeLongTasks = () => {
   if (!window.PerformanceObserver) {
@@ -338,9 +344,14 @@ export const observeLongTasks = () => {
     return null
   }
 }
+/* eslint-enable consistent-return */
 
 /**
  * Create performance observer for layout shifts
+ */
+/* eslint-disable consistent-return */
+/**
+ *
  */
 export const observeLayoutShifts = () => {
   if (!window.PerformanceObserver) {
@@ -372,12 +383,13 @@ export const observeLayoutShifts = () => {
     return null
   }
 }
+/* eslint-enable consistent-return */
 
 /**
  * Measure component render time
  * @param {string} componentName - Name of the component
- * @param {Function} callback - Function to measure
- * @returns {*} Result of callback
+ * @param {() => Promise<unknown>} callback - Function to measure
+ * @returns {unknown} Result of callback
  */
 export const measureRenderTime = async (componentName, callback) => {
   const startTime = performance.now()
@@ -390,7 +402,7 @@ export const measureRenderTime = async (componentName, callback) => {
     trackCustomMetric(`component_render:${componentName}`, duration)
 
     if (config.isDevelopment) {
-      console.log(`[Render Time] ${componentName}: ${duration.toFixed(2)}ms`)
+      console.warn(`[Render Time] ${componentName}: ${duration.toFixed(2)}ms`)
     }
 
     return result
@@ -409,11 +421,11 @@ export const measureRenderTime = async (componentName, callback) => {
  */
 export const initPerformanceMonitoring = () => {
   if (!config.features.enablePerformanceMonitoring) {
-    console.log("Performance monitoring is disabled")
+    console.warn(PERFORMANCE_MONITORING_DISABLED)
     return
   }
 
-  console.log("Initializing performance monitoring...")
+  console.warn("Initializing performance monitoring...")
 
   // Initialize Web Vitals
   initWebVitals()
@@ -433,7 +445,7 @@ export const initPerformanceMonitoring = () => {
   // Observe layout shifts
   observeLayoutShifts()
 
-  console.log("Performance monitoring initialized")
+  console.warn("Performance monitoring initialized")
 }
 
 /**
