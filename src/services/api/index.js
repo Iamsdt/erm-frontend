@@ -1,8 +1,9 @@
 import axios from "axios"
+
 // import { firebaseAuth } from '../lib/firebase'
 // See src/docs/AUTHENTICATION_PATTERNS.md for authentication implementation examples
-import { reportApiError } from "@/lib/utils/error-handler"
 import { config } from "@/lib/config"
+import { reportApiError } from "@/lib/utils/error-handler"
 
 const instance = axios.create({
   baseURL: config.apiBaseUrl,
@@ -20,7 +21,7 @@ const pendingRequests = new Map()
  * @param {object} config - Axios request config
  * @returns {string} Unique request key
  */
-function generateRequestKey(config) {
+const generateRequestKey = (config) => {
   const { method, url, params, data } = config
   return `${method}:${url}:${JSON.stringify(params)}:${JSON.stringify(data)}`
 }
@@ -29,7 +30,7 @@ function generateRequestKey(config) {
  * Cancel pending request if exists
  * @param {string} requestKey - Request key
  */
-function cancelPendingRequest(requestKey) {
+const cancelPendingRequest = (requestKey) => {
   if (pendingRequests.has(requestKey)) {
     const controller = pendingRequests.get(requestKey)
     controller.abort()
@@ -40,7 +41,7 @@ function cancelPendingRequest(requestKey) {
 /**
  * Cancel all pending requests
  */
-export function cancelAllRequests() {
+export const cancelAllRequests = () => {
   pendingRequests.forEach((controller) => {
     controller.abort()
   })
@@ -51,9 +52,7 @@ export function cancelAllRequests() {
  * Get current number of pending requests
  * @returns {number}
  */
-export function getPendingRequestsCount() {
-  return pendingRequests.size
-}
+export const getPendingRequestsCount = () => pendingRequests.size
 
 // Request interceptor with AbortController support
 instance.interceptors.request.use(
@@ -99,7 +98,9 @@ instance.interceptors.response.use(
     // Log request duration in development
     if (config.isDevelopment && response.config._startTime) {
       const duration = Date.now() - response.config._startTime
-      console.log(`✅ ${response.config.method.toUpperCase()} ${response.config.url} (${duration}ms)`)
+      console.log(
+        `✅ ${response.config.method.toUpperCase()} ${response.config.url} (${duration}ms)`
+      )
     }
 
     return response
@@ -136,7 +137,7 @@ instance.interceptors.response.use(
       //   window.location.href = '/misc/maintenance/'
       // }
     } else {
-      const status = error.response.status
+      const { status } = error.response
 
       switch (status) {
         case 400:

@@ -5,7 +5,6 @@
  * Only enabled when:
  * - VITE_ENABLE_MOCKING is true
  * - Running in development mode
- *
  * @async
  * @function enableMocking
  * @returns {Promise<void>|undefined} A promise that resolves when the mock worker is started, or undefined if disabled.
@@ -16,23 +15,36 @@ export const enableMocking = async () => {
   const isProduction = import.meta.env.PROD
 
   // Don't enable mocking in production or when explicitly disabled
-  if (isProduction || !enableMocking) {
+  if (!enableMocking) {
     if (isProduction) {
-      console.log("Mocking disabled in production")
+      console.warn("Mocking disabled in production")
     } else {
-      console.log("Mocking disabled (VITE_ENABLE_MOCKING=false)")
+      console.warn("Mocking disabled (VITE_ENABLE_MOCKING=false)")
     }
     return
   }
 
-  console.log("Initializing Mock Service Worker...")
+  console.warn("Initializing Mock Service Worker...")
 
   const { worker } = await import("./services/mock")
 
   // `worker.start()` returns a Promise that resolves
   // once the Service Worker is up and ready to intercept requests.
   // eslint-disable-next-line consistent-return
-  return worker.start({
-    onUnhandledRequest: "warn", // Warn about unhandled requests
-  })
+  return worker
+    .start({
+      onUnhandledRequest: "bypass", // Bypass non-API requests instead of warning
+      serviceWorker: {
+        url: "/mockServiceWorker.js",
+        options: {
+          // Only intercept requests to the API base URL
+          scope: "/",
+        },
+      },
+      // Ignore requests to local resources
+      quiet: false,
+    })
+    .catch((error) => {
+      console.error("MSW initialization error, but continuing with app:", error)
+    })
 }
