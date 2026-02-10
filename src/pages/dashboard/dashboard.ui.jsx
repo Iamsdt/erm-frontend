@@ -15,7 +15,7 @@ const DashboardUI = ({
   totalComments,
 }) => {
   return (
-    <div className="bg-gradient-to-br from-slate-100 to-slate-300 dark:from-slate-900 dark:to-slate-800 p-8">
+    <div className="bg-linear-to-br from-slate-100 to-slate-300 dark:from-slate-900 dark:to-slate-800 p-8">
       <div className="max-w-5xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100">
@@ -90,7 +90,7 @@ const DashboardUI = ({
             <span className="mt-2 text-base text-gray-500 dark:text-gray-400">
               See what others are saying and join the conversation!
             </span>
-            <div className="w-24 h-1 mt-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400" />
+            <div className="w-24 h-1 mt-4 rounded-full bg-linear-to-r from-amber-400 via-amber-500 to-yellow-400" />
           </div>
 
           {isLoading && (

@@ -21,7 +21,7 @@ const defaults = {
  * @param {string} key - Environment variable key
  * @param {string|null} defaultValue - Default value if not set
  * @param {boolean} required - Whether the variable is required
- * @returns {string|null}
+ * @returns {string|null} The environment variable value or default
  */
 const getEnvironmentVariable = (key, defaultValue = null, required = false) => {
   const value = import.meta.env[key]
@@ -40,7 +40,7 @@ const getEnvironmentVariable = (key, defaultValue = null, required = false) => {
  * Parse boolean environment variable
  * @param {string|null} value - Environment variable value
  * @param {boolean} defaultValue - Default boolean value
- * @returns {boolean}
+ * @returns {boolean} The parsed boolean value
  */
 const parseBoolean = (value, defaultValue = false) => {
   if (value === null || value === undefined) return defaultValue
@@ -51,7 +51,7 @@ const parseBoolean = (value, defaultValue = false) => {
  * Parse number environment variable
  * @param {string|null} value - Environment variable value
  * @param {number} defaultValue - Default number value
- * @returns {number}
+ * @returns {number} The parsed number value
  */
 const parseNumber = (value, defaultValue) => {
   if (value === null || value === undefined) return defaultValue

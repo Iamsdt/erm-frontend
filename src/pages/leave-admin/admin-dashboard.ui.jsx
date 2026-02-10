@@ -11,6 +11,9 @@ const PENDING_STYLE =
   "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30"
 
 const BLUE_BG = "bg-blue-500"
+const RED_BG = "bg-red-500"
+const EMERALD_BG = "bg-emerald-500"
+const LEAVE_DEFAULT_COLOR = "bg-gray-400"
 
 const STATUS_STYLE = {
   approved:
@@ -21,7 +24,7 @@ const STATUS_STYLE = {
 
 const LEAVE_COLOR = {
   blue: BLUE_BG,
-  red: "bg-red-500",
+  red: RED_BG,
   purple: "bg-purple-500",
   orange: "bg-orange-500",
   cyan: "bg-cyan-500",
@@ -68,13 +71,13 @@ MetricCard.defaultProps = {
   sub: undefined,
 }
 
-const DeptBar = ({ present, onLeave, absent, wfh }) => {
-  const total = present + onLeave + absent + (wfh ?? 0)
+const DeptBar = ({ present, leaveCount, absent, wfh }) => {
+  const total = present + leaveCount + absent + (wfh ?? 0)
   if (total === 0) return null
   return (
     <div className="flex w-full h-2 rounded-full overflow-hidden gap-px">
       <div
-        className="bg-emerald-500 transition-all"
+        className={`${EMERALD_BG} transition-all`}
         style={{ width: `${(present / total) * 100}%` }}
       />
       <div
@@ -83,10 +86,10 @@ const DeptBar = ({ present, onLeave, absent, wfh }) => {
       />
       <div
         className="bg-amber-400 transition-all"
-        style={{ width: `${(onLeave / total) * 100}%` }}
+        style={{ width: `${(leaveCount / total) * 100}%` }}
       />
       <div
-        className="bg-red-500 transition-all"
+        className={`${RED_BG} transition-all`}
         style={{ width: `${(absent / total) * 100}%` }}
       />
     </div>
@@ -95,13 +98,378 @@ const DeptBar = ({ present, onLeave, absent, wfh }) => {
 
 DeptBar.propTypes = {
   present: PropTypes.number.isRequired,
-  onLeave: PropTypes.number.isRequired,
+  leaveCount: PropTypes.number.isRequired,
   absent: PropTypes.number.isRequired,
   wfh: PropTypes.number,
 }
 
 DeptBar.defaultProps = {
   wfh: 0,
+}
+
+// ─── Section Sub-components ───────────────────────────────────────────────────
+
+const LeaveBreakdownAndDeptSection = ({
+  isLoading,
+  leaveBreakdown,
+  totalRequests,
+  departmentStats,
+}) => (
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    {/* Leave Type Breakdown */}
+    <Card className="shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base">Leave Type Breakdown</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <Skeleton key={index} className="h-8 rounded-lg" />
+            ))
+          : leaveBreakdown?.map((item) => {
+              const pct = Math.round((item.count / totalRequests) * 100)
+              return (
+                <div key={item.type}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full ${LEAVE_COLOR[item.color] ?? LEAVE_DEFAULT_COLOR}`}
+                      />
+                      <span className="text-sm font-medium">{item.type}</span>
+                    </div>
+                    <span className="text-sm font-bold">{item.count}</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${LEAVE_COLOR[item.color] ?? LEAVE_DEFAULT_COLOR}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+      </CardContent>
+    </Card>
+
+    {/* Department Stats */}
+    <Card className="shadow-sm lg:col-span-2">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base">Department Overview</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Skeleton key={index} className="h-10 mb-2 rounded-lg" />
+          ))
+        ) : (
+          <div className="space-y-3">
+            {departmentStats?.map((dept) => (
+              <div key={dept.department}>
+                <div className="flex items-center justify-between mb-1 text-sm">
+                  <span className="font-medium w-28 truncate">
+                    {dept.department}
+                  </span>
+                  <div className="flex gap-2 text-xs text-muted-foreground">
+                    <span className="text-emerald-600 font-semibold">
+                      ✓ {dept.present}
+                    </span>
+                    <span className="text-cyan-600 font-semibold">
+                      🏠 {dept.wfh ?? 0}
+                    </span>
+                    <span className="text-amber-600 font-semibold">
+                      ⏳ {dept.onLeave}
+                    </span>
+                    <span className="text-red-500 font-semibold">
+                      ✗ {dept.absent}
+                    </span>
+                  </div>
+                </div>
+                <DeptBar
+                  present={dept.present}
+                  leaveCount={dept.onLeave}
+                  absent={dept.absent}
+                  wfh={dept.wfh}
+                />
+              </div>
+            ))}
+            <div className="flex flex-wrap gap-3 pt-2 border-t mt-2">
+              {[
+                [EMERALD_BG, "Present"],
+                ["bg-cyan-400", "WFH"],
+                ["bg-amber-400", "On Leave"],
+                [RED_BG, "Absent"],
+              ].map(([cls, lbl]) => (
+                <div key={lbl} className="flex items-center gap-1.5">
+                  <div className={`w-2.5 h-2.5 rounded-full ${cls}`} />
+                  <span className="text-xs text-muted-foreground">{lbl}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+)
+
+LeaveBreakdownAndDeptSection.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  leaveBreakdown: PropTypes.arrayOf(
+    PropTypes.shape({
+      type: PropTypes.string,
+      count: PropTypes.number,
+      color: PropTypes.string,
+    })
+  ),
+  totalRequests: PropTypes.number.isRequired,
+  departmentStats: PropTypes.arrayOf(
+    PropTypes.shape({
+      department: PropTypes.string,
+      onLeave: PropTypes.number,
+      absent: PropTypes.number,
+      present: PropTypes.number,
+      wfh: PropTypes.number,
+    })
+  ),
+}
+
+LeaveBreakdownAndDeptSection.defaultProps = {
+  leaveBreakdown: undefined,
+  departmentStats: undefined,
+}
+
+const TopLeaveTakersCard = ({ isLoading, topLeaveTakers }) => (
+  <Card className="shadow-sm">
+    <CardHeader className="pb-2">
+      <CardTitle className="text-base flex items-center gap-2">
+        🏆 Top Leave Takers This Month
+        <span className="text-xs text-muted-foreground font-normal">
+          by total days away
+        </span>
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      {isLoading ? (
+        Array.from({ length: 5 }).map((_, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Skeleton key={index} className="h-12 mb-2 rounded-lg" />
+        ))
+      ) : (
+        <div className="space-y-2">
+          {topLeaveTakers?.map((emp, index) => {
+            const maxDays = topLeaveTakers?.[0]?.totalDays || 1
+            const barW = Math.round((emp.totalDays / maxDays) * 100)
+            return (
+              <div key={emp.id} className="flex items-center gap-3">
+                {/* Rank */}
+                <span
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                    index === 0
+                      ? "bg-yellow-400 text-yellow-900"
+                      : index === 1
+                        ? "bg-slate-300 text-slate-700"
+                        : index === 2
+                          ? "bg-amber-600 text-white"
+                          : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                {/* Name & dept */}
+                <div className="w-40 shrink-0">
+                  <p className="text-sm font-semibold leading-none">
+                    {emp.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {emp.department}
+                  </p>
+                </div>
+                {/* Bar */}
+                <div className="flex-1 h-2.5 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${BLUE_BG} rounded-full transition-all`}
+                    style={{ width: `${barW}%` }}
+                  />
+                </div>
+                {/* Days + types */}
+                <div className="shrink-0 text-right">
+                  <span className="text-sm font-bold">{emp.totalDays}d</span>
+                  <div className="flex gap-1 mt-0.5 justify-end flex-wrap">
+                    {emp.types.map((t) => (
+                      <span
+                        key={t}
+                        className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </CardContent>
+  </Card>
+)
+
+TopLeaveTakersCard.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  topLeaveTakers: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      department: PropTypes.string,
+      totalDays: PropTypes.number,
+      types: PropTypes.arrayOf(PropTypes.string),
+    })
+  ),
+}
+
+TopLeaveTakersCard.defaultProps = {
+  topLeaveTakers: undefined,
+}
+
+const ApprovalsAndActivitySection = ({
+  isLoading,
+  pendingApprovals,
+  recentActivity,
+}) => (
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    {/* Pending Approvals preview */}
+    <Card className="shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2">
+          Pending Approvals
+          {!isLoading && (
+            <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30 text-xs">
+              {pendingApprovals?.length}
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {isLoading
+          ? Array.from({ length: 3 }).map((_, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <Skeleton key={index} className="h-14 rounded-lg" />
+            ))
+          : pendingApprovals?.slice(0, 5).map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50 gap-2"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold leading-none truncate">
+                    {item.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {item.type} · {item.from} → {item.to}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] px-1.5 ${SUBTYPE_BADGE[item.subType] ?? ""}`}
+                  >
+                    {SUBTYPE_LABEL[item.subType] ?? item.subType}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {item.days}d
+                  </Badge>
+                </div>
+              </div>
+            ))}
+      </CardContent>
+    </Card>
+
+    {/* Recent Activity */}
+    <Card className="shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base">Recent Activity</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Skeleton key={index} className="h-10 mb-2 rounded-lg" />
+          ))
+        ) : (
+          <div className="space-y-1">
+            {recentActivity?.map((item, index) => (
+              <div key={item.id}>
+                <div className="flex items-center justify-between py-2 text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div
+                      className={`w-2 h-2 rounded-full shrink-0 ${
+                        item.action.includes("Approved")
+                          ? EMERALD_BG
+                          : item.action.includes("Rejected")
+                            ? RED_BG
+                            : item.action.includes("Absent")
+                              ? "bg-red-400"
+                              : BLUE_BG
+                      }`}
+                    />
+                    <span className="font-medium truncate">{item.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 ml-2">
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                        item.action.includes("Approved")
+                          ? STATUS_STYLE.approved
+                          : item.action.includes("Rejected")
+                            ? STATUS_STYLE.rejected
+                            : STATUS_STYLE.pending
+                      }`}
+                    >
+                      {item.action}
+                    </span>
+                    <span className="text-xs text-muted-foreground hidden sm:block">
+                      {item.date}
+                    </span>
+                  </div>
+                </div>
+                {index < (recentActivity?.length ?? 0) - 1 && <Separator />}
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+)
+
+ApprovalsAndActivitySection.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  pendingApprovals: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string,
+      type: PropTypes.string,
+      subType: PropTypes.string,
+      from: PropTypes.string,
+      to: PropTypes.string,
+      days: PropTypes.number,
+    })
+  ),
+  recentActivity: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string,
+      action: PropTypes.string,
+      type: PropTypes.string,
+      date: PropTypes.string,
+    })
+  ),
+}
+
+ApprovalsAndActivitySection.defaultProps = {
+  pendingApprovals: undefined,
+  recentActivity: undefined,
 }
 
 // ─── Main UI ──────────────────────────────────────────────────────────────────
@@ -146,6 +514,7 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
       {isLoading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <Skeleton key={index} className="h-24 rounded-xl" />
           ))}
         </div>
@@ -186,6 +555,7 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
       {isLoading ? (
         <div className="grid grid-cols-2 gap-3">
           {Array.from({ length: 2 }).map((_, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <Skeleton key={index} className="h-20 rounded-xl" />
           ))}
         </div>
@@ -208,287 +578,21 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Leave Type Breakdown */}
-        <Card className="shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Leave Type Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {isLoading
-              ? Array.from({ length: 6 }).map((_, index) => (
-                  <Skeleton key={index} className="h-8 rounded-lg" />
-                ))
-              : data?.leaveBreakdown?.map((item) => {
-                  const pct = Math.round((item.count / totalRequests) * 100)
-                  return (
-                    <div key={item.type}>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`w-2.5 h-2.5 rounded-full ${LEAVE_COLOR[item.color] ?? "bg-gray-400"}`}
-                          />
-                          <span className="text-sm font-medium">
-                            {item.type}
-                          </span>
-                        </div>
-                        <span className="text-sm font-bold">{item.count}</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all ${LEAVE_COLOR[item.color] ?? "bg-gray-400"}`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
-          </CardContent>
-        </Card>
-
-        {/* Department Stats */}
-        <Card className="shadow-sm lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Department Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, index) => (
-                <Skeleton key={index} className="h-10 mb-2 rounded-lg" />
-              ))
-            ) : (
-              <div className="space-y-3">
-                {data?.departmentStats?.map((dept) => (
-                  <div key={dept.department}>
-                    <div className="flex items-center justify-between mb-1 text-sm">
-                      <span className="font-medium w-28 truncate">
-                        {dept.department}
-                      </span>
-                      <div className="flex gap-2 text-xs text-muted-foreground">
-                        <span className="text-emerald-600 font-semibold">
-                          ✓ {dept.present}
-                        </span>
-                        <span className="text-cyan-600 font-semibold">
-                          🏠 {dept.wfh ?? 0}
-                        </span>
-                        <span className="text-amber-600 font-semibold">
-                          ⏳ {dept.onLeave}
-                        </span>
-                        <span className="text-red-500 font-semibold">
-                          ✗ {dept.absent}
-                        </span>
-                      </div>
-                    </div>
-                    <DeptBar
-                      present={dept.present}
-                      onLeave={dept.onLeave}
-                      absent={dept.absent}
-                      wfh={dept.wfh}
-                    />
-                  </div>
-                ))}
-                <div className="flex flex-wrap gap-3 pt-2 border-t mt-2">
-                  {[
-                    ["bg-emerald-500", "Present"],
-                    ["bg-cyan-400", "WFH"],
-                    ["bg-amber-400", "On Leave"],
-                    ["bg-red-500", "Absent"],
-                  ].map(([cls, lbl]) => (
-                    <div key={lbl} className="flex items-center gap-1.5">
-                      <div className={`w-2.5 h-2.5 rounded-full ${cls}`} />
-                      <span className="text-xs text-muted-foreground">
-                        {lbl}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Top Leave Takers */}
-      <Card className="shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            🏆 Top Leave Takers This Month
-            <span className="text-xs text-muted-foreground font-normal">
-              by total days away
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            Array.from({ length: 5 }).map((_, index) => (
-              <Skeleton key={index} className="h-12 mb-2 rounded-lg" />
-            ))
-          ) : (
-            <div className="space-y-2">
-              {data?.topLeaveTakers?.map((emp, index) => {
-                const maxDays = data?.topLeaveTakers?.[0]?.totalDays || 1
-                const barW = Math.round((emp.totalDays / maxDays) * 100)
-                return (
-                  <div key={emp.id} className="flex items-center gap-3">
-                    {/* Rank */}
-                    <span
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                        index === 0
-                          ? "bg-yellow-400 text-yellow-900"
-                          : index === 1
-                            ? "bg-slate-300 text-slate-700"
-                            : index === 2
-                              ? "bg-amber-600 text-white"
-                              : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {index + 1}
-                    </span>
-                    {/* Name & dept */}
-                    <div className="w-40 shrink-0">
-                      <p className="text-sm font-semibold leading-none">
-                        {emp.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {emp.department}
-                      </p>
-                    </div>
-                    {/* Bar */}
-                    <div className="flex-1 h-2.5 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${BLUE_BG} rounded-full transition-all`}
-                        style={{ width: `${barW}%` }}
-                      />
-                    </div>
-                    {/* Days + types */}
-                    <div className="shrink-0 text-right">
-                      <span className="text-sm font-bold">
-                        {emp.totalDays}d
-                      </span>
-                      <div className="flex gap-1 mt-0.5 justify-end flex-wrap">
-                        {emp.types.map((t) => (
-                          <span
-                            key={t}
-                            className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Pending Approvals preview */}
-        <Card className="shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              Pending Approvals
-              {!isLoading && (
-                <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30 text-xs">
-                  {data?.pendingApprovals?.length}
-                </Badge>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {isLoading
-              ? Array.from({ length: 3 }).map((_, index) => (
-                  <Skeleton key={index} className="h-14 rounded-lg" />
-                ))
-              : data?.pendingApprovals?.slice(0, 5).map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50 gap-2"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold leading-none truncate">
-                        {item.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {item.type} · {item.from} → {item.to}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] px-1.5 ${SUBTYPE_BADGE[item.subType] ?? ""}`}
-                      >
-                        {SUBTYPE_LABEL[item.subType] ?? item.subType}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {item.days}d
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card className="shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} className="h-10 mb-2 rounded-lg" />
-              ))
-            ) : (
-              <div className="space-y-1">
-                {data?.recentActivity?.map((item, index) => (
-                  <div key={item.id}>
-                    <div className="flex items-center justify-between py-2 text-sm">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div
-                          className={`w-2 h-2 rounded-full shrink-0 ${
-                            item.action.includes("Approved")
-                              ? "bg-emerald-500"
-                              : item.action.includes("Rejected")
-                                ? "bg-red-500"
-                                : item.action.includes("Absent")
-                                  ? "bg-red-400"
-                                  : BLUE_BG
-                          }`}
-                        />
-                        <span className="font-medium truncate">
-                          {item.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0 ml-2">
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
-                            item.action.includes("Approved")
-                              ? STATUS_STYLE.approved
-                              : item.action.includes("Rejected")
-                                ? STATUS_STYLE.rejected
-                                : STATUS_STYLE.pending
-                          }`}
-                        >
-                          {item.action}
-                        </span>
-                        <span className="text-xs text-muted-foreground hidden sm:block">
-                          {item.date}
-                        </span>
-                      </div>
-                    </div>
-                    {index < (data?.recentActivity?.length ?? 0) - 1 && (
-                      <Separator />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <LeaveBreakdownAndDeptSection
+        isLoading={isLoading}
+        leaveBreakdown={data?.leaveBreakdown}
+        totalRequests={totalRequests}
+        departmentStats={data?.departmentStats}
+      />
+      <TopLeaveTakersCard
+        isLoading={isLoading}
+        topLeaveTakers={data?.topLeaveTakers}
+      />
+      <ApprovalsAndActivitySection
+        isLoading={isLoading}
+        pendingApprovals={data?.pendingApprovals}
+        recentActivity={data?.recentActivity}
+      />
     </div>
   )
 }

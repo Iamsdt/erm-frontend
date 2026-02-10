@@ -33,7 +33,7 @@ export const useRequestCancellation = () => {
 /**
  * Custom hook to create an AbortController for manual request cancellation
  * Useful for cancelling requests on user actions (e.g., navigation, button clicks)
- * @returns {{ signal: AbortSignal|null, cancel: Function }}
+ * @returns {{ signal: (AbortController['signal']|null), cancel: () => void }} The abort signal and cancel function
  * @example
  * function SearchComponent() {
  *   const { signal, cancel } = useAbortController()
@@ -92,10 +92,10 @@ export const useAbortController = () => {
 /**
  * Custom hook to automatically cancel requests when a dependency changes
  * Useful for search inputs, filters, etc.
- * @param {Function} requestFunction - Function that makes the API request
+ * @param {(...args: unknown[]) => unknown} requestFunction - Function that makes the API request
  * @param {Array} deps - Dependencies to watch for changes
  * @param {object} options - Configuration options
- * @returns {{ cancel: Function }}
+ * @returns {{ cancel: () => void }} The cancel function to abort in-flight requests
  * @example
  * function SearchComponent({ searchTerm }) {
  *   const { isLoading, error, cancel } = useCancellableRequest(

@@ -32,10 +32,10 @@ const ApprovalsPage = () => {
     approveLeave(
       { id, status, note: noteMap[id] ?? "" },
       {
-        onSuccess: (res) => {
+        onSuccess: (response) => {
           toast({
             title: status === "approved" ? "Approved ✓" : "Rejected",
-            description: res.data?.message,
+            description: response.data?.message,
           })
         },
         onError: () => {
@@ -53,6 +53,8 @@ const ApprovalsPage = () => {
     setNoteMap((previous) => ({ ...previous, [id]: value }))
   }
 
+  const handleFilterChange = (value) => setFilter(value)
+
   return (
     <ApprovalsUI
       requests={data ?? []}
@@ -60,7 +62,7 @@ const ApprovalsPage = () => {
       isError={isError}
       isActing={isActing}
       filter={filter}
-      onFilterChange={setFilter}
+      onFilterChange={handleFilterChange}
       noteMap={noteMap}
       onNoteChange={handleNoteChange}
       onAction={handleAction}

@@ -46,7 +46,7 @@ const ROLE_LABELS = {
  * LeaveRoleGuard — protects leave module routes by `leave_management_role`.
  * Shows a funny unauthorized page with a countdown before navigating back.
  * @param {object} props - Component props
- * @param {React.ReactElement} props.children - Child components to render if access is granted
+ * @param {import('react').ReactElement} props.children - Child components to render if access is granted
  * @param {string[]} props.allowedRoles - Array of roles that have access
  */
 const LeaveRoleGuard = ({ children, allowedRoles }) => {

@@ -68,7 +68,7 @@ export const reportError = (errorData) => {
  * CURRENTLY DISABLED - Sentry integration is commented out
  *
  * To enable Sentry:
- * 1. Install: npm install @sentry/react
+ * 1. Install: npm install `@sentry/react`
  * 2. Configure: Set VITE_SENTRY_DSN in your .env file
  * 3. Uncomment the code in reportError() function
  * 4. Uncomment this function

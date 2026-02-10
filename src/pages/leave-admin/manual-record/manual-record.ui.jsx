@@ -49,8 +49,19 @@ const HALF_DAY_SLOTS = [
   { value: "afternoon", label: "🌇 Afternoon (PM)" },
 ]
 
+const ManualInfoCallout = () => (
+  <div className="flex gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-sm text-blue-700 dark:text-blue-400">
+    <span className="shrink-0 mt-0.5">ℹ️</span>
+    <p>
+      This action will override the employee&apos;s attendance record for the
+      selected date. The employee will be notified automatically.
+    </p>
+  </div>
+)
+
+/* eslint-disable react/jsx-handler-names */
 /**
- * ManualRecordUI — form for admin to manually record an employee's attendance status.
+ * ManualRecordUI — form for admin to manually record an employee attendance status.
  */
 const ManualRecordUI = ({
   form,
@@ -68,7 +79,7 @@ const ManualRecordUI = ({
           Manual Attendance Record
         </h1>
         <p className="text-muted-foreground text-sm mt-0.5">
-          Override or manually record an employee's attendance status for a
+          Override or manually record an employee&apos;s attendance status for a
           specific date.
         </p>
       </div>
@@ -245,14 +256,7 @@ const ManualRecordUI = ({
               />
 
               {/* Info callout */}
-              <div className="flex gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-sm text-blue-700 dark:text-blue-400">
-                <span className="shrink-0 mt-0.5">ℹ️</span>
-                <p>
-                  This action will override the employee's attendance record for
-                  the selected date. The employee will be notified
-                  automatically.
-                </p>
-              </div>
+              <ManualInfoCallout />
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Saving…" : "Save Record"}
@@ -264,6 +268,7 @@ const ManualRecordUI = ({
     </div>
   )
 }
+/* eslint-enable react/jsx-handler-names */
 
 ManualRecordUI.propTypes = {
   form: PropTypes.object.isRequired,

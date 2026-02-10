@@ -11,11 +11,15 @@ import {
   postManualRecord,
 } from "@api/leave.api"
 
+const QUERY_KEY_ADMIN_SUMMARY = "leave-admin-summary"
+const QUERY_KEY_EMPLOYEE_PROFILE = "leave-employee-profile"
+const QUERY_KEY_ADMIN_APPROVALS = "leave-admin-approvals"
+
 /**
  * React Query hook for fetching monthly attendance data.
- * @param {number} year
+ * @param {number} year - The full year (e.g. 2025)
  * @param {number} month - 0-indexed (0=Jan)
- * @returns {import("@tanstack/react-query").UseQueryResult}
+ * @returns {import("@tanstack/react-query").UseQueryResult} The query result with monthly attendance data
  */
 export const useFetchMonthlyAttendance = (year, month) => {
   return useQuery({
@@ -31,11 +35,11 @@ export const useFetchMonthlyAttendance = (year, month) => {
 
 /**
  * React Query hook for fetching the admin leave dashboard summary.
- * @returns {import("@tanstack/react-query").UseQueryResult}
+ * @returns {import("@tanstack/react-query").UseQueryResult} The query result with admin leave summary
  */
 export const useFetchAdminLeaveSummary = () => {
   return useQuery({
-    queryKey: ["leave-admin-summary"],
+    queryKey: [QUERY_KEY_ADMIN_SUMMARY],
     queryFn: async ({ signal }) => {
       const response = await getAdminLeaveSummary({ signal })
       return response.data
@@ -47,11 +51,11 @@ export const useFetchAdminLeaveSummary = () => {
 
 /**
  * React Query hook for fetching the current employee's leave profile.
- * @returns {import("@tanstack/react-query").UseQueryResult}
+ * @returns {import("@tanstack/react-query").UseQueryResult} The query result with the employee leave profile
  */
 export const useFetchEmployeeLeaveProfile = () => {
   return useQuery({
-    queryKey: ["leave-employee-profile"],
+    queryKey: [QUERY_KEY_EMPLOYEE_PROFILE],
     queryFn: async ({ signal }) => {
       const response = await getEmployeeLeaveProfile({ signal })
       return response.data
@@ -63,11 +67,11 @@ export const useFetchEmployeeLeaveProfile = () => {
 
 /**
  * React Query hook for fetching the full admin approvals list.
- * @returns {import("@tanstack/react-query").UseQueryResult}
+ * @returns {import("@tanstack/react-query").UseQueryResult} The query result with all leave approval requests
  */
 export const useFetchAdminApprovals = () => {
   return useQuery({
-    queryKey: ["leave-admin-approvals"],
+    queryKey: [QUERY_KEY_ADMIN_APPROVALS],
     queryFn: async ({ signal }) => {
       const response = await getAdminApprovals({ signal })
       return response.data
@@ -79,7 +83,7 @@ export const useFetchAdminApprovals = () => {
 
 /**
  * React Query hook for fetching the employee list (for manual record form).
- * @returns {import("@tanstack/react-query").UseQueryResult}
+ * @returns {import("@tanstack/react-query").UseQueryResult} The query result with the list of employees
  */
 export const useFetchAdminEmployees = () => {
   return useQuery({
@@ -103,8 +107,8 @@ export const useApproveLeave = () => {
   return useMutation({
     mutationFn: ({ id, status, note }) => patchLeaveApproval(id, status, note),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leave-admin-approvals"] })
-      queryClient.invalidateQueries({ queryKey: ["leave-admin-summary"] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_APPROVALS] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_SUMMARY] })
     },
   })
 }
@@ -129,7 +133,7 @@ export const usePostLeaveRequest = () => {
   return useMutation({
     mutationFn: (payload) => postLeaveRequest(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leave-employee-profile"] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEE_PROFILE] })
     },
   })
 }

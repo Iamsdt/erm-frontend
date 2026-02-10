@@ -240,6 +240,7 @@ const ApprovalsUI = ({
         <div className="space-y-3">
           {}
           {Array.from({ length: 4 }).map((_, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <Skeleton key={`skeleton-${index}`} className="h-36 rounded-xl" />
           ))}
         </div>

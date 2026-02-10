@@ -47,6 +47,7 @@ const ManualRecordPage = () => {
     },
   })
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const recordType = form.watch("recordType")
 
   useEffect(() => {
