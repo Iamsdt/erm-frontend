@@ -18,18 +18,33 @@ const guard = (element, allowedRoles) => (
 )
 
 const mainRoutes = [
-  { path: ct.route.ROOT,                       element: <Dashboard /> },
-  { path: "/comments",                         element: <Comments /> },
-  { path: ct.route.leave.CALENDAR,             element: <LeaveCalendar /> },
+  { path: ct.route.ROOT, element: <Dashboard /> },
+  { path: "/comments", element: <Comments /> },
+  { path: ct.route.leave.CALENDAR, element: <LeaveCalendar /> },
 
   // Admin-only routes
-  { path: ct.route.leave.ADMIN_DASHBOARD,      element: guard(<AdminDashboard />,   ["admin"]) },
-  { path: ct.route.leave.ADMIN_APPROVALS,      element: guard(<ApprovalsPage />,    ["admin"]) },
-  { path: ct.route.leave.ADMIN_MANUAL_RECORD,  element: guard(<ManualRecordPage />, ["admin"]) },
+  {
+    path: ct.route.leave.ADMIN_DASHBOARD,
+    element: guard(<AdminDashboard />, ["admin"]),
+  },
+  {
+    path: ct.route.leave.ADMIN_APPROVALS,
+    element: guard(<ApprovalsPage />, ["admin"]),
+  },
+  {
+    path: ct.route.leave.ADMIN_MANUAL_RECORD,
+    element: guard(<ManualRecordPage />, ["admin"]),
+  },
 
   // Employee-only routes
-  { path: ct.route.leave.EMPLOYEE_DASHBOARD,   element: guard(<EmployeeDashboard />,  ["employee"]) },
-  { path: ct.route.leave.EMPLOYEE_REQUEST,     element: guard(<RequestLeavePage />,   ["employee"]) },
+  {
+    path: ct.route.leave.EMPLOYEE_DASHBOARD,
+    element: guard(<EmployeeDashboard />, ["employee"]),
+  },
+  {
+    path: ct.route.leave.EMPLOYEE_REQUEST,
+    element: guard(<RequestLeavePage />, ["employee"]),
+  },
 ]
 
 export default mainRoutes

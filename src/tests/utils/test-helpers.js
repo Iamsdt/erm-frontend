@@ -1,6 +1,6 @@
 /**
  * Test Helpers
- * 
+ *
  * Additional helper functions for testing
  */
 
@@ -13,7 +13,7 @@ import { vi } from "vitest"
  * @param {string} expectedText - Expected text content
  * @param {Object} options - Wait options
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * await waitForText(() => screen.getByRole('heading'), 'Welcome')
  */
@@ -32,7 +32,7 @@ export async function waitForText(getElement, expectedText, options = {}) {
  * @param {Function} getElement - Function that returns the element
  * @param {Object} options - Wait options
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * await waitForElementToBeRemoved(() => screen.queryByText('Loading...'))
  */
@@ -48,10 +48,10 @@ export async function waitForElementToBeRemoved(getElement, options = {}) {
 /**
  * Wait for async validation
  * Useful for form validation that happens asynchronously
- * 
+ *
  * @param {number} ms - Milliseconds to wait
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * fireEvent.change(input, { target: { value: 'test' } })
  * await waitForValidation()
@@ -64,9 +64,9 @@ export async function waitForValidation(ms = 500) {
 /**
  * Flush all pending promises
  * Useful for waiting for all async operations to complete
- * 
+ *
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * await flushPromises()
  */
@@ -77,9 +77,9 @@ export async function flushPromises() {
 /**
  * Create a deferred promise for manual control
  * Useful for testing loading states
- * 
+ *
  * @returns {Object} Object with promise, resolve, and reject
- * 
+ *
  * @example
  * const { promise, resolve } = createDeferred()
  * mockApi.get.mockReturnValue(promise)
@@ -101,7 +101,7 @@ export function createDeferred() {
  * Create a spy object with methods
  * @param {Array<string>} methods - Method names to spy on
  * @returns {Object} Object with spy methods
- * 
+ *
  * @example
  * const api = createSpy(['get', 'post'])
  * api.get.mockResolvedValue({ data: { id: 1 } })
@@ -119,9 +119,9 @@ export function createSpy(methods = []) {
 /**
  * Create a counter spy
  * Useful for tracking number of calls
- * 
+ *
  * @returns {Object} Counter object with methods
- * 
+ *
  * @example
  * const counter = createCounter()
  * counter.increment() // count = 1
@@ -143,7 +143,7 @@ export function createCounter() {
  * @param {HTMLElement} element - Element to check
  * @param {string} attribute - Attribute name
  * @param {string} value - Expected value
- * 
+ *
  * @example
  * assertAttribute(button, 'disabled', 'true')
  */
@@ -155,7 +155,7 @@ export function assertAttribute(element, attribute, value) {
  * Assert that element has class
  * @param {HTMLElement} element - Element to check
  * @param {string} className - Class name
- * 
+ *
  * @example
  * assertClass(button, 'btn-primary')
  */
@@ -166,7 +166,7 @@ export function assertClass(element, className) {
 /**
  * Assert that element is visible
  * @param {HTMLElement} element - Element to check
- * 
+ *
  * @example
  * assertVisible(modal)
  */
@@ -177,7 +177,7 @@ export function assertVisible(element) {
 /**
  * Assert that element is not visible
  * @param {HTMLElement} element - Element to check
- * 
+ *
  * @example
  * assertNotVisible(modal)
  */
@@ -189,7 +189,7 @@ export function assertNotVisible(element) {
  * Assert that function was called with
  * @param {Function} fn - Mock function
  * @param {Array} args - Expected arguments
- * 
+ *
  * @example
  * assertCalledWith(mockFn, [1, 'test'])
  */
@@ -201,7 +201,7 @@ export function assertCalledWith(fn, args) {
  * Assert that function was called times
  * @param {Function} fn - Mock function
  * @param {number} times - Expected number of calls
- * 
+ *
  * @example
  * assertCalledTimes(mockFn, 3)
  */
@@ -212,7 +212,7 @@ export function assertCalledTimes(fn, times) {
 /**
  * Create a mock timer and advance time
  * @returns {Object} Timer control object
- * 
+ *
  * @example
  * const timer = useFakeTimers()
  * // ... code with timers ...
@@ -233,10 +233,10 @@ export function useFakeTimers() {
 /**
  * Create a mock console
  * Useful for testing console output
- * 
+ *
  * @param {Array<string>} methods - Console methods to mock
  * @returns {Object} Mock console with restore function
- * 
+ *
  * @example
  * const console = mockConsole(['log', 'error'])
  * // ... test code ...
@@ -266,10 +266,10 @@ export function mockConsole(methods = ["log", "error", "warn"]) {
 /**
  * Test a11y (accessibility)
  * Checks for basic accessibility violations
- * 
+ *
  * @param {HTMLElement} container - Container element
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * const { container } = render(<MyComponent />)
  * await testA11y(container)
@@ -303,7 +303,7 @@ export async function testA11y(container) {
  * Create a mock implementation that cycles through values
  * @param {Array} values - Values to cycle through
  * @returns {Function} Mock function
- * 
+ *
  * @example
  * const mock = createCyclicMock([1, 2, 3])
  * mock() // returns 1
@@ -324,10 +324,10 @@ export function createCyclicMock(values) {
 /**
  * Create a mock implementation that calls original function
  * Useful for spying on functions without changing behavior
- * 
+ *
  * @param {Function} fn - Original function
  * @returns {Function} Spy function
- * 
+ *
  * @example
  * const originalFn = (x) => x * 2
  * const spy = createPassThroughSpy(originalFn)
@@ -341,7 +341,7 @@ export function createPassThroughSpy(fn) {
 /**
  * Wait for next tick
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * await waitForNextTick()
  */
@@ -353,7 +353,7 @@ export async function waitForNextTick() {
  * Create a mock ref
  * @param {*} current - Initial current value
  * @returns {Object} Ref object
- * 
+ *
  * @example
  * const ref = createMockRef(null)
  */
@@ -366,13 +366,15 @@ export function createMockRef(current = null) {
  * @param {HTMLElement} container - Container element
  * @param {string} text - Text to find
  * @returns {HTMLElement|null} Found element
- * 
+ *
  * @example
  * const button = findByTextContent(container, 'click me')
  */
 export function findByTextContent(container, text) {
   const regex = new RegExp(text, "i")
-  return Array.from(container.querySelectorAll("*")).find((element) => regex.test(element.textContent))
+  return Array.from(container.querySelectorAll("*")).find((element) =>
+    regex.test(element.textContent)
+  )
 }
 
 /**
@@ -380,13 +382,15 @@ export function findByTextContent(container, text) {
  * @param {HTMLElement} container - Container element
  * @param {string} text - Text to find
  * @returns {Array<HTMLElement>} Found elements
- * 
+ *
  * @example
  * const buttons = getAllByTextContent(container, 'click')
  */
 export function getAllByTextContent(container, text) {
   const regex = new RegExp(text, "i")
-  return Array.from(container.querySelectorAll("*")).filter((element) => regex.test(element.textContent))
+  return Array.from(container.querySelectorAll("*")).filter((element) =>
+    regex.test(element.textContent)
+  )
 }
 
 export default {

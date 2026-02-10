@@ -1,6 +1,6 @@
 /**
  * API Response Test Fixtures
- * 
+ *
  * Predefined API responses for mocking
  */
 

@@ -22,11 +22,7 @@ const AdminDashboard = () => {
   }, [error])
 
   return (
-    <AdminDashboardUI
-      data={data}
-      isLoading={isLoading}
-      isError={isError}
-    />
+    <AdminDashboardUI data={data} isLoading={isLoading} isError={isError} />
   )
 }
 

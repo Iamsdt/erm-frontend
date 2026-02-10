@@ -1,6 +1,6 @@
 /**
  * Test Utilities
- * 
+ *
  * Custom render functions and utilities for testing React components
  * with all necessary providers (Redux, React Query, Router, Theme, etc.)
  */
@@ -59,7 +59,7 @@ export function createTestQueryClient(config = {}) {
 
 /**
  * Custom render function that wraps component with all providers
- * 
+ *
  * @param {React.ReactElement} ui - Component to render
  * @param {Object} options - Render options
  * @param {Object} options.preloadedState - Initial Redux state
@@ -70,7 +70,7 @@ export function createTestQueryClient(config = {}) {
  * @param {string} options.route - Initial route
  * @param {Object} options.theme - Theme config
  * @returns {Object} Render result with additional utilities
- * 
+ *
  * @example
  * const { store, queryClient } = renderWithProviders(<MyComponent />, {
  *   preloadedState: { user: { name: 'John' } },
@@ -120,7 +120,14 @@ export function renderWithProviders(
  * @param {Object} options - Render options
  * @returns {Object} Render result with store
  */
-export function renderWithRedux(ui, { preloadedState = {}, store = createTestStore(preloadedState), ...renderOptions } = {}) {
+export function renderWithRedux(
+  ui,
+  {
+    preloadedState = {},
+    store = createTestStore(preloadedState),
+    ...renderOptions
+  } = {}
+) {
   function Wrapper({ children }) {
     return <Provider store={store}>{children}</Provider>
   }
@@ -137,9 +144,14 @@ export function renderWithRedux(ui, { preloadedState = {}, store = createTestSto
  * @param {Object} options - Render options
  * @returns {Object} Render result with queryClient
  */
-export function renderWithQuery(ui, { queryClient = createTestQueryClient(), ...renderOptions } = {}) {
+export function renderWithQuery(
+  ui,
+  { queryClient = createTestQueryClient(), ...renderOptions } = {}
+) {
   function Wrapper({ children }) {
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
   }
 
   return {
@@ -154,7 +166,15 @@ export function renderWithQuery(ui, { queryClient = createTestQueryClient(), ...
  * @param {Object} options - Render options
  * @returns {Object} Render result
  */
-export function renderWithRouter(ui, { initialEntries = ["/"], initialIndex = 0, route = "/", ...renderOptions } = {}) {
+export function renderWithRouter(
+  ui,
+  {
+    initialEntries = ["/"],
+    initialIndex = 0,
+    route = "/",
+    ...renderOptions
+  } = {}
+) {
   const entries = route !== "/" ? [route] : initialEntries
 
   function Wrapper({ children }) {
@@ -171,11 +191,11 @@ export function renderWithRouter(ui, { initialEntries = ["/"], initialIndex = 0,
 /**
  * Wait for loading to complete
  * Useful for components with loading states
- * 
+ *
  * @param {Object} screen - Testing Library screen
  * @param {number} timeout - Timeout in ms
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * await waitForLoadingToFinish(screen)
  */
@@ -205,12 +225,12 @@ export async function waitForLoadingToFinish(screen, timeout = 3000) {
 /**
  * Simulate user typing with delay
  * More realistic than fireEvent.change
- * 
+ *
  * @param {HTMLElement} element - Input element
  * @param {string} value - Value to type
  * @param {number} delay - Delay between keystrokes in ms
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * await userType(screen.getByRole('textbox'), 'Hello World')
  */
@@ -234,11 +254,15 @@ export async function userType(element, value, delay = 50) {
  * @param {number} size - File size in bytes
  * @param {string} type - MIME type
  * @returns {File}
- * 
+ *
  * @example
  * const file = createMockFile('test.jpg', 1024, 'image/jpeg')
  */
-export function createMockFile(name = "test.txt", size = 1024, type = "text/plain") {
+export function createMockFile(
+  name = "test.txt",
+  size = 1024,
+  type = "text/plain"
+) {
   const blob = new Blob(["a".repeat(size)], { type })
   return new File([blob], name, { type })
 }
@@ -254,7 +278,9 @@ export function mockIntersectionObserver() {
 
     observe() {
       // Immediately trigger callback
-      this.callback([{ isIntersecting: true, target: document.createElement("div") }])
+      this.callback([
+        { isIntersecting: true, target: document.createElement("div") },
+      ])
     }
 
     unobserve() {}
@@ -343,10 +369,10 @@ export function mockScrollTo() {
 /**
  * Create a promise that resolves after a delay
  * Useful for testing loading states
- * 
+ *
  * @param {number} ms - Delay in milliseconds
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * await delay(1000) // Wait 1 second
  */
@@ -358,7 +384,7 @@ export function delay(ms) {
  * Suppress console methods during tests
  * @param {Array<string>} methods - Console methods to suppress
  * @returns {Function} Cleanup function
- * 
+ *
  * @example
  * const restore = suppressConsole(['error', 'warn'])
  * // ... test code ...

@@ -1,6 +1,6 @@
 /**
  * Error Handler Utility
- * 
+ *
  * Centralized error handling and reporting functionality.
  * Supports integration with error monitoring services like Sentry.
  */
@@ -22,7 +22,7 @@ const errorQueue = []
 
 /**
  * Reports an error to the error monitoring service
- * 
+ *
  * @param {object} errorData - Error data to report
  * @param {Error} errorData.error - The error object
  * @param {object} errorData.errorInfo - Additional error information
@@ -65,15 +65,15 @@ export const reportError = (errorData) => {
 
 /**
  * Reports error to Sentry (if configured)
- * 
+ *
  * CURRENTLY DISABLED - Sentry integration is commented out
- * 
+ *
  * To enable Sentry:
  * 1. Install: npm install @sentry/react
  * 2. Configure: Set VITE_SENTRY_DSN in your .env file
  * 3. Uncomment the code in reportError() function
  * 4. Uncomment this function
- * 
+ *
  * @param {object} errorReport - Error report data
  */
 // const reportToSentry = async (errorReport) => {
@@ -104,7 +104,7 @@ export const reportError = (errorData) => {
 
 /**
  * Reports API error
- * 
+ *
  * @param {object} apiError - API error data
  * @param {string} apiError.url - API endpoint URL
  * @param {number} apiError.status - HTTP status code
@@ -172,9 +172,10 @@ export const initGlobalErrorHandlers = () => {
   // Handle unhandled promise rejections
   window.addEventListener("unhandledrejection", (event) => {
     const errorData = {
-      error: event.reason instanceof Error
-        ? event.reason
-        : new Error(String(event.reason)),
+      error:
+        event.reason instanceof Error
+          ? event.reason
+          : new Error(String(event.reason)),
       errorInfo: {
         type: "UNHANDLED_REJECTION",
         reason: event.reason,
@@ -197,7 +198,9 @@ export const initGlobalErrorHandlers = () => {
       // Only handle resource errors (not JavaScript errors)
       if (event.target && event.target !== window) {
         const errorData = {
-          error: new Error(`Resource loading error: ${event.target.src || event.target.href}`),
+          error: new Error(
+            `Resource loading error: ${event.target.src || event.target.href}`
+          ),
           errorInfo: {
             type: "RESOURCE_ERROR",
             tagName: event.target.tagName,

@@ -4,8 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ]
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
@@ -16,8 +26,10 @@ const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const getDayColorClass = (record) => {
   if (record.isWeekend) return "bg-muted/40 border-muted"
   const presentPct = record.present / record.total
-  if (presentPct >= 0.85) return "bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20"
-  if (presentPct >= 0.7) return "bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20"
+  if (presentPct >= 0.85)
+    return "bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20"
+  if (presentPct >= 0.7)
+    return "bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20"
   return "bg-red-500/10 border-red-500/30 hover:bg-red-500/20"
 }
 
@@ -32,9 +44,18 @@ const AttendanceBar = ({ present, onLeave, absent, total }) => {
 
   return (
     <div className="flex w-full h-1.5 rounded-full overflow-hidden mt-1.5 gap-px">
-      <div className="bg-emerald-500 rounded-l-full transition-all" style={{ width: `${presentW}%` }} />
-      <div className="bg-amber-400 transition-all" style={{ width: `${leaveW}%` }} />
-      <div className="bg-red-500 rounded-r-full transition-all" style={{ width: `${absentW}%` }} />
+      <div
+        className="bg-emerald-500 rounded-l-full transition-all"
+        style={{ width: `${presentW}%` }}
+      />
+      <div
+        className="bg-amber-400 transition-all"
+        style={{ width: `${leaveW}%` }}
+      />
+      <div
+        className="bg-red-500 rounded-r-full transition-all"
+        style={{ width: `${absentW}%` }}
+      />
     </div>
   )
 }
@@ -54,7 +75,9 @@ const StatCard = ({ label, value, color, icon }) => (
     <CardContent className="flex items-center gap-3 p-4">
       <div className="text-2xl">{icon}</div>
       <div>
-        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{label}</p>
+        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          {label}
+        </p>
         <p className="text-2xl font-bold leading-none mt-0.5">{value}</p>
       </div>
     </CardContent>
@@ -100,7 +123,9 @@ const LeaveCalendarUI = ({
 
   // Build calendar grid: leading empty cells + day records
   const firstDayOfWeek = new Date(year, month, 1).getDay()
-  const recordMap = Object.fromEntries((data?.records ?? []).map((r) => [r.date, r]))
+  const recordMap = Object.fromEntries(
+    (data?.records ?? []).map((r) => [r.date, r])
+  )
   const daysInMonth = new Date(year, month + 1, 0).getDate()
 
   const gridCells = []
@@ -109,7 +134,16 @@ const LeaveCalendarUI = ({
   }
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
-    gridCells.push(recordMap[dateStr] ?? { date: dateStr, isWeekend: false, present: 0, absent: 0, onLeave: 0, total: 0 })
+    gridCells.push(
+      recordMap[dateStr] ?? {
+        date: dateStr,
+        isWeekend: false,
+        present: 0,
+        absent: 0,
+        onLeave: 0,
+        total: 0,
+      }
+    )
   }
 
   if (isError) {
@@ -124,7 +158,9 @@ const LeaveCalendarUI = ({
     <div className="p-4 md:p-6 space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Leave &amp; Attendance Calendar</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Leave &amp; Attendance Calendar
+        </h1>
         <p className="text-muted-foreground text-sm mt-1">
           Monthly overview of employee attendance, leave, and absences.
         </p>
@@ -147,19 +183,31 @@ const LeaveCalendarUI = ({
           />
           <StatCard
             label="Avg. Present / Day"
-            value={monthTotals.workdays ? Math.round(monthTotals.present / monthTotals.workdays) : 0}
+            value={
+              monthTotals.workdays
+                ? Math.round(monthTotals.present / monthTotals.workdays)
+                : 0
+            }
             color="bg-emerald-500/10"
             icon="✅"
           />
           <StatCard
             label="Avg. On Leave / Day"
-            value={monthTotals.workdays ? Math.round(monthTotals.onLeave / monthTotals.workdays) : 0}
+            value={
+              monthTotals.workdays
+                ? Math.round(monthTotals.onLeave / monthTotals.workdays)
+                : 0
+            }
             color="bg-amber-500/10"
             icon="🏖️"
           />
           <StatCard
             label="Avg. Absent / Day"
-            value={monthTotals.workdays ? Math.round(monthTotals.absent / monthTotals.workdays) : 0}
+            value={
+              monthTotals.workdays
+                ? Math.round(monthTotals.absent / monthTotals.workdays)
+                : 0
+            }
             color="bg-red-500/10"
             icon="❌"
           />
@@ -271,7 +319,9 @@ const LeaveCalendarUI = ({
 
                     {/* Weekend label */}
                     {record.isWeekend && (
-                      <p className="text-[9px] text-muted-foreground/40 mt-0.5 hidden md:block">Weekend</p>
+                      <p className="text-[9px] text-muted-foreground/40 mt-0.5 hidden md:block">
+                        Weekend
+                      </p>
                     )}
                   </div>
                 )
@@ -281,7 +331,9 @@ const LeaveCalendarUI = ({
 
           {/* Legend */}
           <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t">
-            <span className="text-xs font-medium text-muted-foreground">Legend:</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Legend:
+            </span>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-full bg-emerald-500" />
               <span className="text-xs text-muted-foreground">Present</span>
@@ -311,22 +363,34 @@ const LeaveCalendarUI = ({
         <div className="flex items-start gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
           <span className="text-lg mt-0.5">🟢</span>
           <div>
-            <p className="font-semibold text-emerald-700 dark:text-emerald-400">High Attendance</p>
-            <p className="text-xs text-muted-foreground mt-0.5">85%+ of employees present</p>
+            <p className="font-semibold text-emerald-700 dark:text-emerald-400">
+              High Attendance
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              85%+ of employees present
+            </p>
           </div>
         </div>
         <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
           <span className="text-lg mt-0.5">🟡</span>
           <div>
-            <p className="font-semibold text-yellow-700 dark:text-yellow-400">Moderate Attendance</p>
-            <p className="text-xs text-muted-foreground mt-0.5">70–84% of employees present</p>
+            <p className="font-semibold text-yellow-700 dark:text-yellow-400">
+              Moderate Attendance
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              70–84% of employees present
+            </p>
           </div>
         </div>
         <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
           <span className="text-lg mt-0.5">🔴</span>
           <div>
-            <p className="font-semibold text-red-700 dark:text-red-400">Low Attendance</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Below 70% of employees present</p>
+            <p className="font-semibold text-red-700 dark:text-red-400">
+              Low Attendance
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Below 70% of employees present
+            </p>
           </div>
         </div>
       </div>

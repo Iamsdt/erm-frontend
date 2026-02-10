@@ -60,7 +60,10 @@ export const getAdminApprovals = async ({ signal } = {}) => {
  * @returns {Promise}
  */
 export const patchLeaveApproval = async (id, status, note = "") => {
-  return api.patch(`${ct.api.leave.adminApprovalAction}/${id}/`, { status, note })
+  return api.patch(`${ct.api.leave.adminApprovalAction}/${id}/`, {
+    status,
+    note,
+  })
 }
 
 /**

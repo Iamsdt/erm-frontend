@@ -1,9 +1,9 @@
 /**
  * DateTime Utilities (Native JavaScript)
- * 
+ *
  * Provides date/time functionality without external dependencies.
  * Zero bundle size impact, uses native browser APIs.
- * 
+ *
  * For more complex use cases, consider date-fns or Day.js.
  * See: src/docs/DEPENDENCY_OPTIMIZATION_GUIDE.md
  */
@@ -22,7 +22,7 @@ export function getUserTimezone() {
  * @param {string} timezone - IANA timezone (optional, defaults to user's timezone)
  * @param {Intl.DateTimeFormatOptions} options - Formatting options
  * @returns {string} Formatted date string
- * 
+ *
  * @example
  * formatDateWithTimezone(new Date(), 'America/New_York', {
  *   year: 'numeric',
@@ -33,7 +33,11 @@ export function getUserTimezone() {
  * })
  * // "January 11, 2026 at 03:30 PM"
  */
-export function formatDateWithTimezone(date, timezone = getUserTimezone(), options = {}) {
+export function formatDateWithTimezone(
+  date,
+  timezone = getUserTimezone(),
+  options = {}
+) {
   const d = date instanceof Date ? date : new Date(date)
 
   const defaultOptions = {
@@ -96,7 +100,7 @@ export function getTimezoneOffset(timezone, date = new Date()) {
  * @param {Date|string|number} date - Date to compare
  * @param {Date} baseDate - Base date to compare against (optional, defaults to now)
  * @returns {string} Relative time string
- * 
+ *
  * @example
  * getRelativeTime(new Date(Date.now() - 3600000)) // "1 hour ago"
  * getRelativeTime(new Date(Date.now() + 86400000)) // "in 1 day"
@@ -177,7 +181,7 @@ export function isYesterday(date) {
  * @param {Date|string} date - Date to format
  * @param {boolean} use24Hour - Use 24-hour format (default: false)
  * @returns {string} Formatted time string
- * 
+ *
  * @example
  * formatTime(new Date(), false) // "03:30 PM"
  * formatTime(new Date(), true)  // "15:30"

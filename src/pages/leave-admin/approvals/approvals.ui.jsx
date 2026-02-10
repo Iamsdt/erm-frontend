@@ -10,55 +10,74 @@ import { Skeleton } from "@/components/ui/skeleton"
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const FILTER_TABS = [
-  { key: "all",      label: "All" },
-  { key: "pending",  label: "Pending" },
+  { key: "all", label: "All" },
+  { key: "pending", label: "Pending" },
   { key: "approved", label: "Approved" },
   { key: "rejected", label: "Rejected" },
 ]
 
 const STATUS_STYLE = {
-  approved: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
+  approved:
+    "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
   rejected: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30",
-  pending:  "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+  pending:
+    "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
 }
 
 const SUBTYPE_STYLE = {
-  wfh:     "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-500/30",
-  halfday: "bg-yellow-500/15 text-yellow-700 dark:text-yellow-400 border-yellow-500/30",
-  full:    "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30",
+  wfh: "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-500/30",
+  halfday:
+    "bg-yellow-500/15 text-yellow-700 dark:text-yellow-400 border-yellow-500/30",
+  full: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30",
 }
 
-const SUBTYPE_LABEL = { wfh: "🏠 WFH", halfday: "🌗 Half Day", full: "📅 Full Day" }
+const SUBTYPE_LABEL = {
+  wfh: "🏠 WFH",
+  halfday: "🌗 Half Day",
+  full: "📅 Full Day",
+}
 
 // ─── Request Card ─────────────────────────────────────────────────────────────
 
 const RequestCard = ({ item, isActing, note, onNoteChange, onAction }) => (
   <Card className="shadow-sm border border-border/60">
     <CardContent className="p-4 space-y-3">
-
       {/* Top row: avatar + info + status badge */}
       <div className="flex items-start gap-3">
         <Avatar className="w-10 h-10 shrink-0 border">
           <AvatarImage src={item.avatar} alt={item.name} />
           <AvatarFallback className="text-xs font-bold">
-            {item.name.split(" ").map((n) => n[0]).join("")}
+            {item.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-sm font-semibold leading-none">{item.name}</p>
-            <span className="text-xs text-muted-foreground">{item.department}</span>
+            <span className="text-xs text-muted-foreground">
+              {item.department}
+            </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">Applied: {item.appliedOn}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Applied: {item.appliedOn}
+          </p>
         </div>
-        <Badge variant="outline" className={`text-xs shrink-0 ${STATUS_STYLE[item.status]}`}>
+        <Badge
+          variant="outline"
+          className={`text-xs shrink-0 ${STATUS_STYLE[item.status]}`}
+        >
           {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
         </Badge>
       </div>
 
       {/* Leave details */}
       <div className="flex flex-wrap gap-2 items-center">
-        <Badge variant="outline" className={`text-xs ${SUBTYPE_STYLE[item.subType] ?? ""}`}>
+        <Badge
+          variant="outline"
+          className={`text-xs ${SUBTYPE_STYLE[item.subType] ?? ""}`}
+        >
           {SUBTYPE_LABEL[item.subType] ?? item.subType}
         </Badge>
         <span className="text-sm font-medium">{item.type}</span>
@@ -72,7 +91,8 @@ const RequestCard = ({ item, isActing, note, onNoteChange, onAction }) => (
 
       {/* Reason */}
       <p className="text-sm text-muted-foreground bg-muted/40 rounded-md px-3 py-2 border border-border/40">
-        <span className="font-medium text-foreground">Reason:</span> {item.reason}
+        <span className="font-medium text-foreground">Reason:</span>{" "}
+        {item.reason}
       </p>
 
       {/* Note input + actions — only for pending */}
@@ -145,11 +165,12 @@ const ApprovalsUI = ({
   onAction,
   onManualRecord,
 }) => {
-  const filtered = filter === "all" ? requests : requests.filter((r) => r.status === filter)
+  const filtered =
+    filter === "all" ? requests : requests.filter((r) => r.status === filter)
 
   const counts = {
-    all:      requests.length,
-    pending:  requests.filter((r) => r.status === "pending").length,
+    all: requests.length,
+    pending: requests.filter((r) => r.status === "pending").length,
     approved: requests.filter((r) => r.status === "approved").length,
     rejected: requests.filter((r) => r.status === "rejected").length,
   }
@@ -164,7 +185,6 @@ const ApprovalsUI = ({
 
   return (
     <div className="p-4 md:p-6 space-y-5">
-
       {/* Header */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
@@ -173,7 +193,12 @@ const ApprovalsUI = ({
             Review and act on employee leave, WFH, and half-day requests.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={onManualRecord} className="shrink-0">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onManualRecord}
+          className="shrink-0"
+        >
           ✏️ Manual Record
         </Button>
       </div>
@@ -192,9 +217,11 @@ const ApprovalsUI = ({
               }`}
             >
               {label}
-              <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
-                filter === key ? "bg-primary-foreground/20" : "bg-muted"
-              }`}>
+              <span
+                className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
+                  filter === key ? "bg-primary-foreground/20" : "bg-muted"
+                }`}
+              >
                 {counts[key]}
               </span>
             </button>

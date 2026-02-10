@@ -13,7 +13,10 @@ const LeaveCalendar = () => {
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
 
-  const { data, isLoading, isError, error } = useFetchMonthlyAttendance(year, month)
+  const { data, isLoading, isError, error } = useFetchMonthlyAttendance(
+    year,
+    month
+  )
 
   const handlePrevMonth = () => {
     if (month === 0) {

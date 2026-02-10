@@ -48,7 +48,8 @@ const generateMonthAttendance = (year, month) => {
 
 const leaveAttendanceMock = http.get("*/leave/attendance/", ({ request }) => {
   const url = new URL(request.url)
-  const year = parseInt(url.searchParams.get("year")) || new Date().getFullYear()
+  const year =
+    parseInt(url.searchParams.get("year")) || new Date().getFullYear()
   const month = parseInt(url.searchParams.get("month")) || new Date().getMonth()
 
   const records = generateMonthAttendance(year, month)

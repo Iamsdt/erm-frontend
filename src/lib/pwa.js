@@ -1,6 +1,6 @@
 /**
  * PWA (Progressive Web App) Utilities
- * 
+ *
  * Handles:
  * - Service Worker registration
  * - Install prompt
@@ -45,7 +45,10 @@ export async function registerServiceWorker() {
 
       if (newWorker) {
         newWorker.addEventListener("statechange", () => {
-          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+          if (
+            newWorker.state === "installed" &&
+            navigator.serviceWorker.controller
+          ) {
             // New service worker available
             console.log("New Service Worker available")
 
@@ -57,9 +60,12 @@ export async function registerServiceWorker() {
     })
 
     // Check for updates every hour
-    setInterval(() => {
-      registration.update()
-    }, 60 * 60 * 1000)
+    setInterval(
+      () => {
+        registration.update()
+      },
+      60 * 60 * 1000
+    )
 
     return registration
   } catch (error) {

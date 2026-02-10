@@ -18,12 +18,12 @@ i18n
     supportedLngs: ["en", "hi"],
     // Allow non-explicit language codes to fall back to base language
     nonExplicitSupportedLngs: true,
-    
+
     // Configure backend
     backend: {
       loadPath: "/locales/{{lng}}/{{ns}}.json",
     },
-    
+
     // Configure language detector
     detection: {
       // Only check localStorage and navigator

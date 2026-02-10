@@ -1,12 +1,19 @@
 import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 /**
  * ErrorPage component displays a user-friendly error page
  * with error details, retry functionality, and support information
- * 
+ *
  * @param {Error} error - The error object
  * @param {object} errorInfo - Additional error information
  * @param {string} errorId - Unique error ID for tracking
@@ -39,10 +46,12 @@ const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
     }
 
     const errorText = JSON.stringify(errorDetails, null, 2)
-    
+
     if (navigator.clipboard) {
       navigator.clipboard.writeText(errorText).then(() => {
-        alert("Error details copied to clipboard. Please contact support with this information.")
+        alert(
+          "Error details copied to clipboard. Please contact support with this information."
+        )
       })
     } else {
       // Fallback for browsers without clipboard API
@@ -52,7 +61,9 @@ const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
       textarea.select()
       document.execCommand("copy")
       document.body.removeChild(textarea)
-      alert("Error details copied to clipboard. Please contact support with this information.")
+      alert(
+        "Error details copied to clipboard. Please contact support with this information."
+      )
     }
   }
 
@@ -62,7 +73,8 @@ const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
         <CardHeader>
           <CardTitle className="text-2xl">Something went wrong</CardTitle>
           <CardDescription>
-            We're sorry, but something unexpected happened. Our team has been notified.
+            We're sorry, but something unexpected happened. Our team has been
+            notified.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

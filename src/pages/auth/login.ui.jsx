@@ -98,7 +98,8 @@ const LoginUI = ({ form, onSubmit }) => {
                     </SelectContent>
                   </Select>
                   <FormDescription className="text-xs text-amber-600 dark:text-amber-400">
-                    Temporary — role selection will be removed once auth is integrated.
+                    Temporary — role selection will be removed once auth is
+                    integrated.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

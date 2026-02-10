@@ -1,6 +1,6 @@
 /**
  * Image Optimization Utilities
- * 
+ *
  * Helper functions for optimizing images:
  * - Generate responsive srcsets
  * - Create blur placeholders
@@ -14,12 +14,16 @@
  * @param {number[]} widths - Array of widths for srcset
  * @param {Object} options - Additional options
  * @returns {string} srcset string
- * 
+ *
  * @example
  * generateSrcSet('/images/hero.jpg', [320, 640, 1024])
  * // Returns: '/images/hero.jpg?w=320 320w, /images/hero.jpg?w=640 640w, ...'
  */
-export function generateSrcSet(baseUrl, widths = [320, 640, 768, 1024, 1280, 1920], options = {}) {
+export function generateSrcSet(
+  baseUrl,
+  widths = [320, 640, 768, 1024, 1280, 1920],
+  options = {}
+) {
   const { quality = 80, format } = options
 
   return widths
@@ -47,7 +51,7 @@ export function generateSrcSet(baseUrl, widths = [320, 640, 768, 1024, 1280, 192
  * Generate sizes attribute for responsive images
  * @param {Object} breakpoints - Breakpoint configurations
  * @returns {string} sizes string
- * 
+ *
  * @example
  * generateSizes({ sm: '100vw', md: '50vw', lg: '33vw' })
  */
@@ -74,11 +78,15 @@ export function generateSizes(breakpoints = {}) {
  * @param {number} width - Placeholder width (smaller = more blur)
  * @param {number} quality - JPEG quality (lower = more blur)
  * @returns {Promise<string>} Base64 data URL
- * 
+ *
  * Note: This is a client-side implementation. For production, generate
  * placeholders at build time or use a CDN service.
  */
-export async function createBlurPlaceholder(imageUrl, width = 10, quality = 20) {
+export async function createBlurPlaceholder(
+  imageUrl,
+  width = 10,
+  quality = 20
+) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = "Anonymous"
@@ -131,7 +139,10 @@ export function checkImageFormatSupport() {
  * @param {Object} formatSupport - Format support flags
  * @returns {string} Optimal image URL
  */
-export function getOptimalImageUrl(originalUrl, formatSupport = checkImageFormatSupport()) {
+export function getOptimalImageUrl(
+  originalUrl,
+  formatSupport = checkImageFormatSupport()
+) {
   // Priority: AVIF > WebP > Original
   if (formatSupport.avif) {
     return originalUrl.replace(/\.(jpg|jpeg|png)$/i, ".avif")
@@ -203,7 +214,12 @@ export function lazyLoadImages(selector = "img[data-src]", options = {}) {
  * @param {number} targetHeight - Target height
  * @returns {Object} Calculated dimensions
  */
-export function calculateImageDimensions(originalWidth, originalHeight, targetWidth, targetHeight) {
+export function calculateImageDimensions(
+  originalWidth,
+  originalHeight,
+  targetWidth,
+  targetHeight
+) {
   const aspectRatio = originalWidth / originalHeight
 
   let width = targetWidth
@@ -238,7 +254,7 @@ export function calculateImageDimensions(originalWidth, originalHeight, targetWi
  * @param {string} baseUrl - Base image URL
  * @param {Object} transformations - Transformation options
  * @returns {string} CDN URL with transformations
- * 
+ *
  * @example
  * generateCDNUrl('/image.jpg', { width: 800, quality: 80, format: 'webp' })
  */

@@ -12,7 +12,9 @@ import RequestLeaveUI from "./request-leave.ui"
 const schema = z
   .object({
     leaveType: z.string().min(1, "Select a leave type"),
-    subType: z.enum(["full", "wfh", "halfday"], { required_error: "Select a request type" }),
+    subType: z.enum(["full", "wfh", "halfday"], {
+      required_error: "Select a request type",
+    }),
     halfDaySlot: z.enum(["morning", "afternoon"]).optional(),
     fromDate: z.string().min(1, "Start date is required"),
     toDate: z.string().min(1, "End date is required"),
@@ -36,7 +38,12 @@ const schema = z
  * RequestLeavePage container — employee leave application form.
  */
 const RequestLeavePage = () => {
-  const { mutate: submitRequest, isPending: isSubmitting, isSuccess, reset: resetMutation } = usePostLeaveRequest()
+  const {
+    mutate: submitRequest,
+    isPending: isSubmitting,
+    isSuccess,
+    reset: resetMutation,
+  } = usePostLeaveRequest()
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -65,7 +72,10 @@ const RequestLeavePage = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      toast({ title: "Request Submitted ✓", description: "Your leave request has been sent for approval." })
+      toast({
+        title: "Request Submitted ✓",
+        description: "Your leave request has been sent for approval.",
+      })
       form.reset()
       resetMutation()
     }
@@ -74,7 +84,11 @@ const RequestLeavePage = () => {
   const onSubmit = (values) => {
     submitRequest(values, {
       onError: () => {
-        toast({ title: "Error", description: "Failed to submit request. Please try again.", variant: "destructive" })
+        toast({
+          title: "Error",
+          description: "Failed to submit request. Please try again.",
+          variant: "destructive",
+        })
       },
     })
   }

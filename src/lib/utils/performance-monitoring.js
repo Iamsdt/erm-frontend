@@ -1,13 +1,13 @@
 /**
  * Performance Monitoring Utilities
- * 
+ *
  * Tracks Web Vitals and custom performance metrics:
  * - LCP (Largest Contentful Paint)
  * - INP (Interaction to Next Paint) - replaces FID
  * - CLS (Cumulative Layout Shift)
  * - FCP (First Contentful Paint)
  * - TTFB (Time to First Byte)
- * 
+ *
  * Note: FID (First Input Delay) is deprecated in web-vitals v4+
  * Use INP (Interaction to Next Paint) instead
  */
@@ -289,7 +289,8 @@ export function trackNavigationTiming() {
         request: nav.responseStart - nav.requestStart,
         response: nav.responseEnd - nav.responseStart,
         domProcessing: nav.domComplete - nav.domInteractive,
-        domContentLoaded: nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart,
+        domContentLoaded:
+          nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart,
         load: nav.loadEventEnd - nav.loadEventStart,
       }
 
@@ -461,7 +462,8 @@ export function getPerformanceBudgetStatus() {
       status[metric] = {
         value: metricSummary.average,
         budget: budget.threshold,
-        status: metricSummary.average <= budget.threshold ? "passing" : "failing",
+        status:
+          metricSummary.average <= budget.threshold ? "passing" : "failing",
         rating:
           metricSummary.average <= budget.good
             ? "good"

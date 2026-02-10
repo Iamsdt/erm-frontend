@@ -1,7 +1,14 @@
 import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 /**
  * NotFoundPage displays a 404 error message when a page is not found.
@@ -29,8 +36,8 @@ const NotFoundPage = () => {
         </CardHeader>
         <CardContent>
           <p className="text-gray-600 dark:text-gray-400">
-            Sorry, we couldn't find the page you're looking for.
-            The page may have been moved or deleted.
+            Sorry, we couldn't find the page you're looking for. The page may
+            have been moved or deleted.
           </p>
         </CardContent>
         <CardFooter className="flex justify-center gap-2">

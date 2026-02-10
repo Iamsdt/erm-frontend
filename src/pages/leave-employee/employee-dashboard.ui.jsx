@@ -10,9 +10,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const STATUS_STYLE = {
-  approved: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
+  approved:
+    "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
   rejected: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30",
-  pending: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+  pending:
+    "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
 }
 
 const STATUS_LABEL = {
@@ -32,10 +34,22 @@ const AttendanceRing = ({ pct }) => {
   return (
     <div className="relative flex items-center justify-center w-24 h-24">
       <svg className="-rotate-90" width="96" height="96">
-        <circle cx="48" cy="48" r={r} stroke="currentColor" strokeWidth="8" fill="none" className="text-muted/40" />
         <circle
-          cx="48" cy="48" r={r}
-          stroke="currentColor" strokeWidth="8" fill="none"
+          cx="48"
+          cy="48"
+          r={r}
+          stroke="currentColor"
+          strokeWidth="8"
+          fill="none"
+          className="text-muted/40"
+        />
+        <circle
+          cx="48"
+          cy="48"
+          r={r}
+          stroke="currentColor"
+          strokeWidth="8"
+          fill="none"
           strokeDasharray={circumference}
           strokeDashoffset={circumference - filled}
           strokeLinecap="round"
@@ -61,7 +75,8 @@ const LeaveBalanceRow = ({ type, allocated, used, pending, remaining }) => {
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium">{type}</span>
         <span className="text-muted-foreground text-xs">
-          <span className="text-foreground font-semibold">{remaining}</span> / {allocated} days left
+          <span className="text-foreground font-semibold">{remaining}</span> /{" "}
+          {allocated} days left
         </span>
       </div>
       <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden flex gap-px">
@@ -82,9 +97,20 @@ const LeaveBalanceRow = ({ type, allocated, used, pending, remaining }) => {
         />
       </div>
       <div className="flex gap-3 text-[11px] text-muted-foreground">
-        <span><span className="inline-block w-2 h-2 rounded-full bg-red-400 mr-1" />Used: {used}</span>
-        {pending > 0 && <span><span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1" />Pending: {pending}</span>}
-        <span><span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1" />Available: {remaining}</span>
+        <span>
+          <span className="inline-block w-2 h-2 rounded-full bg-red-400 mr-1" />
+          Used: {used}
+        </span>
+        {pending > 0 && (
+          <span>
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1" />
+            Pending: {pending}
+          </span>
+        )}
+        <span>
+          <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1" />
+          Available: {remaining}
+        </span>
       </div>
     </div>
   )
@@ -122,7 +148,6 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-
       {/* Header / Employee Profile Card */}
       <Card className="shadow-sm border-0 bg-gradient-to-r from-blue-600/10 via-indigo-500/10 to-purple-600/10">
         <CardContent className="p-5">
@@ -140,19 +165,29 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
               <Avatar className="w-16 h-16 border-2 border-white/30 shadow">
                 <AvatarImage src={emp?.avatar} alt={emp?.name} />
                 <AvatarFallback className="text-lg font-bold">
-                  {emp?.name?.split(" ").map((n) => n[0]).join("")}
+                  {emp?.name
+                    ?.split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold tracking-tight">{emp?.name}</h1>
-                <p className="text-sm text-muted-foreground">{emp?.role} · {emp?.department}</p>
+                <h1 className="text-xl font-bold tracking-tight">
+                  {emp?.name}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {emp?.role} · {emp?.department}
+                </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  ID: {emp?.id} · Manager: {emp?.manager} · Joined {emp?.joinDate}
+                  ID: {emp?.id} · Manager: {emp?.manager} · Joined{" "}
+                  {emp?.joinDate}
                 </p>
               </div>
               <div className="shrink-0 flex flex-col items-center gap-2">
                 <AttendanceRing pct={thisMonth?.attendancePct} />
-                <p className="text-xs text-center text-muted-foreground">This month</p>
+                <p className="text-xs text-center text-muted-foreground">
+                  This month
+                </p>
                 <Button size="sm" onClick={onRequestLeave} className="w-full">
                   + Request Leave
                 </Button>
@@ -165,22 +200,48 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
       {/* Quick Stats */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-xl" />
+          ))}
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { icon: "📅", label: "Total Allocated", value: totalAllocated, accent: "bg-blue-500/10" },
-            { icon: "✅", label: "Days Used", value: totalUsed, accent: "bg-red-500/10" },
-            { icon: "⏳", label: "Pending Approval", value: totalPending, accent: "bg-amber-500/10" },
-            { icon: "🎯", label: "Days Remaining", value: totalRemaining, accent: "bg-emerald-500/10" },
+            {
+              icon: "📅",
+              label: "Total Allocated",
+              value: totalAllocated,
+              accent: "bg-blue-500/10",
+            },
+            {
+              icon: "✅",
+              label: "Days Used",
+              value: totalUsed,
+              accent: "bg-red-500/10",
+            },
+            {
+              icon: "⏳",
+              label: "Pending Approval",
+              value: totalPending,
+              accent: "bg-amber-500/10",
+            },
+            {
+              icon: "🎯",
+              label: "Days Remaining",
+              value: totalRemaining,
+              accent: "bg-emerald-500/10",
+            },
           ].map(({ icon, label, value, accent }) => (
             <Card key={label} className={`border-0 shadow-sm ${accent}`}>
               <CardContent className="flex items-center gap-3 p-4">
                 <span className="text-2xl">{icon}</span>
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{label}</p>
-                  <p className="text-2xl font-extrabold leading-none mt-0.5">{value}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+                    {label}
+                  </p>
+                  <p className="text-2xl font-extrabold leading-none mt-0.5">
+                    {value}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -189,7 +250,6 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
         {/* Leave Balance */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
@@ -197,7 +257,9 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading
-              ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-12 rounded-lg" />)
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 rounded-lg" />
+                ))
               : balance.map((b) => (
                   <LeaveBalanceRow
                     key={b.type}
@@ -213,7 +275,6 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
 
         {/* This Month Snapshot + Upcoming */}
         <div className="space-y-4">
-
           {/* This Month */}
           <Card className="shadow-sm">
             <CardHeader className="pb-2">
@@ -222,18 +283,34 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
             <CardContent>
               {isLoading ? (
                 <div className="space-y-2">
-                  {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-8 rounded-lg" />)}
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton key={i} className="h-8 rounded-lg" />
+                  ))}
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-3 text-center">
                   {[
-                    { label: "Present", value: thisMonth?.presentDays, cls: "text-emerald-600" },
-                    { label: "On Leave", value: thisMonth?.leaveDays, cls: "text-amber-600" },
-                    { label: "Absent", value: thisMonth?.absentDays, cls: "text-red-500" },
+                    {
+                      label: "Present",
+                      value: thisMonth?.presentDays,
+                      cls: "text-emerald-600",
+                    },
+                    {
+                      label: "On Leave",
+                      value: thisMonth?.leaveDays,
+                      cls: "text-amber-600",
+                    },
+                    {
+                      label: "Absent",
+                      value: thisMonth?.absentDays,
+                      cls: "text-red-500",
+                    },
                   ].map(({ label, value, cls }) => (
                     <div key={label} className="p-3 rounded-xl bg-muted/40">
                       <p className={`text-2xl font-bold ${cls}`}>{value}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {label}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -247,21 +324,30 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
               <CardTitle className="text-base">Upcoming</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {isLoading
-                ? Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-12 rounded-lg" />)
-                : upcoming.length === 0
-                  ? <p className="text-sm text-muted-foreground">No upcoming leaves or holidays.</p>
-                  : upcoming.map((u) => (
-                      <div key={u.label} className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50">
-                        <div>
-                          <p className="text-sm font-semibold">{u.label}</p>
-                          <p className="text-xs text-muted-foreground">{u.date}</p>
-                        </div>
-                        <Badge variant="outline" className="text-xs">
-                          in {u.daysUntil}d
-                        </Badge>
-                      </div>
-                    ))}
+              {isLoading ? (
+                Array.from({ length: 2 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 rounded-lg" />
+                ))
+              ) : upcoming.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No upcoming leaves or holidays.
+                </p>
+              ) : (
+                upcoming.map((u) => (
+                  <div
+                    key={u.label}
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold">{u.label}</p>
+                      <p className="text-xs text-muted-foreground">{u.date}</p>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      in {u.daysUntil}d
+                    </Badge>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
         </div>
@@ -275,7 +361,9 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
         <CardContent>
           {isLoading ? (
             <div className="space-y-2">
-              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-12 rounded-lg" />)}
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 rounded-lg" />
+              ))}
             </div>
           ) : (
             <div className="space-y-1">
@@ -284,9 +372,15 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
                   <div className="flex items-center justify-between py-2.5 text-sm">
                     <div className="min-w-0">
                       <p className="font-medium">{item.type}</p>
-                      <p className="text-xs text-muted-foreground">{item.from} → {item.to} · {item.days} day{item.days > 1 ? "s" : ""}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.from} → {item.to} · {item.days} day
+                        {item.days > 1 ? "s" : ""}
+                      </p>
                     </div>
-                    <Badge variant="outline" className={`text-xs shrink-0 ml-3 ${STATUS_STYLE[item.status]}`}>
+                    <Badge
+                      variant="outline"
+                      className={`text-xs shrink-0 ml-3 ${STATUS_STYLE[item.status]}`}
+                    >
                       {STATUS_LABEL[item.status]}
                     </Badge>
                   </div>

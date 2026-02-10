@@ -1,6 +1,6 @@
 /**
  * Mock Factories
- * 
+ *
  * Factory functions for creating mock data objects for testing.
  * Uses a simple counter-based approach for unique IDs.
  */
@@ -22,7 +22,7 @@ export function resetCounters() {
  * Create a mock user
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock user object
- * 
+ *
  * @example
  * const user = createMockUser({ name: 'John Doe', role: 'admin' })
  */
@@ -48,7 +48,7 @@ export function createMockUser(overrides = {}) {
  * @param {number} count - Number of users to create
  * @param {Object} overrides - Override default values
  * @returns {Array<Object>} Array of mock users
- * 
+ *
  * @example
  * const users = createMockUsers(5)
  */
@@ -60,7 +60,7 @@ export function createMockUsers(count, overrides = {}) {
  * Create a mock comment
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock comment object
- * 
+ *
  * @example
  * const comment = createMockComment({ text: 'Great post!', userId: 1 })
  */
@@ -91,7 +91,7 @@ export function createMockComment(overrides = {}) {
  * @param {number} count - Number of comments to create
  * @param {Object} overrides - Override default values
  * @returns {Array<Object>} Array of mock comments
- * 
+ *
  * @example
  * const comments = createMockComments(10, { postId: 5 })
  */
@@ -103,7 +103,7 @@ export function createMockComments(count, overrides = {}) {
  * Create a mock post
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock post object
- * 
+ *
  * @example
  * const post = createMockPost({ title: 'My Post', userId: 1 })
  */
@@ -137,7 +137,7 @@ export function createMockPost(overrides = {}) {
  * @param {number} count - Number of posts to create
  * @param {Object} overrides - Override default values
  * @returns {Array<Object>} Array of mock posts
- * 
+ *
  * @example
  * const posts = createMockPosts(5, { published: true })
  */
@@ -150,7 +150,7 @@ export function createMockPosts(count, overrides = {}) {
  * @param {*} data - Response data
  * @param {Object} options - Response options
  * @returns {Object} Mock API response
- * 
+ *
  * @example
  * const response = createMockApiResponse([user1, user2], { status: 200 })
  */
@@ -171,11 +171,15 @@ export function createMockApiResponse(data, options = {}) {
  * @param {number} status - HTTP status code
  * @param {Object} options - Additional options
  * @returns {Object} Mock API error
- * 
+ *
  * @example
  * const error = createMockApiError('Not found', 404)
  */
-export function createMockApiError(message = "Error", status = 500, options = {}) {
+export function createMockApiError(
+  message = "Error",
+  status = 500,
+  options = {}
+) {
   const error = new Error(message)
   error.response = {
     data: {
@@ -196,10 +200,10 @@ export function createMockApiError(message = "Error", status = 500, options = {}
  * Create a mock Redux store state
  * @param {Object} overrides - Override default state
  * @returns {Object} Mock Redux state
- * 
+ *
  * @example
- * const state = createMockStoreState({ 
- *   user: { name: 'John', role: 'admin' } 
+ * const state = createMockStoreState({
+ *   user: { name: 'John', role: 'admin' }
  * })
  */
 export function createMockStoreState(overrides = {}) {
@@ -222,11 +226,11 @@ export function createMockStoreState(overrides = {}) {
  * Create a mock form data
  * @param {Object} data - Form data
  * @returns {FormData} Mock FormData object
- * 
+ *
  * @example
- * const formData = createMockFormData({ 
- *   name: 'John', 
- *   email: 'john@example.com' 
+ * const formData = createMockFormData({
+ *   name: 'John',
+ *   email: 'john@example.com'
  * })
  */
 export function createMockFormData(data = {}) {
@@ -251,12 +255,12 @@ export function createMockFormData(data = {}) {
  * Create a mock file object
  * @param {Object} options - File options
  * @returns {File} Mock File object
- * 
+ *
  * @example
- * const file = createMockFile({ 
- *   name: 'avatar.jpg', 
+ * const file = createMockFile({
+ *   name: 'avatar.jpg',
  *   type: 'image/jpeg',
- *   size: 1024 
+ *   size: 1024
  * })
  */
 export function createMockFile(options = {}) {
@@ -276,7 +280,7 @@ export function createMockFile(options = {}) {
  * Create a mock image file
  * @param {Object} options - Image options
  * @returns {File} Mock image File object
- * 
+ *
  * @example
  * const image = createMockImage({ name: 'photo.png' })
  */
@@ -296,7 +300,7 @@ export function createMockImage(options = {}) {
  * Create a mock pagination info
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock pagination object
- * 
+ *
  * @example
  * const pagination = createMockPagination({ page: 2, total: 100 })
  */
@@ -321,7 +325,7 @@ export function createMockPagination(overrides = {}) {
  * @param {Array} data - Response data
  * @param {Object} pagination - Pagination options
  * @returns {Object} Mock paginated response
- * 
+ *
  * @example
  * const response = createMockPaginatedResponse(
  *   createMockUsers(10),
@@ -344,7 +348,7 @@ export function createMockPaginatedResponse(data, pagination = {}) {
  * @param {string} type - Event type
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock event object
- * 
+ *
  * @example
  * const event = createMockEvent('click', { target: { value: 'test' } })
  */
@@ -366,7 +370,7 @@ export function createMockEvent(type = "click", overrides = {}) {
  * Create a mock router location
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock location object
- * 
+ *
  * @example
  * const location = createMockLocation({ pathname: '/dashboard' })
  */
@@ -385,7 +389,7 @@ export function createMockLocation(overrides = {}) {
  * Create a mock router match
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock match object
- * 
+ *
  * @example
  * const match = createMockMatch({ params: { id: '123' } })
  */
@@ -404,7 +408,7 @@ export function createMockMatch(overrides = {}) {
  * @param {*} data - Query data
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock query result
- * 
+ *
  * @example
  * const queryResult = createMockQueryResult(users, { isLoading: false })
  */
@@ -426,7 +430,7 @@ export function createMockQueryResult(data, overrides = {}) {
  * Create mock mutation result (React Query)
  * @param {Object} overrides - Override default values
  * @returns {Object} Mock mutation result
- * 
+ *
  * @example
  * const mutation = createMockMutationResult({ isLoading: true })
  */

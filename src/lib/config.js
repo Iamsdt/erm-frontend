@@ -29,7 +29,7 @@ const getEnvironmentVariable = (key, defaultValue = null, required = false) => {
   if (required && !value) {
     throw new Error(
       `Missing required environment variable: ${key}\n` +
-      `Please check your .env file and ensure ${key} is set.`
+        `Please check your .env file and ensure ${key} is set.`
     )
   }
 

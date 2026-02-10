@@ -1,6 +1,6 @@
 /**
  * HTTPS Enforcement Utility
- * 
+ *
  * Enforces HTTPS in production environments.
  * Note: HTTPS should primarily be enforced server-side.
  * This is a client-side fallback check.
@@ -17,7 +17,10 @@ export const enforceHTTPS = () => {
   }
 
   // Skip for localhost
-  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+  if (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+  ) {
     return
   }
 

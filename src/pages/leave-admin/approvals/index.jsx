@@ -21,7 +21,11 @@ const ApprovalsPage = () => {
 
   useEffect(() => {
     if (error) {
-      toast({ title: "Error", description: "Failed to load approvals.", variant: "destructive" })
+      toast({
+        title: "Error",
+        description: "Failed to load approvals.",
+        variant: "destructive",
+      })
     }
   }, [error])
 
@@ -30,10 +34,17 @@ const ApprovalsPage = () => {
       { id, status, note: noteMap[id] ?? "" },
       {
         onSuccess: (res) => {
-          toast({ title: status === "approved" ? "Approved ✓" : "Rejected", description: res.data?.message })
+          toast({
+            title: status === "approved" ? "Approved ✓" : "Rejected",
+            description: res.data?.message,
+          })
         },
         onError: () => {
-          toast({ title: "Error", description: "Action failed. Please try again.", variant: "destructive" })
+          toast({
+            title: "Error",
+            description: "Action failed. Please try again.",
+            variant: "destructive",
+          })
         },
       }
     )

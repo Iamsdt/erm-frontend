@@ -24,8 +24,17 @@ const schema = z.object({
  * ManualRecordPage container — handles employee attendance override form.
  */
 const ManualRecordPage = () => {
-  const { data: employees, isLoading: isLoadingEmps, error: empsError } = useFetchAdminEmployees()
-  const { mutate: submitRecord, isPending: isSubmitting, isSuccess, reset: resetMutation } = usePostManualRecord()
+  const {
+    data: employees,
+    isLoading: isLoadingEmps,
+    error: empsError,
+  } = useFetchAdminEmployees()
+  const {
+    mutate: submitRecord,
+    isPending: isSubmitting,
+    isSuccess,
+    reset: resetMutation,
+  } = usePostManualRecord()
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -43,14 +52,28 @@ const ManualRecordPage = () => {
 
   useEffect(() => {
     if (empsError) {
-      toast({ title: "Error", description: "Failed to load employee list.", variant: "destructive" })
+      toast({
+        title: "Error",
+        description: "Failed to load employee list.",
+        variant: "destructive",
+      })
     }
   }, [empsError])
 
   useEffect(() => {
     if (isSuccess) {
-      toast({ title: "Record Saved ✓", description: "Attendance record has been updated." })
-      form.reset({ date: new Date().toISOString().split("T")[0], employeeId: "", recordType: "", leaveType: "", halfDaySlot: "", note: "" })
+      toast({
+        title: "Record Saved ✓",
+        description: "Attendance record has been updated.",
+      })
+      form.reset({
+        date: new Date().toISOString().split("T")[0],
+        employeeId: "",
+        recordType: "",
+        leaveType: "",
+        halfDaySlot: "",
+        note: "",
+      })
       resetMutation()
     }
   }, [isSuccess, form, resetMutation])
@@ -58,7 +81,11 @@ const ManualRecordPage = () => {
   const onSubmit = (values) => {
     submitRecord(values, {
       onError: () => {
-        toast({ title: "Error", description: "Failed to save record. Please try again.", variant: "destructive" })
+        toast({
+          title: "Error",
+          description: "Failed to save record. Please try again.",
+          variant: "destructive",
+        })
       },
     })
   }

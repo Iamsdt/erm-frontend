@@ -2,7 +2,13 @@ import PropTypes from "prop-types"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -26,22 +32,41 @@ import { Textarea } from "@/components/ui/textarea"
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const LEAVE_TYPES = [
-  { value: "Annual Leave",        icon: "🏖️", desc: "Planned vacation / personal time" },
-  { value: "Sick Leave",          icon: "🤒", desc: "Illness or medical needs" },
-  { value: "Casual Leave",        icon: "🎲", desc: "Short unplanned leave" },
-  { value: "Compensatory",        icon: "⚖️", desc: "In lieu of overtime worked" },
-  { value: "Unpaid Leave",        icon: "💰", desc: "Leave without pay" },
+  {
+    value: "Annual Leave",
+    icon: "🏖️",
+    desc: "Planned vacation / personal time",
+  },
+  { value: "Sick Leave", icon: "🤒", desc: "Illness or medical needs" },
+  { value: "Casual Leave", icon: "🎲", desc: "Short unplanned leave" },
+  { value: "Compensatory", icon: "⚖️", desc: "In lieu of overtime worked" },
+  { value: "Unpaid Leave", icon: "💰", desc: "Leave without pay" },
   { value: "Maternity/Paternity", icon: "👶", desc: "Parental leave" },
 ]
 
 const SUB_TYPES = [
-  { value: "full",    icon: "📅", label: "Full Day(s)",    desc: "One or more full working days" },
-  { value: "halfday", icon: "🌗", label: "Half Day",       desc: "Morning or afternoon only" },
-  { value: "wfh",     icon: "🏠", label: "Work From Home", desc: "Working remotely (requires approval)" },
+  {
+    value: "full",
+    icon: "📅",
+    label: "Full Day(s)",
+    desc: "One or more full working days",
+  },
+  {
+    value: "halfday",
+    icon: "🌗",
+    label: "Half Day",
+    desc: "Morning or afternoon only",
+  },
+  {
+    value: "wfh",
+    icon: "🏠",
+    label: "Work From Home",
+    desc: "Working remotely (requires approval)",
+  },
 ]
 
 const HALF_DAY_SLOTS = [
-  { value: "morning",   label: "🌅 Morning (until 1 PM)" },
+  { value: "morning", label: "🌅 Morning (until 1 PM)" },
   { value: "afternoon", label: "🌇 Afternoon (from 1 PM)" },
 ]
 
@@ -49,10 +74,15 @@ const TODAY = new Date().toISOString().split("T")[0]
 
 // ─── Main UI ──────────────────────────────────────────────────────────────────
 
-const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }) => {
+const RequestLeaveUI = ({
+  form,
+  subType,
+  estimatedDays,
+  isSubmitting,
+  onSubmit,
+}) => {
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-5">
-
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Request Leave</h1>
@@ -65,14 +95,14 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Leave Request Form</CardTitle>
           <CardDescription className="text-xs">
-            Fields marked with * are required. Requests are usually reviewed within 1–2 business days.
+            Fields marked with * are required. Requests are usually reviewed
+            within 1–2 business days.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <Form {...form}>
             <form onSubmit={onSubmit} className="space-y-5">
-
               {/* Request type (Full / Half / WFH) */}
               <FormField
                 control={form.control}
@@ -93,8 +123,12 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                           }`}
                         >
                           <div className="text-xl">{st.icon}</div>
-                          <p className="text-sm font-semibold mt-1">{st.label}</p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5">{st.desc}</p>
+                          <p className="text-sm font-semibold mt-1">
+                            {st.label}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {st.desc}
+                          </p>
                         </button>
                       ))}
                     </div>
@@ -119,7 +153,10 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                       <SelectContent>
                         {LEAVE_TYPES.map((lt) => (
                           <SelectItem key={lt.value} value={lt.value}>
-                            {lt.icon} {lt.value} — <span className="text-muted-foreground">{lt.desc}</span>
+                            {lt.icon} {lt.value} —{" "}
+                            <span className="text-muted-foreground">
+                              {lt.desc}
+                            </span>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -159,7 +196,9 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                         />
                       </FormControl>
                       {(subType === "wfh" || subType === "halfday") && (
-                        <FormDescription className="text-xs">Auto-set to same day</FormDescription>
+                        <FormDescription className="text-xs">
+                          Auto-set to same day
+                        </FormDescription>
                       )}
                       <FormMessage />
                     </FormItem>
@@ -200,11 +239,16 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
               {/* Estimated days chip */}
               {estimatedDays > 0 && (
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                  <span className="text-emerald-600 font-semibold text-sm">📊 Estimated:</span>
+                  <span className="text-emerald-600 font-semibold text-sm">
+                    📊 Estimated:
+                  </span>
                   <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
-                    {estimatedDays} working {estimatedDays === 1 ? "day" : "days"}
+                    {estimatedDays} working{" "}
+                    {estimatedDays === 1 ? "day" : "days"}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">(weekends excluded)</span>
+                  <span className="text-xs text-muted-foreground">
+                    (weekends excluded)
+                  </span>
                 </div>
               )}
 
@@ -244,7 +288,9 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                       <FormControl>
                         <Input placeholder="Colleague's name…" {...field} />
                       </FormControl>
-                      <FormDescription className="text-xs">Who covers your work?</FormDescription>
+                      <FormDescription className="text-xs">
+                        Who covers your work?
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -258,7 +304,9 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                       <FormControl>
                         <Input placeholder="Phone or email…" {...field} />
                       </FormControl>
-                      <FormDescription className="text-xs">If urgent contact needed</FormDescription>
+                      <FormDescription className="text-xs">
+                        If urgent contact needed
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -269,8 +317,9 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
               <div className="flex gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-sm text-amber-700 dark:text-amber-400">
                 <span className="shrink-0">⚠️</span>
                 <p>
-                  Requests must be submitted at least <strong>2 working days</strong> in advance
-                  (except sick leave). WFH requests require manager approval.
+                  Requests must be submitted at least{" "}
+                  <strong>2 working days</strong> in advance (except sick
+                  leave). WFH requests require manager approval.
                 </p>
               </div>
 

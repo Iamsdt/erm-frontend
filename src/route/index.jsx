@@ -24,7 +24,9 @@ const RouteLoadingFallback = () => (
 const withSuspense = (routes) =>
   routes.map((route) => ({
     ...route,
-    element: <Suspense fallback={<RouteLoadingFallback />}>{route.element}</Suspense>,
+    element: (
+      <Suspense fallback={<RouteLoadingFallback />}>{route.element}</Suspense>
+    ),
   }))
 
 const router = createBrowserRouter([

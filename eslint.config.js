@@ -2,7 +2,6 @@ import config from "@10xscale/eslint-modern"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
-import pluginUnusedImports from "eslint-plugin-unused-imports"
 import pluginImport from "eslint-plugin-import"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -28,11 +27,6 @@ export default [
     // App config
     // ---------------------------------------------------------------------------
     {
-        plugins: {
-            "unused-imports": pluginUnusedImports,
-            import: pluginImport,
-        },
-
         languageOptions: {
             globals: {
                 window: "readonly",

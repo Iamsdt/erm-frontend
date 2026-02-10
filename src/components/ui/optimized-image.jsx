@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * OptimizedImage Component
- * 
+ *
  * A highly optimized image component with:
  * - Lazy loading
  * - Responsive images (srcset)
@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils"
  * - Error handling
  * - Modern format support (WebP, AVIF)
  * - Blur placeholder
- * 
+ *
  * @example
  * <OptimizedImage
  *   src="/images/hero.jpg"
@@ -78,9 +78,7 @@ export function OptimizedImage({
       style={{ width, height }}
     >
       {/* Loading skeleton */}
-      {isLoading && (
-        <div className="absolute inset-0 bg-muted animate-pulse" />
-      )}
+      {isLoading && <div className="absolute inset-0 bg-muted animate-pulse" />}
 
       {/* Blur placeholder image */}
       {placeholderSrc && isLoading && (
@@ -149,7 +147,13 @@ OptimizedImage.propTypes = {
   placeholderSrc: PropTypes.string,
   onLoad: PropTypes.func,
   onError: PropTypes.func,
-  objectFit: PropTypes.oneOf(["contain", "cover", "fill", "none", "scale-down"]),
+  objectFit: PropTypes.oneOf([
+    "contain",
+    "cover",
+    "fill",
+    "none",
+    "scale-down",
+  ]),
   priority: PropTypes.bool,
 }
 
@@ -272,12 +276,16 @@ export function BackgroundImage({
       />
 
       {!hasError && (
-        <div className={cn("relative", isLoading && "opacity-0")}>{children}</div>
+        <div className={cn("relative", isLoading && "opacity-0")}>
+          {children}
+        </div>
       )}
 
       {hasError && (
         <div className="absolute inset-0 bg-muted flex items-center justify-center">
-          <span className="text-muted-foreground">Background image unavailable</span>
+          <span className="text-muted-foreground">
+            Background image unavailable
+          </span>
         </div>
       )}
     </div>

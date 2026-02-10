@@ -1,6 +1,6 @@
 /**
  * User Test Fixtures
- * 
+ *
  * Predefined user data for consistent testing
  */
 

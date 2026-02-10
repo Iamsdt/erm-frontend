@@ -6,13 +6,13 @@ import ErrorPage from "@/pages/misc/error-found"
 
 /**
  * Error Boundary Component
- * 
+ *
  * Catches JavaScript errors anywhere in the child component tree,
  * logs those errors, and displays a fallback UI instead of crashing.
- * 
+ *
  * Uses react-error-boundary library for modern functional component API.
  * (The library uses a class component internally, but we use it functionally)
- * 
+ *
  * Usage:
  *   <ErrorBoundary>
  *     <YourComponent />

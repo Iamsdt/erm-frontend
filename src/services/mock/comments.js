@@ -60,8 +60,7 @@ const commentMock = http.get("*/comments/", () => {
       likes: 17,
     },
   ])
-}
-)
+})
 
 const handlers = [commentMock]
 

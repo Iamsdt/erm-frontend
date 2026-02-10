@@ -1,13 +1,13 @@
 /**
  * HTML Sanitization Utility
- * 
+ *
  * Provides safe HTML sanitization using DOMPurify to prevent XSS attacks
  * when rendering user-generated content.
- * 
+ *
  * Usage:
  *   import { sanitizeHtml } from '@/lib/utils/sanitize'
  *   <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(userContent) }} />
- * 
+ *
  * Installation:
  *   npm install dompurify
  */
@@ -60,7 +60,9 @@ export const sanitizeHtml = (dirty, options = {}) => {
 
     return DOMPurify.sanitize(dirty, defaultOptions)
   } catch (error) {
-    console.error("DOMPurify not available. Install it with: npm install dompurify")
+    console.error(
+      "DOMPurify not available. Install it with: npm install dompurify"
+    )
     // Fallback: strip all HTML tags if DOMPurify is not available
     return dirty?.replace(/<[^>]*>/g, "") || ""
   }
