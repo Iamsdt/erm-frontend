@@ -19,17 +19,17 @@ import {
  * @param {Error} error - The error object
  * @param {object} errorInfo - Additional error information
  * @param {string} errorId - Unique error ID for tracking
- * @param {Function} onReset - Callback to reset error state
+ * @param {Function} handleReset - Callback to reset error state
  */
-const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
+const ErrorPage = ({ error, errorInfo, errorId, handleReset }) => {
   const navigate = useNavigate()
 
   const COPY_MESSAGE =
     "Error details copied to clipboard. Please contact support with this information."
 
   const handleRetry = () => {
-    if (onReset) {
-      onReset()
+    if (handleReset) {
+      handleReset()
     } else {
       // Fallback: reload the page
       window.location.reload()
@@ -159,14 +159,14 @@ ErrorPage.propTypes = {
   }),
   errorInfo: PropTypes.object,
   errorId: PropTypes.string,
-  onReset: PropTypes.func,
+  handleReset: PropTypes.func,
 }
 
 ErrorPage.defaultProps = {
   error: null,
   errorInfo: null,
   errorId: null,
-  onReset: null,
+  handleReset: null,
 }
 
 export default ErrorPage

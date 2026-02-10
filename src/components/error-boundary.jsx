@@ -1,23 +1,10 @@
-import { useMemo } from "react"
+import PropTypes from "prop-types"
+import { useMemo, useState, useEffect } from "react"
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary"
 
 import { reportError } from "@/lib/utils/error-handler"
 import ErrorPage from "@/pages/misc/error-found"
 
-/**
- * Error Boundary Component
- *
- * Catches JavaScript errors anywhere in the child component tree,
- * logs those errors, and displays a fallback UI instead of crashing.
- *
- * Uses react-error-boundary library for modern functional component API.
- * (The library uses a class component internally, but we use it functionally)
- *
- * Usage:
- *   <ErrorBoundary>
- *     <YourComponent />
- *   </ErrorBoundary>
- */
 const ErrorBoundary = ({ children }) => {
   const handleError = (error, errorInfo) => {
     // Generate unique error ID
@@ -46,18 +33,28 @@ const ErrorBoundary = ({ children }) => {
     }
   }
 
+  const handleReset = () => {
+    // Reset error state - the library handles this automatically
+    window.location.reload()
+  }
+
   return (
     <ReactErrorBoundary
       FallbackComponent={ErrorFallback}
       onError={handleError}
-      onReset={() => {
-        // Reset error state - the library handles this automatically
-        window.location.reload()
-      }}
+      onReset={handleReset}
     >
       {children}
     </ReactErrorBoundary>
   )
+}
+
+ErrorBoundary.propTypes = {
+  children: PropTypes.node,
+}
+
+ErrorBoundary.defaultProps = {
+  children: null,
 }
 
 /**
@@ -65,11 +62,12 @@ const ErrorBoundary = ({ children }) => {
  * Wrapper to pass error details to our ErrorPage component
  */
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
-  // Generate error ID once
-  const errorId = useMemo(
-    () => `ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
-    []
-  )
+  const [errorId, setErrorId] = useState(null)
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setErrorId(`ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`)
+  }, [])
 
   const errorInfo = useMemo(
     () => ({
@@ -85,9 +83,18 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
       error={error}
       errorInfo={errorInfo}
       errorId={errorId}
-      onReset={resetErrorBoundary}
+      handleReset={resetErrorBoundary}
     />
   )
+}
+
+ErrorFallback.propTypes = {
+  error: PropTypes.instanceOf(Error),
+  resetErrorBoundary: PropTypes.func.isRequired,
+}
+
+ErrorFallback.defaultProps = {
+  error: null,
 }
 
 export default ErrorBoundary

@@ -13,7 +13,8 @@ export default [
             "**/src/tests/**",
             "**/*.test.{js,jsx}",
             "**/*.spec.{js,jsx}",
-            "**/src/services/mock/**"
+            "**/src/services/mock/**",
+            "**/.github/**"
         ],
     },
 
