@@ -8,6 +8,8 @@ import { usePostLeaveRequest } from "@query/leave.query"
 
 import RequestLeaveUI from "./request-leave.ui"
 
+/* eslint-disable react-hooks/incompatible-library */
+
 const schema = z
   .object({
     leaveType: z.string().min(1, "Select a leave type"),

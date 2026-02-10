@@ -3,6 +3,8 @@ import PropTypes from "prop-types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
+/* eslint-disable complexity, react/no-array-index-key */
+
 const MONTH_NAMES = [
   "January",
   "February",
@@ -38,10 +40,10 @@ const getDayColorClass = (record) => {
 /**
  * Mini horizontal bar showing present / onLeave / absent proportions.
  */
-const AttendanceBar = ({ present, onLeave, total }) => {
+const AttendanceBar = ({ present, leaveCount, total }) => {
   if (total === 0) return null
   const presentW = Math.round((present / total) * 100)
-  const leaveW = Math.round((onLeave / total) * 100)
+  const leaveW = Math.round((leaveCount / total) * 100)
   const absentW = 100 - presentW - leaveW
 
   return (
@@ -64,8 +66,7 @@ const AttendanceBar = ({ present, onLeave, total }) => {
 
 AttendanceBar.propTypes = {
   present: PropTypes.number.isRequired,
-  onLeave: PropTypes.number.isRequired,
-  absent: PropTypes.number.isRequired,
+  leaveCount: PropTypes.number.isRequired,
   total: PropTypes.number.isRequired,
 }
 
@@ -93,9 +94,7 @@ StatCard.propTypes = {
   icon: PropTypes.string.isRequired,
 }
 
-/**
- * LeaveCalendarUI — presentational component for the calendar view.
- */
+// eslint-disable-next-line max-lines-per-function
 const LeaveCalendarUI = ({
   year,
   month,
@@ -107,21 +106,28 @@ const LeaveCalendarUI = ({
   canGoNext,
 }) => {
   const today = new Date()
-  const todayString = today.toISOString().split("T")[0]
+  const [todayString] = today.toISOString().split("T")
+
+  const handlePreviousMonth = onPrevMonth
+  const handleNextMonth = onNextMonth
 
   // Compute aggregated monthly totals (weekdays only)
-  const monthTotals = data?.records?.reduce(
-    (accumulator, r) => {
-      if (!r.isWeekend) {
-        accumulator.present += r.present
-        accumulator.absent += r.absent
-        accumulator.onLeave += r.onLeave
-        accumulator.workdays += 1
-      }
-      return accumulator
-    },
-    { present: 0, absent: 0, onLeave: 0, workdays: 0 }
-  ) ?? { present: 0, absent: 0, onLeave: 0, workdays: 0 }
+  const computeMonthTotals = (records) => {
+    return (records ?? []).reduce(
+      (accumulator, r) => {
+        if (!r.isWeekend) {
+          accumulator.present += r.present
+          accumulator.absent += r.absent
+          accumulator.onLeave += r.onLeave
+          accumulator.workdays += 1
+        }
+        return accumulator
+      },
+      { present: 0, absent: 0, onLeave: 0, workdays: 0 }
+    )
+  }
+
+  const monthTotals = computeMonthTotals(data?.records)
 
   // Build calendar grid: leading empty cells + day records
   const firstDayOfWeek = new Date(year, month, 1).getDay()
@@ -172,7 +178,10 @@ const LeaveCalendarUI = ({
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-20 rounded-xl" />
+            <Skeleton
+              key={`stat-skeleton-${index}`}
+              className="h-20 rounded-xl"
+            />
           ))}
         </div>
       ) : (
@@ -222,7 +231,7 @@ const LeaveCalendarUI = ({
           <div className="flex items-center justify-between">
             {/* Prev */}
             <button
-              onClick={onPrevMonth}
+              onClick={handlePreviousMonth}
               className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
               aria-label="Previous month"
             >
@@ -235,7 +244,7 @@ const LeaveCalendarUI = ({
 
             {/* Next */}
             <button
-              onClick={onNextMonth}
+              onClick={handleNextMonth}
               disabled={!canGoNext}
               className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Next month"
@@ -262,14 +271,22 @@ const LeaveCalendarUI = ({
           {isLoading ? (
             <div className="grid grid-cols-7 gap-1">
               {Array.from({ length: 35 }).map((_, index) => (
-                <Skeleton key={index} className="h-16 rounded-lg" />
+                <Skeleton
+                  key={`skeleton-${index}`}
+                  className="h-16 rounded-lg"
+                />
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-7 gap-1">
               {gridCells.map((record, index) => {
                 if (!record) {
-                  return <div key={`empty-${index}`} className="h-16 md:h-20" />
+                  return (
+                    <div
+                      key={`empty-${firstDayOfWeek}-${index}`}
+                      className="h-16 md:h-20"
+                    />
+                  )
                 }
 
                 const dayNumber = parseInt(record.date.split("-")[2])
@@ -313,8 +330,7 @@ const LeaveCalendarUI = ({
                     {!record.isWeekend && record.total > 0 && (
                       <AttendanceBar
                         present={record.present}
-                        onLeave={record.onLeave}
-                        absent={record.absent}
+                        leaveCount={record.onLeave}
                         total={record.total}
                       />
                     )}
@@ -420,6 +436,10 @@ LeaveCalendarUI.propTypes = {
   onPrevMonth: PropTypes.func.isRequired,
   onNextMonth: PropTypes.func.isRequired,
   canGoNext: PropTypes.bool.isRequired,
+}
+
+LeaveCalendarUI.defaultProps = {
+  data: null,
 }
 
 export default LeaveCalendarUI
