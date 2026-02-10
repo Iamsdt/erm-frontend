@@ -2,8 +2,6 @@ import config from "@10xscale/eslint-modern"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
-import pluginImport from "eslint-plugin-import"
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default [
@@ -15,6 +13,7 @@ export default [
             "**/src/tests/**",
             "**/*.test.{js,jsx}",
             "**/*.spec.{js,jsx}",
+            "**/src/services/mock/**"
         ],
     },
 
@@ -42,6 +41,9 @@ export default [
                 atob: "readonly",
                 btoa: "readonly",
                 URL: "readonly",
+                AbortController: "readonly",
+                module: "readonly",
+                alert: "readonly",
             },
         },
 

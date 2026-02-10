@@ -5,16 +5,27 @@ import axios from "axios"
 import { config } from "@/lib/config"
 import { reportApiError } from "@/lib/utils/error-handler"
 
+// Common header values
+
+const JSON_CONTENT_TYPE = "application/json"
+
 const instance = axios.create({
   baseURL: config.apiBaseUrl,
   timeout: config.apiTimeout,
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": JSON_CONTENT_TYPE,
   },
 })
 
 // AbortController management for request cancellation
 const pendingRequests = new Map()
+
+// Common route paths used for redirects
+const PATHS = {
+  NOT_AUTHORIZED: "/misc/not-authorized/",
+  MAINTENANCE: "/misc/maintenance/",
+  LOGIN: "/login",
+}
 
 /**
  * Generate a unique key for each request
@@ -26,20 +37,21 @@ const generateRequestKey = (config) => {
   return `${method}:${url}:${JSON.stringify(params)}:${JSON.stringify(data)}`
 }
 
-/**
- * Cancel pending request if exists
- * @param {string} requestKey - Request key
- */
-const cancelPendingRequest = (requestKey) => {
-  if (pendingRequests.has(requestKey)) {
-    const controller = pendingRequests.get(requestKey)
-    controller.abort()
-    pendingRequests.delete(requestKey)
-  }
-}
+// /**
+//  * Cancel pending request if exists
+//  * @param {string} requestKey - Request key
+//  */
+// const cancelPendingRequest = (requestKey) => {
+//   if (pendingRequests.has(requestKey)) {
+//     const controller = pendingRequests.get(requestKey)
+//     controller.abort()
+//     pendingRequests.delete(requestKey)
+//   }
+// }
 
 /**
  * Cancel all pending requests
+ * @returns {void} No return value.
  */
 export const cancelAllRequests = () => {
   pendingRequests.forEach((controller) => {
@@ -50,7 +62,7 @@ export const cancelAllRequests = () => {
 
 /**
  * Get current number of pending requests
- * @returns {number}
+ * @returns {number} Number of pending requests
  */
 export const getPendingRequestsCount = () => pendingRequests.size
 
@@ -87,6 +99,71 @@ instance.interceptors.request.use(
 )
 
 // Response interceptor with error handling and cleanup
+
+/**
+ * Delete pending request entry for a request (if present)
+ * @param {object|undefined} originalRequest - Axios request config
+ * @returns {void}
+ */
+const cleanupPendingRequest = (originalRequest) => {
+  if (originalRequest?._requestKey) {
+    pendingRequests.delete(originalRequest._requestKey)
+  }
+}
+
+/**
+ * Report error to monitoring service
+ * @param {Error} error - Axios error object
+ * @returns {void}
+ */
+const reportToMonitoring = (error) => {
+  reportApiError({
+    url: error.config?.url || error.request?.responseURL,
+    status: error.response?.status,
+    response: error.response,
+    request: error.request,
+    config: error.config,
+  })
+}
+
+/**
+ * Handle HTTP status specific actions
+ * @param {number} status - HTTP status code
+ * @param {object} error - Axios error object
+ * @returns {void}
+ */
+const handleHttpStatus = (status, error) => {
+  const serverStatuses = new Set([500, 502, 503, 504])
+
+  const handlers = {
+    400: (error_) => console.error("Bad request:", error_.response.data),
+    401: () => {
+      if (window.location.pathname !== PATHS.LOGIN) {
+        // window.location.href = PATHS.LOGIN
+      }
+    },
+    403: () => {
+      if (window.location.pathname !== PATHS.NOT_AUTHORIZED) {
+        window.location.href = PATHS.NOT_AUTHORIZED
+      }
+    },
+    404: (error_) => console.error("Resource not found:", error_.config?.url),
+    429: () => console.error("Rate limit exceeded"),
+  }
+
+  if (serverStatuses.has(status)) {
+    console.error(`Server error (${status}):`, error.response.data)
+    return
+  }
+
+  if (handlers[status]) {
+    handlers[status](error)
+    return
+  }
+
+  console.error(`API error (${status}):`, error.response.data)
+}
+
 instance.interceptors.response.use(
   (response) => {
     // Clean up pending request tracking
@@ -98,7 +175,7 @@ instance.interceptors.response.use(
     // Log request duration in development
     if (config.isDevelopment && response.config._startTime) {
       const duration = Date.now() - response.config._startTime
-      console.log(
+      console.warn(
         `✅ ${response.config.method.toUpperCase()} ${response.config.url} (${duration}ms)`
       )
     }
@@ -109,84 +186,25 @@ instance.interceptors.response.use(
     const originalRequest = error.config
 
     // Clean up pending request tracking
-    if (originalRequest?._requestKey) {
-      pendingRequests.delete(originalRequest._requestKey)
-    }
+    cleanupPendingRequest(originalRequest)
 
     // Handle request cancellation (don't report to monitoring)
     if (axios.isCancel(error)) {
-      console.log("Request cancelled:", originalRequest?.url)
+      console.warn("Request cancelled:", originalRequest?.url)
       return Promise.reject(error)
     }
 
     // Report API error to monitoring service
-    reportApiError({
-      url: error.config?.url || error.request?.responseURL,
-      status: error.response?.status,
-      response: error.response,
-      request: error.request,
-      config: error.config,
-    })
+    reportToMonitoring(error)
 
     // Handle specific HTTP status codes
     if (!error.response) {
       // Network error or server not reachable
       console.error("Network error:", error.message)
-      // Optionally redirect to maintenance page
-      // if (window.location.pathname !== '/misc/maintenance/') {
-      //   window.location.href = '/misc/maintenance/'
-      // }
     } else {
       const { status } = error.response
 
-      switch (status) {
-        case 400:
-          // Bad Request - validation errors
-          console.error("Bad request:", error.response.data)
-          break
-
-        case 401:
-          // Unauthorized - token expired or invalid
-          // Handle authentication - redirect to login or refresh token
-          // See src/docs/AUTHENTICATION_PATTERNS.md for auth handling
-          if (window.location.pathname !== "/login") {
-            // Uncomment to redirect to login
-            // window.location.href = "/login"
-          }
-          break
-
-        case 403:
-          // Forbidden - user doesn't have permission
-          if (window.location.pathname !== "/misc/not-authorized/") {
-            window.location.href = "/misc/not-authorized/"
-          }
-          break
-
-        case 404:
-          // Not Found
-          console.error("Resource not found:", error.config?.url)
-          break
-
-        case 429:
-          // Too Many Requests - rate limiting
-          console.error("Rate limit exceeded")
-          break
-
-        case 500:
-        case 502:
-        case 503:
-        case 504:
-          // Server errors
-          console.error(`Server error (${status}):`, error.response.data)
-          // Optionally redirect to maintenance page
-          // if (window.location.pathname !== '/misc/maintenance/') {
-          //   window.location.href = '/misc/maintenance/'
-          // }
-          break
-
-        default:
-          console.error(`API error (${status}):`, error.response.data)
-      }
+      handleHttpStatus(status, error)
     }
 
     return Promise.reject(error)
@@ -219,7 +237,7 @@ instance.interceptors.response.use(
 //         }
 //     } catch (error) {
 //         // toast.error("Session Expired, Please Login Again");
-//         // window.location.href = "/login";
+//         // window.location.href = PATHS.LOGIN;
 //         console.log('DEBUG: I am rejecting', error)
 //         // throw error; // Propagate the error to the caller of the interceptor
 //         return ''
@@ -240,13 +258,13 @@ instance.interceptors.response.use(
 //     },
 //     (error) => {
 //         if (error.response === null) {
-//             if (window.location.pathname !== '/misc/maintenance/') {
-//                 window.location.href = '/misc/maintenance/'
+//         if (window.location.pathname !== PATHS.MAINTENANCE) {
+//                 window.location.href = PATHS.MAINTENANCE
 //             }
 //         } else if (Number(error.response?.status) === 400) {
 //         } else if (Number(error.response?.status) === 401) {
-//             if (window.location.pathname !== '/misc/not-authorized/') {
-//                 window.location.href = '/misc/not-authorized/'
+//             if (window.location.pathname !== PATHS.NOT_AUTHORIZED) {
+//                 window.location.href = PATHS.NOT_AUTHORIZED
 //             }
 //             // window.location.href = "/misc/not-authorized/";
 //             // handle 502

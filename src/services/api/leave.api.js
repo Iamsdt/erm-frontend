@@ -4,11 +4,13 @@ import api from "."
 
 /**
  * Fetches attendance records for a specific month/year.
- * @param {object} options
- * @param {number} options.year
- * @param {number} options.month - 0-indexed (0=Jan)
- * @param {AbortSignal} [options.signal]
- * @returns {Promise}
+ * @async
+ * @function
+ * @param {object} options - Request options
+ * @param {number} options.year - Year to fetch (e.g., 2026)
+ * @param {number} options.month - 0-indexed month (0 = Jan)
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response from the API containing attendance data
  */
 export const getMonthlyAttendance = async ({ year, month, signal } = {}) => {
   const config = {
@@ -21,9 +23,11 @@ export const getMonthlyAttendance = async ({ year, month, signal } = {}) => {
 
 /**
  * Fetches admin leave dashboard summary.
- * @param {object} options
- * @param {AbortSignal} [options.signal]
- * @returns {Promise}
+ * @async
+ * @function
+ * @param {object} options - Request options
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response from the API containing the admin summary
  */
 export const getAdminLeaveSummary = async ({ signal } = {}) => {
   const config = { headers: { "Content-Type": "application/json" }, signal }
@@ -32,9 +36,11 @@ export const getAdminLeaveSummary = async ({ signal } = {}) => {
 
 /**
  * Fetches the current employee's leave profile.
- * @param {object} options
- * @param {AbortSignal} [options.signal]
- * @returns {Promise}
+ * @async
+ * @function
+ * @param {object} options - Request options
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response from the API containing the employee profile
  */
 export const getEmployeeLeaveProfile = async ({ signal } = {}) => {
   const config = { headers: { "Content-Type": "application/json" }, signal }
@@ -43,9 +49,11 @@ export const getEmployeeLeaveProfile = async ({ signal } = {}) => {
 
 /**
  * Fetches the full list of leave approval requests.
- * @param {object} options
- * @param {AbortSignal} [options.signal]
- * @returns {Promise}
+ * @async
+ * @function
+ * @param {object} options - Request options
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response from the API containing approval requests
  */
 export const getAdminApprovals = async ({ signal } = {}) => {
   const config = { headers: { "Content-Type": "application/json" }, signal }
@@ -54,10 +62,12 @@ export const getAdminApprovals = async ({ signal } = {}) => {
 
 /**
  * Approves or rejects a leave request.
- * @param {number} id
- * @param {"approved"|"rejected"} status
- * @param {string} [note]
- * @returns {Promise}
+ * @async
+ * @function
+ * @param {number} id - Approval request id
+ * @param {"approved"|"rejected"} status - Action to perform on the request
+ * @param {string} [note] - Optional note explaining the decision
+ * @returns {Promise} The response from the API after performing the action
  */
 export const patchLeaveApproval = async (id, status, note = "") => {
   return api.patch(`${ct.api.leave.adminApprovalAction}/${id}/`, {
@@ -68,9 +78,11 @@ export const patchLeaveApproval = async (id, status, note = "") => {
 
 /**
  * Fetches the employee list for manual record selection.
- * @param {object} options
- * @param {AbortSignal} [options.signal]
- * @returns {Promise}
+ * @async
+ * @function
+ * @param {object} options - Request options
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response from the API containing the employee list
  */
 export const getAdminEmployees = async ({ signal } = {}) => {
   const config = { headers: { "Content-Type": "application/json" }, signal }
@@ -79,8 +91,10 @@ export const getAdminEmployees = async ({ signal } = {}) => {
 
 /**
  * Posts a manual attendance record for an employee.
- * @param {object} payload
- * @returns {Promise}
+ * @async
+ * @function
+ * @param {object} payload - Manual record payload
+ * @returns {Promise} The response from the API
  */
 export const postManualRecord = async (payload) => {
   return api.post(ct.api.leave.adminManualRecord, payload)
@@ -88,8 +102,10 @@ export const postManualRecord = async (payload) => {
 
 /**
  * Posts a leave request from the employee.
- * @param {object} payload
- * @returns {Promise}
+ * @async
+ * @function
+ * @param {object} payload - Leave request payload
+ * @returns {Promise} The response from the API
  */
 export const postLeaveRequest = async (payload) => {
   return api.post(ct.api.leave.employeeRequest, payload)

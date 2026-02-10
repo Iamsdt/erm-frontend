@@ -1,3 +1,6 @@
+/* eslint-disable jsdoc/reject-function-type */
+/* eslint-disable jsdoc/check-param-names */
+import PropTypes from "prop-types"
 import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
@@ -16,10 +19,13 @@ import {
  * @param {Error} error - The error object
  * @param {object} errorInfo - Additional error information
  * @param {string} errorId - Unique error ID for tracking
- * @param {function} onReset - Callback to reset error state
+ * @param {Function} onReset - Callback to reset error state
  */
 const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
   const navigate = useNavigate()
+
+  const COPY_MESSAGE =
+    "Error details copied to clipboard. Please contact support with this information."
 
   const handleRetry = () => {
     if (onReset) {
@@ -47,11 +53,22 @@ const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
     const errorText = JSON.stringify(errorDetails, null, 2)
 
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(errorText).then(() => {
-        alert(
-          "Error details copied to clipboard. Please contact support with this information."
-        )
-      })
+      navigator.clipboard
+        .writeText(errorText)
+        .then(() => {
+          alert(COPY_MESSAGE)
+          return undefined
+        })
+        .catch(() => {
+          // Fallback for browsers without clipboard API or write failure
+          const textarea = document.createElement("textarea")
+          textarea.value = errorText
+          document.body.appendChild(textarea)
+          textarea.select()
+          document.execCommand("copy")
+          document.body.removeChild(textarea)
+          alert(COPY_MESSAGE)
+        })
     } else {
       // Fallback for browsers without clipboard API
       const textarea = document.createElement("textarea")
@@ -60,9 +77,7 @@ const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
       textarea.select()
       document.execCommand("copy")
       document.body.removeChild(textarea)
-      alert(
-        "Error details copied to clipboard. Please contact support with this information."
-      )
+      alert(COPY_MESSAGE)
     }
   }
 
@@ -72,8 +87,8 @@ const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
         <CardHeader>
           <CardTitle className="text-2xl">Something went wrong</CardTitle>
           <CardDescription>
-            We're sorry, but something unexpected happened. Our team has been
-            notified.
+            We&apos;re sorry, but something unexpected happened. Our team has
+            been notified.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -135,6 +150,23 @@ const ErrorPage = ({ error, errorInfo, errorId, onReset }) => {
       </Card>
     </div>
   )
+}
+
+ErrorPage.propTypes = {
+  error: PropTypes.shape({
+    message: PropTypes.string,
+    stack: PropTypes.string,
+  }),
+  errorInfo: PropTypes.object,
+  errorId: PropTypes.string,
+  onReset: PropTypes.func,
+}
+
+ErrorPage.defaultProps = {
+  error: null,
+  errorInfo: null,
+  errorId: null,
+  onReset: null,
 }
 
 export default ErrorPage

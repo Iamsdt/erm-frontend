@@ -38,7 +38,7 @@ const getDayColorClass = (record) => {
 /**
  * Mini horizontal bar showing present / onLeave / absent proportions.
  */
-const AttendanceBar = ({ present, onLeave, absent, total }) => {
+const AttendanceBar = ({ present, onLeave, total }) => {
   if (total === 0) return null
   const presentW = Math.round((present / total) * 100)
   const leaveW = Math.round((onLeave / total) * 100)
@@ -410,7 +410,6 @@ LeaveCalendarUI.propTypes = {
         date: PropTypes.string,
         isWeekend: PropTypes.bool,
         present: PropTypes.number,
-        absent: PropTypes.number,
         onLeave: PropTypes.number,
         total: PropTypes.number,
       })
