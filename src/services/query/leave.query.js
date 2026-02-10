@@ -100,7 +100,7 @@ export const useFetchAdminEmployees = () => {
 /**
  * Mutation hook to approve or reject a leave request.
  * Invalidates the approvals list on success.
- * @returns {import("@tanstack/react-query").UseMutationResult}
+ * @returns {import("@tanstack/react-query").UseMutationResult} The mutation result for approving/rejecting leave
  */
 export const useApproveLeave = () => {
   const queryClient = useQueryClient()
@@ -115,7 +115,7 @@ export const useApproveLeave = () => {
 
 /**
  * Mutation hook to post a manual attendance record.
- * @returns {import("@tanstack/react-query").UseMutationResult}
+ * @returns {import("@tanstack/react-query").UseMutationResult} The mutation result for posting a manual record
  */
 export const usePostManualRecord = () => {
   return useMutation({
@@ -126,7 +126,7 @@ export const usePostManualRecord = () => {
 /**
  * Mutation hook to submit a leave request from the employee.
  * Invalidates the employee profile on success.
- * @returns {import("@tanstack/react-query").UseMutationResult}
+ * @returns {import("@tanstack/react-query").UseMutationResult} The mutation result for submitting a leave request
  */
 export const usePostLeaveRequest = () => {
   const queryClient = useQueryClient()
