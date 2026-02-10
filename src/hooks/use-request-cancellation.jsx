@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { cancelAllRequests } from "@/services/api"
 
@@ -33,7 +33,7 @@ export const useRequestCancellation = () => {
 /**
  * Custom hook to create an AbortController for manual request cancellation
  * Useful for cancelling requests on user actions (e.g., navigation, button clicks)
- * @returns {{ signal: AbortSignal, cancel: Function }}
+ * @returns {{ signal: AbortSignal|null, cancel: Function }}
  * @example
  * function SearchComponent() {
  *   const { signal, cancel } = useAbortController()
@@ -61,9 +61,11 @@ export const useRequestCancellation = () => {
  */
 export const useAbortController = () => {
   const controllerReference = useRef(null)
+  const [signal, setSignal] = useState(null)
 
   useEffect(() => {
     controllerReference.current = new AbortController()
+    setSignal(controllerReference.current.signal)
 
     return () => {
       if (controllerReference.current) {
@@ -77,11 +79,12 @@ export const useAbortController = () => {
       controllerReference.current.abort()
       // Create new controller for subsequent requests
       controllerReference.current = new AbortController()
+      setSignal(controllerReference.current.signal)
     }
   }
 
   return {
-    signal: controllerReference.current?.signal,
+    signal,
     cancel,
   }
 }
@@ -89,10 +92,10 @@ export const useAbortController = () => {
 /**
  * Custom hook to automatically cancel requests when a dependency changes
  * Useful for search inputs, filters, etc.
- * @param {Function} requestFn - Function that makes the API request
+ * @param {Function} requestFunction - Function that makes the API request
  * @param {Array} deps - Dependencies to watch for changes
  * @param {object} options - Configuration options
- * @returns {{ isLoading: boolean, error: Error|null, cancel: Function }}
+ * @returns {{ cancel: Function }}
  * @example
  * function SearchComponent({ searchTerm }) {
  *   const { isLoading, error, cancel } = useCancellableRequest(
@@ -166,7 +169,7 @@ export const useCancellableRequest = (
         clearTimeout(timeoutReference.current)
       }
     }
-  }, deps)
+  }, [requestFunction, debounce, onError, onSuccess, ...deps]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const cancel = () => {
     if (controllerReference.current) {

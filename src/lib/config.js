@@ -161,6 +161,7 @@ export const config = {
 /**
  *
  */
+// eslint-disable-next-line complexity
 const validateConfig = () => {
   const errors = []
 

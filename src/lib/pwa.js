@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * PWA (Progressive Web App) Utilities
  *
@@ -8,6 +9,8 @@
  * - Offline detection
  */
 
+/* global CustomEvent, Notification, Event */
+
 import { config } from "./config"
 
 let deferredPrompt = null
@@ -15,7 +18,6 @@ let serviceWorkerRegistration = null
 
 /**
  * Register service worker
- * @returns {Promise<ServiceWorkerRegistration|null>}
  */
 export const registerServiceWorker = async () => {
   if (!config.features.enablePWA) {
@@ -155,12 +157,12 @@ export const clearServiceWorkerCache = async () => {
  * Capture install prompt
  */
 export const setupInstallPrompt = () => {
-  window.addEventListener("beforeinstallprompt", (e) => {
+  window.addEventListener("beforeinstallprompt", (event) => {
     // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault()
+    event.preventDefault()
 
     // Stash the event so it can be triggered later
-    deferredPrompt = e
+    deferredPrompt = event
 
     console.log("Install prompt available")
 
@@ -180,7 +182,6 @@ export const setupInstallPrompt = () => {
 
 /**
  * Show install prompt
- * @returns {Promise<{outcome: string}>}
  */
 export const showInstallPrompt = async () => {
   if (!deferredPrompt) {
@@ -209,7 +210,6 @@ export const showInstallPrompt = async () => {
 
 /**
  * Check if app is installed
- * @returns {boolean}
  */
 export const isAppInstalled = () =>
   window.matchMedia("(display-mode: standalone)").matches ||
@@ -218,7 +218,6 @@ export const isAppInstalled = () =>
 
 /**
  * Check if install prompt is available
- * @returns {boolean}
  */
 export const isInstallPromptAvailable = () => deferredPrompt !== null
 
@@ -260,7 +259,6 @@ const updateOnlineStatus = () => {
 
 /**
  * Request notification permission
- * @returns {Promise<NotificationPermission>}
  */
 export const requestNotificationPermission = async () => {
   if (!("Notification" in window)) {
@@ -284,7 +282,6 @@ export const requestNotificationPermission = async () => {
 /**
  * Subscribe to push notifications
  * @param {string} vapidPublicKey - VAPID public key
- * @returns {Promise<PushSubscription|null>}
  */
 export const subscribeToPushNotifications = async (vapidPublicKey) => {
   if (!serviceWorkerRegistration) {

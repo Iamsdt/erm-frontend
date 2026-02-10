@@ -9,7 +9,7 @@ import api from "./index"
  * @async
  * @function
  * @param {object} options - Request options
- * @param {AbortSignal} options.signal - AbortSignal for request cancellation
+ * @param {object} options.signal - AbortSignal for request cancellation
  * @returns {Promise} The response from the API containing the comments data.
  */
 export const getComments = async (options = {}) => {

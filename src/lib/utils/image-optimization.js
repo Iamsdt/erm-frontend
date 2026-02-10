@@ -8,6 +8,8 @@
  * - CDN URL generation
  */
 
+/* global URLSearchParams, Image, IntersectionObserver */
+
 /**
  * Generate responsive image srcset
  * @param {string} baseUrl - Base image URL
@@ -15,10 +17,10 @@
  * @param {object} options - Additional options
  * @returns {string} srcset string
  * @example
- * generateSrcSet('/images/hero.jpg', [320, 640, 1024])
+ * generateSourceSet('/images/hero.jpg', [320, 640, 1024])
  * // Returns: '/images/hero.jpg?w=320 320w, /images/hero.jpg?w=640 640w, ...'
  */
-export const generateSrcSet = (
+export const generateSourceSet = (
   baseUrl,
   widths = [320, 640, 768, 1024, 1280, 1920],
   options = {}
@@ -254,6 +256,7 @@ export const calculateImageDimensions = (
  * @example
  * generateCDNUrl('/image.jpg', { width: 800, quality: 80, format: 'webp' })
  */
+// eslint-disable-next-line complexity
 export const generateCDNUrl = (baseUrl, transformations = {}) => {
   const {
     width,

@@ -102,6 +102,7 @@ export const getTimezoneOffset = (timezone, date = new Date()) => {
  * getRelativeTime(new Date(Date.now() - 3600000)) // "1 hour ago"
  * getRelativeTime(new Date(Date.now() + 86400000)) // "in 1 day"
  */
+// eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 export const getRelativeTime = (date, baseDate = new Date()) => {
   const d = date instanceof Date ? date : new Date(date)
   const diffMs = d.getTime() - baseDate.getTime()

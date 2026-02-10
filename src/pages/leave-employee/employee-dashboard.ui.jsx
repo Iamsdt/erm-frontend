@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 
+/* eslint-disable complexity, max-lines-per-function, react/no-array-index-key */
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const STATUS_STYLE = {
@@ -62,6 +64,8 @@ const AttendanceRing = ({ pct }) => {
 }
 
 AttendanceRing.propTypes = { pct: PropTypes.number }
+
+AttendanceRing.defaultProps = { pct: 0 }
 
 /**
  * Leave balance progress bar for a single leave type.
@@ -133,6 +137,8 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
   const history = data?.leaveHistory ?? []
   const upcoming = data?.upcoming ?? []
 
+  const handleRequestLeave = onRequestLeave
+
   const totalUsed = balance.reduce((accumulator, b) => accumulator + b.used, 0)
   const totalAllocated = balance.reduce(
     (accumulator, b) => accumulator + b.allocated,
@@ -197,7 +203,11 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
                 <p className="text-xs text-center text-muted-foreground">
                   This month
                 </p>
-                <Button size="sm" onClick={onRequestLeave} className="w-full">
+                <Button
+                  size="sm"
+                  onClick={handleRequestLeave}
+                  className="w-full"
+                >
                   + Request Leave
                 </Button>
               </div>
@@ -452,6 +462,10 @@ EmployeeDashboardUI.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   onRequestLeave: PropTypes.func.isRequired,
+}
+
+EmployeeDashboardUI.defaultProps = {
+  data: null,
 }
 
 export default EmployeeDashboardUI

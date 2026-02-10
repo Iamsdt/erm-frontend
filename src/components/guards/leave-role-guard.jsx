@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
@@ -45,7 +45,9 @@ const ROLE_LABELS = {
 /**
  * LeaveRoleGuard — protects leave module routes by `leave_management_role`.
  * Shows a funny unauthorized page with a countdown before navigating back.
- * @param {{ children: React.ReactNode, allowedRoles: string[] }} props
+ * @param {object} props - Component props
+ * @param {React.ReactElement} props.children - Child components to render if access is granted
+ * @param {string[]} props.allowedRoles - Array of roles that have access
  */
 const LeaveRoleGuard = ({ children, allowedRoles }) => {
   const navigate = useNavigate()
@@ -55,13 +57,12 @@ const LeaveRoleGuard = ({ children, allowedRoles }) => {
   const hasAccess = allowedRoles.includes(leaveRole)
 
   const [countdown, setCountdown] = useState(3)
-  const messageReference = useRef(
-    FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)]
+  const [message] = useState(
+    () => FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)]
   )
-  const message = messageReference.current
 
   useEffect(() => {
-    if (hasAccess) return
+    if (hasAccess) return () => {}
 
     const interval = setInterval(() => {
       setCountdown((n) => {
