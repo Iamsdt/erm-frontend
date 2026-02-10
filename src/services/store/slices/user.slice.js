@@ -9,17 +9,20 @@ export const authSlice = createSlice({
     userName: "",
     isAuthenticated: false,
     userRole: "",
+    leave_management_role: "", // "admin" | "employee" — scoped role for Leave Management module
   },
   reducers: {
     login: (state, action) => {
       state.userName = action.payload.userName
       state.isAuthenticated = true
       state.userRole = action.payload.userRole
+      state.leave_management_role = action.payload.leave_management_role ?? ""
     },
     logout: (state) => {
       state.userName = ""
       state.isAuthenticated = false
       state.userRole = ""
+      state.leave_management_role = ""
 
       // also clear localhost
       queryClient.clear()

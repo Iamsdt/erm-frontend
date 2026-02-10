@@ -14,6 +14,7 @@ const FormSchema = z.object({
   email: z.string().email().min(5, {
     message: "Username must be at least 2 characters.",
   }),
+  role: z.enum(["admin", "employee"], { required_error: "Select a role" }),
 })
 
 const Login = () => {
@@ -24,18 +25,20 @@ const Login = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       email: "",
+      role: "employee",
     },
   })
 
   /**
    * Handles the login form submission.
-   * @param {object} data - The form data containing the email.
+   * @param {object} data - The form data containing the email and role.
    */
   const handleOnSubmit = async (data) => {
     dispatch(
       login({
         userName: data.email,
-        userRole: "user",
+        userRole: data.role,
+        leave_management_role: data.role,
       })
     )
     toast({
