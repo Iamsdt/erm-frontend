@@ -1,6 +1,6 @@
 import commentHandler from "./comments"
-import leaveDashboardHandler from "./leave-dashboard"
 import leaveHandler from "./leave"
+import leaveDashboardHandler from "./leave-dashboard"
 
 const handlers = [...commentHandler, ...leaveHandler, ...leaveDashboardHandler]
 

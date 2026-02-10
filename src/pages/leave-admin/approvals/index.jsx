@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-
 import { useNavigate } from "react-router-dom"
 
 import { toast } from "@/components/ui/use-toast"
@@ -51,7 +50,7 @@ const ApprovalsPage = () => {
   }
 
   const handleNoteChange = (id, value) => {
-    setNoteMap((prev) => ({ ...prev, [id]: value }))
+    setNoteMap((previous) => ({ ...previous, [id]: value }))
   }
 
   return (

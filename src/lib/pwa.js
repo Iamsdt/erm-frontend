@@ -17,7 +17,7 @@ let serviceWorkerRegistration = null
  * Register service worker
  * @returns {Promise<ServiceWorkerRegistration|null>}
  */
-export async function registerServiceWorker() {
+export const registerServiceWorker = async () => {
   if (!config.features.enablePWA) {
     console.log("PWA is disabled in configuration")
     return null
@@ -77,7 +77,7 @@ export async function registerServiceWorker() {
 /**
  * Unregister service worker
  */
-export async function unregisterServiceWorker() {
+export const unregisterServiceWorker = async () => {
   if (!("serviceWorker" in navigator)) {
     return
   }
@@ -96,7 +96,7 @@ export async function unregisterServiceWorker() {
 /**
  * Notify user about service worker update
  */
-function notifyUserAboutUpdate() {
+const notifyUserAboutUpdate = () => {
   // You can show a toast/notification here
   // Example using custom event:
   const event = new CustomEvent("sw-update-available", {
@@ -117,7 +117,7 @@ function notifyUserAboutUpdate() {
 /**
  * Update service worker immediately
  */
-export function updateServiceWorker() {
+export const updateServiceWorker = () => {
   if (!serviceWorkerRegistration) {
     console.warn("No service worker registration found")
     return
@@ -138,7 +138,7 @@ export function updateServiceWorker() {
 /**
  * Clear all service worker caches
  */
-export async function clearServiceWorkerCache() {
+export const clearServiceWorkerCache = async () => {
   if (!serviceWorkerRegistration) {
     return
   }
@@ -154,7 +154,7 @@ export async function clearServiceWorkerCache() {
 /**
  * Capture install prompt
  */
-export function setupInstallPrompt() {
+export const setupInstallPrompt = () => {
   window.addEventListener("beforeinstallprompt", (e) => {
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault()
@@ -182,7 +182,7 @@ export function setupInstallPrompt() {
  * Show install prompt
  * @returns {Promise<{outcome: string}>}
  */
-export async function showInstallPrompt() {
+export const showInstallPrompt = async () => {
   if (!deferredPrompt) {
     console.log("Install prompt not available")
     return { outcome: "unavailable" }
@@ -211,27 +211,21 @@ export async function showInstallPrompt() {
  * Check if app is installed
  * @returns {boolean}
  */
-export function isAppInstalled() {
-  // Check if running as PWA
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true ||
-    document.referrer.includes("android-app://")
-  )
-}
+export const isAppInstalled = () =>
+  window.matchMedia("(display-mode: standalone)").matches ||
+  window.navigator.standalone === true ||
+  document.referrer.includes("android-app://")
 
 /**
  * Check if install prompt is available
  * @returns {boolean}
  */
-export function isInstallPromptAvailable() {
-  return deferredPrompt !== null
-}
+export const isInstallPromptAvailable = () => deferredPrompt !== null
 
 /**
  * Setup offline/online detection
  */
-export function setupNetworkDetection() {
+export const setupNetworkDetection = () => {
   // Initial status
   updateOnlineStatus()
 
@@ -256,7 +250,7 @@ export function setupNetworkDetection() {
 /**
  * Update online status indicator
  */
-function updateOnlineStatus() {
+const updateOnlineStatus = () => {
   const isOnline = navigator.onLine
 
   // You can update UI here
@@ -268,7 +262,7 @@ function updateOnlineStatus() {
  * Request notification permission
  * @returns {Promise<NotificationPermission>}
  */
-export async function requestNotificationPermission() {
+export const requestNotificationPermission = async () => {
   if (!("Notification" in window)) {
     console.log("Notifications not supported")
     return "denied"
@@ -292,7 +286,7 @@ export async function requestNotificationPermission() {
  * @param {string} vapidPublicKey - VAPID public key
  * @returns {Promise<PushSubscription|null>}
  */
-export async function subscribeToPushNotifications(vapidPublicKey) {
+export const subscribeToPushNotifications = async (vapidPublicKey) => {
   if (!serviceWorkerRegistration) {
     console.error("Service Worker not registered")
     return null
@@ -323,15 +317,15 @@ export async function subscribeToPushNotifications(vapidPublicKey) {
 /**
  * Convert VAPID key from base64 to Uint8Array
  */
-function urlBase64ToUint8Array(base64String) {
+const urlBase64ToUint8Array = (base64String) => {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/")
 
   const rawData = window.atob(base64)
   const outputArray = new Uint8Array(rawData.length)
 
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i)
+  for (let index = 0; index < rawData.length; ++index) {
+    outputArray[index] = rawData.charCodeAt(index)
   }
 
   return outputArray
@@ -340,7 +334,7 @@ function urlBase64ToUint8Array(base64String) {
 /**
  * Initialize PWA features
  */
-export function initializePWA() {
+export const initializePWA = () => {
   if (!config.features.enablePWA) {
     console.log("PWA features are disabled")
     return

@@ -13,7 +13,6 @@ import {
 /**
  * ErrorPage component displays a user-friendly error page
  * with error details, retry functionality, and support information
- *
  * @param {Error} error - The error object
  * @param {object} errorInfo - Additional error information
  * @param {string} errorId - Unique error ID for tracking

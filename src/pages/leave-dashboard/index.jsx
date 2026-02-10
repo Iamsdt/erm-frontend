@@ -18,7 +18,7 @@ const LeaveCalendar = () => {
     month
   )
 
-  const handlePrevMonth = () => {
+  const handlePreviousMonth = () => {
     if (month === 0) {
       setMonth(11)
       setYear((y) => y - 1)
@@ -67,7 +67,7 @@ const LeaveCalendar = () => {
       data={data}
       isLoading={isLoading}
       isError={isError}
-      onPrevMonth={handlePrevMonth}
+      onPrevMonth={handlePreviousMonth}
       onNextMonth={handleNextMonth}
       canGoNext={canGoNext}
     />

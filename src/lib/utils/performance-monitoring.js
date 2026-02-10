@@ -21,9 +21,9 @@ const metrics = []
 
 /**
  * Report metric to console and/or analytics service
- * @param {Object} metric - Web Vital metric object
+ * @param {object} metric - Web Vital metric object
  */
-function reportMetric(metric) {
+const reportMetric = (metric) => {
   const { name, value, rating, delta } = metric
 
   // Log in development
@@ -66,9 +66,9 @@ function reportMetric(metric) {
 
 /**
  * Send metric to analytics service
- * @param {Object} metric - Web Vital metric object
+ * @param {object} metric - Web Vital metric object
  */
-function sendToAnalytics(metric) {
+const sendToAnalytics = (metric) => {
   const { name, value, rating, id } = metric
 
   // Google Analytics 4
@@ -103,7 +103,7 @@ function sendToAnalytics(metric) {
 /**
  * Initialize Web Vitals tracking
  */
-export function initWebVitals() {
+export const initWebVitals = () => {
   if (!config.features.enablePerformanceMonitoring) {
     console.log("Performance monitoring is disabled")
     return
@@ -127,15 +127,13 @@ export function initWebVitals() {
  * Get all recorded metrics
  * @returns {Array} Array of metric objects
  */
-export function getMetrics() {
-  return [...metrics]
-}
+export const getMetrics = () => [...metrics]
 
 /**
  * Get metrics summary
- * @returns {Object} Summary of metrics by name
+ * @returns {object} Summary of metrics by name
  */
-export function getMetricsSummary() {
+export const getMetricsSummary = () => {
   const summary = {}
 
   metrics.forEach((metric) => {
@@ -168,7 +166,7 @@ export function getMetricsSummary() {
 /**
  * Clear stored metrics
  */
-export function clearMetrics() {
+export const clearMetrics = () => {
   metrics.length = 0
 }
 
@@ -176,9 +174,9 @@ export function clearMetrics() {
  * Track custom performance metric
  * @param {string} name - Metric name
  * @param {number} value - Metric value
- * @param {Object} data - Additional data
+ * @param {object} data - Additional data
  */
-export function trackCustomMetric(name, value, data = {}) {
+export const trackCustomMetric = (name, value, data = {}) => {
   const metric = {
     name,
     value,
@@ -197,7 +195,7 @@ export function trackCustomMetric(name, value, data = {}) {
 /**
  * Track page load time
  */
-export function trackPageLoadTime() {
+export const trackPageLoadTime = () => {
   if (typeof window.performance === "undefined") {
     return
   }
@@ -228,7 +226,7 @@ export function trackPageLoadTime() {
 /**
  * Track resource loading performance
  */
-export function trackResourcePerformance() {
+export const trackResourcePerformance = () => {
   if (typeof window.performance === "undefined") {
     return
   }
@@ -245,7 +243,7 @@ export function trackResourcePerformance() {
 
     resources.forEach((resource) => {
       const type = resource.initiatorType || "other"
-      const duration = resource.duration
+      const { duration } = resource
       const size = resource.transferSize || 0
 
       if (!summary.byType[type]) {
@@ -274,7 +272,7 @@ export function trackResourcePerformance() {
 /**
  * Track navigation timing
  */
-export function trackNavigationTiming() {
+export const trackNavigationTiming = () => {
   if (typeof window.performance === "undefined") {
     return
   }
@@ -306,7 +304,7 @@ export function trackNavigationTiming() {
 /**
  * Create performance observer for long tasks
  */
-export function observeLongTasks() {
+export const observeLongTasks = () => {
   if (!window.PerformanceObserver) {
     return
   }
@@ -344,7 +342,7 @@ export function observeLongTasks() {
 /**
  * Create performance observer for layout shifts
  */
-export function observeLayoutShifts() {
+export const observeLayoutShifts = () => {
   if (!window.PerformanceObserver) {
     return
   }
@@ -381,7 +379,7 @@ export function observeLayoutShifts() {
  * @param {Function} callback - Function to measure
  * @returns {*} Result of callback
  */
-export async function measureRenderTime(componentName, callback) {
+export const measureRenderTime = async (componentName, callback) => {
   const startTime = performance.now()
 
   try {
@@ -409,7 +407,7 @@ export async function measureRenderTime(componentName, callback) {
 /**
  * Initialize all performance monitoring
  */
-export function initPerformanceMonitoring() {
+export const initPerformanceMonitoring = () => {
   if (!config.features.enablePerformanceMonitoring) {
     console.log("Performance monitoring is disabled")
     return
@@ -440,9 +438,9 @@ export function initPerformanceMonitoring() {
 
 /**
  * Get performance budget status
- * @returns {Object} Budget status for each metric
+ * @returns {object} Budget status for each metric
  */
-export function getPerformanceBudgetStatus() {
+export const getPerformanceBudgetStatus = () => {
   const budgets = {
     LCP: { threshold: 2500, good: 2500, poor: 4000 },
     INP: { threshold: 200, good: 200, poor: 500 },

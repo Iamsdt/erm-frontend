@@ -26,10 +26,12 @@ const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const getDayColorClass = (record) => {
   if (record.isWeekend) return "bg-muted/40 border-muted"
   const presentPct = record.present / record.total
-  if (presentPct >= 0.85)
+  if (presentPct >= 0.85) {
     return "bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20"
-  if (presentPct >= 0.7)
+  }
+  if (presentPct >= 0.7) {
     return "bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20"
+  }
   return "bg-red-500/10 border-red-500/30 hover:bg-red-500/20"
 }
 
@@ -105,18 +107,18 @@ const LeaveCalendarUI = ({
   canGoNext,
 }) => {
   const today = new Date()
-  const todayStr = today.toISOString().split("T")[0]
+  const todayString = today.toISOString().split("T")[0]
 
   // Compute aggregated monthly totals (weekdays only)
   const monthTotals = data?.records?.reduce(
-    (acc, r) => {
+    (accumulator, r) => {
       if (!r.isWeekend) {
-        acc.present += r.present
-        acc.absent += r.absent
-        acc.onLeave += r.onLeave
-        acc.workdays += 1
+        accumulator.present += r.present
+        accumulator.absent += r.absent
+        accumulator.onLeave += r.onLeave
+        accumulator.workdays += 1
       }
-      return acc
+      return accumulator
     },
     { present: 0, absent: 0, onLeave: 0, workdays: 0 }
   ) ?? { present: 0, absent: 0, onLeave: 0, workdays: 0 }
@@ -129,14 +131,14 @@ const LeaveCalendarUI = ({
   const daysInMonth = new Date(year, month + 1, 0).getDate()
 
   const gridCells = []
-  for (let i = 0; i < firstDayOfWeek; i++) {
+  for (let index = 0; index < firstDayOfWeek; index++) {
     gridCells.push(null)
   }
   for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+    const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
     gridCells.push(
-      recordMap[dateStr] ?? {
-        date: dateStr,
+      recordMap[dateString] ?? {
+        date: dateString,
         isWeekend: false,
         present: 0,
         absent: 0,
@@ -169,8 +171,8 @@ const LeaveCalendarUI = ({
       {/* Summary Stats */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-xl" />
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-20 rounded-xl" />
           ))}
         </div>
       ) : (
@@ -259,19 +261,19 @@ const LeaveCalendarUI = ({
           {/* Calendar grid */}
           {isLoading ? (
             <div className="grid grid-cols-7 gap-1">
-              {Array.from({ length: 35 }).map((_, i) => (
-                <Skeleton key={i} className="h-16 rounded-lg" />
+              {Array.from({ length: 35 }).map((_, index) => (
+                <Skeleton key={index} className="h-16 rounded-lg" />
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-7 gap-1">
-              {gridCells.map((record, idx) => {
+              {gridCells.map((record, index) => {
                 if (!record) {
-                  return <div key={`empty-${idx}`} className="h-16 md:h-20" />
+                  return <div key={`empty-${index}`} className="h-16 md:h-20" />
                 }
 
-                const dayNum = parseInt(record.date.split("-")[2])
-                const isToday = record.date === todayStr
+                const dayNumber = parseInt(record.date.split("-")[2])
+                const isToday = record.date === todayString
 
                 return (
                   <div
@@ -289,7 +291,7 @@ const LeaveCalendarUI = ({
                         ${isToday ? "text-primary" : record.isWeekend ? "text-muted-foreground/50" : "text-foreground"}
                       `}
                     >
-                      {dayNum}
+                      {dayNumber}
                     </span>
 
                     {/* Counts (visible on non-weekends) */}

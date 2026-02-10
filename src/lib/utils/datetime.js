@@ -12,9 +12,8 @@
  * Get user's timezone
  * @returns {string} IANA timezone identifier (e.g., "America/New_York")
  */
-export function getUserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone
-}
+export const getUserTimezone = () =>
+  Intl.DateTimeFormat().resolvedOptions().timeZone
 
 /**
  * Format date with timezone
@@ -22,7 +21,6 @@ export function getUserTimezone() {
  * @param {string} timezone - IANA timezone (optional, defaults to user's timezone)
  * @param {Intl.DateTimeFormatOptions} options - Formatting options
  * @returns {string} Formatted date string
- *
  * @example
  * formatDateWithTimezone(new Date(), 'America/New_York', {
  *   year: 'numeric',
@@ -33,11 +31,11 @@ export function getUserTimezone() {
  * })
  * // "January 11, 2026 at 03:30 PM"
  */
-export function formatDateWithTimezone(
+export const formatDateWithTimezone = (
   date,
   timezone = getUserTimezone(),
   options = {}
-) {
+) => {
   const d = date instanceof Date ? date : new Date(date)
 
   const defaultOptions = {
@@ -59,7 +57,7 @@ export function formatDateWithTimezone(
  * @param {Intl.DateTimeFormatOptions} options - Formatting options
  * @returns {string} Formatted date string
  */
-export function formatDate(date, options = {}) {
+export const formatDate = (date, options = {}) => {
   const d = date instanceof Date ? date : new Date(date)
 
   return new Intl.DateTimeFormat("en-US", {
@@ -76,7 +74,7 @@ export function formatDate(date, options = {}) {
  * @param {string} timezone - Target timezone
  * @returns {Date} Date object representing the time in target timezone
  */
-export function toTimezone(date, timezone) {
+export const toTimezone = (date, timezone) => {
   const d = date instanceof Date ? date : new Date(date)
   const tzString = d.toLocaleString("en-US", { timeZone: timezone })
   return new Date(tzString)
@@ -88,7 +86,7 @@ export function toTimezone(date, timezone) {
  * @param {Date} date - Reference date (optional, defaults to now)
  * @returns {number} Offset in minutes from UTC
  */
-export function getTimezoneOffset(timezone, date = new Date()) {
+export const getTimezoneOffset = (timezone, date = new Date()) => {
   const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }))
   const tzDate = new Date(date.toLocaleString("en-US", { timeZone: timezone }))
 
@@ -100,12 +98,11 @@ export function getTimezoneOffset(timezone, date = new Date()) {
  * @param {Date|string|number} date - Date to compare
  * @param {Date} baseDate - Base date to compare against (optional, defaults to now)
  * @returns {string} Relative time string
- *
  * @example
  * getRelativeTime(new Date(Date.now() - 3600000)) // "1 hour ago"
  * getRelativeTime(new Date(Date.now() + 86400000)) // "in 1 day"
  */
-export function getRelativeTime(date, baseDate = new Date()) {
+export const getRelativeTime = (date, baseDate = new Date()) => {
   const d = date instanceof Date ? date : new Date(date)
   const diffMs = d.getTime() - baseDate.getTime()
   const diffSec = Math.floor(diffMs / 1000)
@@ -119,7 +116,7 @@ export function getRelativeTime(date, baseDate = new Date()) {
   const prefix = isPast ? "" : "in "
   const suffix = isPast ? " ago" : ""
 
-  const abs = Math.abs
+  const { abs } = Math
 
   if (abs(diffYear) > 0) {
     return `${prefix}${abs(diffYear)} year${abs(diffYear) > 1 ? "s" : ""}${suffix}`
@@ -148,7 +145,7 @@ export function getRelativeTime(date, baseDate = new Date()) {
  * @param {Date|string} date - Date to check
  * @returns {boolean} True if date is today
  */
-export function isToday(date) {
+export const isToday = (date) => {
   const d = date instanceof Date ? date : new Date(date)
   const today = new Date()
 
@@ -164,7 +161,7 @@ export function isToday(date) {
  * @param {Date|string} date - Date to check
  * @returns {boolean} True if date is yesterday
  */
-export function isYesterday(date) {
+export const isYesterday = (date) => {
   const d = date instanceof Date ? date : new Date(date)
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
@@ -181,12 +178,11 @@ export function isYesterday(date) {
  * @param {Date|string} date - Date to format
  * @param {boolean} use24Hour - Use 24-hour format (default: false)
  * @returns {string} Formatted time string
- *
  * @example
  * formatTime(new Date(), false) // "03:30 PM"
  * formatTime(new Date(), true)  // "15:30"
  */
-export function formatTime(date, use24Hour = false) {
+export const formatTime = (date, use24Hour = false) => {
   const d = date instanceof Date ? date : new Date(date)
 
   return new Intl.DateTimeFormat("en-US", {
@@ -201,7 +197,7 @@ export function formatTime(date, use24Hour = false) {
  * @param {Date} date - Date
  * @returns {Date} Start of day (00:00:00.000)
  */
-export function startOfDay(date = new Date()) {
+export const startOfDay = (date = new Date()) => {
   const d = new Date(date)
   d.setHours(0, 0, 0, 0)
   return d
@@ -212,7 +208,7 @@ export function startOfDay(date = new Date()) {
  * @param {Date} date - Date
  * @returns {Date} End of day (23:59:59.999)
  */
-export function endOfDay(date = new Date()) {
+export const endOfDay = (date = new Date()) => {
   const d = new Date(date)
   d.setHours(23, 59, 59, 999)
   return d
@@ -224,7 +220,7 @@ export function endOfDay(date = new Date()) {
  * @param {number} days - Number of days to add (can be negative)
  * @returns {Date} New date
  */
-export function addDays(date, days) {
+export const addDays = (date, days) => {
   const d = new Date(date)
   d.setDate(d.getDate() + days)
   return d
@@ -236,7 +232,7 @@ export function addDays(date, days) {
  * @param {number} months - Number of months to add (can be negative)
  * @returns {Date} New date
  */
-export function addMonths(date, months) {
+export const addMonths = (date, months) => {
   const d = new Date(date)
   d.setMonth(d.getMonth() + months)
   return d
@@ -247,18 +243,14 @@ export function addMonths(date, months) {
  * @param {Date} date - Date
  * @returns {string} ISO string
  */
-export function toISOString(date = new Date()) {
-  return date.toISOString()
-}
+export const toISOString = (date = new Date()) => date.toISOString()
 
 /**
  * Parse ISO string
  * @param {string} isoString - ISO date string
  * @returns {Date} Date object
  */
-export function fromISOString(isoString) {
-  return new Date(isoString)
-}
+export const fromISOString = (isoString) => new Date(isoString)
 
 // Export default timezone getter for convenience
 export const userTimezone = getUserTimezone()

@@ -26,7 +26,7 @@ export const enforceHTTPS = () => {
 
   // Redirect HTTP to HTTPS
   if (window.location.protocol !== "https:") {
-    const httpsUrl = `https:${window.location.href.substring(window.location.protocol.length)}`
+    const httpsUrl = `https:${window.location.href.slice(window.location.protocol.length)}`
     window.location.replace(httpsUrl)
   }
 }

@@ -7,10 +7,10 @@ import App from "./App"
 import "./main.css"
 
 import { config } from "./lib/config"
+import { initializePWA } from "./lib/pwa"
+import { getUserTimezone } from "./lib/utils/datetime"
 import { initGlobalErrorHandlers } from "./lib/utils/error-handler"
 import { initPerformanceMonitoring } from "./lib/utils/performance-monitoring"
-import { getUserTimezone } from "./lib/utils/datetime"
-import { initializePWA } from "./lib/pwa"
 import "./lib/i18n"
 import { enableMocking } from "./mock"
 
@@ -30,9 +30,11 @@ if (config.isDevelopment) {
 }
 
 // Render function
-function renderApp() {
+/**
+ *
+ */
+const renderApp = () => {
   if (typeof document !== "undefined") {
-    // eslint-disable-next-line no-undef
     ReactDOM.createRoot(document.getElementById("root")).render(
       <React.StrictMode>
         <App />

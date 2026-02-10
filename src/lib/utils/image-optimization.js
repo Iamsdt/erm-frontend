@@ -12,25 +12,24 @@
  * Generate responsive image srcset
  * @param {string} baseUrl - Base image URL
  * @param {number[]} widths - Array of widths for srcset
- * @param {Object} options - Additional options
+ * @param {object} options - Additional options
  * @returns {string} srcset string
- *
  * @example
  * generateSrcSet('/images/hero.jpg', [320, 640, 1024])
  * // Returns: '/images/hero.jpg?w=320 320w, /images/hero.jpg?w=640 640w, ...'
  */
-export function generateSrcSet(
+export const generateSrcSet = (
   baseUrl,
   widths = [320, 640, 768, 1024, 1280, 1920],
   options = {}
-) {
+) => {
   const { quality = 80, format } = options
 
   return widths
     .map((width) => {
       // If using a CDN or image service (e.g., Cloudinary, Imgix, Vercel)
       // Replace this with your CDN URL generation logic
-      const params = new URLSearchParams({
+      const parameters = new URLSearchParams({
         w: width,
         q: quality,
         ...(format && { fm: format }),
@@ -42,20 +41,19 @@ export function generateSrcSet(
       // Custom: `${baseUrl}?${params.toString()}`
 
       // For now, return standard format (update based on your setup)
-      return `${baseUrl}?${params.toString()} ${width}w`
+      return `${baseUrl}?${parameters.toString()} ${width}w`
     })
     .join(", ")
 }
 
 /**
  * Generate sizes attribute for responsive images
- * @param {Object} breakpoints - Breakpoint configurations
+ * @param {object} breakpoints - Breakpoint configurations
  * @returns {string} sizes string
- *
  * @example
  * generateSizes({ sm: '100vw', md: '50vw', lg: '33vw' })
  */
-export function generateSizes(breakpoints = {}) {
+export const generateSizes = (breakpoints = {}) => {
   const defaultBreakpoints = {
     sm: "100vw",
     md: "50vw",
@@ -82,18 +80,18 @@ export function generateSizes(breakpoints = {}) {
  * Note: This is a client-side implementation. For production, generate
  * placeholders at build time or use a CDN service.
  */
-export async function createBlurPlaceholder(
+export const createBlurPlaceholder = async (
   imageUrl,
   width = 10,
   quality = 20
-) {
-  return new Promise((resolve, reject) => {
+) =>
+  new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = "Anonymous"
 
     img.onload = () => {
       const canvas = document.createElement("canvas")
-      const ctx = canvas.getContext("2d")
+      const context = canvas.getContext("2d")
 
       // Calculate proportional height
       const aspectRatio = img.height / img.width
@@ -103,7 +101,7 @@ export async function createBlurPlaceholder(
       canvas.height = height
 
       // Draw tiny version
-      ctx.drawImage(img, 0, 0, width, height)
+      context.drawImage(img, 0, 0, width, height)
 
       // Convert to data URL
       const dataUrl = canvas.toDataURL("image/jpeg", quality / 100)
@@ -116,13 +114,12 @@ export async function createBlurPlaceholder(
 
     img.src = imageUrl
   })
-}
 
 /**
  * Check if browser supports modern image formats
- * @returns {Object} Support flags for different formats
+ * @returns {object} Support flags for different formats
  */
-export function checkImageFormatSupport() {
+export const checkImageFormatSupport = () => {
   const canvas = document.createElement("canvas")
   canvas.width = 1
   canvas.height = 1
@@ -136,13 +133,13 @@ export function checkImageFormatSupport() {
 /**
  * Get optimal image format based on browser support
  * @param {string} originalUrl - Original image URL
- * @param {Object} formatSupport - Format support flags
+ * @param {object} formatSupport - Format support flags
  * @returns {string} Optimal image URL
  */
-export function getOptimalImageUrl(
+export const getOptimalImageUrl = (
   originalUrl,
   formatSupport = checkImageFormatSupport()
-) {
+) => {
   // Priority: AVIF > WebP > Original
   if (formatSupport.avif) {
     return originalUrl.replace(/\.(jpg|jpeg|png)$/i, ".avif")
@@ -156,9 +153,9 @@ export function getOptimalImageUrl(
 /**
  * Preload critical images for better LCP
  * @param {string[]} imageUrls - Array of image URLs to preload
- * @param {Object} options - Preload options
+ * @param {object} options - Preload options
  */
-export function preloadImages(imageUrls, options = {}) {
+export const preloadImages = (imageUrls, options = {}) => {
   const { as = "image", fetchpriority = "high" } = options
 
   imageUrls.forEach((url) => {
@@ -174,9 +171,9 @@ export function preloadImages(imageUrls, options = {}) {
 /**
  * Lazy load images using Intersection Observer
  * @param {string} selector - CSS selector for images to lazy load
- * @param {Object} options - Intersection Observer options
+ * @param {object} options - Intersection Observer options
  */
-export function lazyLoadImages(selector = "img[data-src]", options = {}) {
+export const lazyLoadImages = (selector = "img[data-src]", options = {}) => {
   const defaultOptions = {
     root: null,
     rootMargin: "50px",
@@ -189,7 +186,7 @@ export function lazyLoadImages(selector = "img[data-src]", options = {}) {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const img = entry.target
-        const src = img.dataset.src
+        const { src } = img.dataset
 
         if (src) {
           img.src = src
@@ -212,14 +209,14 @@ export function lazyLoadImages(selector = "img[data-src]", options = {}) {
  * @param {number} originalHeight - Original height
  * @param {number} targetWidth - Target width
  * @param {number} targetHeight - Target height
- * @returns {Object} Calculated dimensions
+ * @returns {object} Calculated dimensions
  */
-export function calculateImageDimensions(
+export const calculateImageDimensions = (
   originalWidth,
   originalHeight,
   targetWidth,
   targetHeight
-) {
+) => {
   const aspectRatio = originalWidth / originalHeight
 
   let width = targetWidth
@@ -252,13 +249,12 @@ export function calculateImageDimensions(
 /**
  * Generate CDN URL with transformations
  * @param {string} baseUrl - Base image URL
- * @param {Object} transformations - Transformation options
+ * @param {object} transformations - Transformation options
  * @returns {string} CDN URL with transformations
- *
  * @example
  * generateCDNUrl('/image.jpg', { width: 800, quality: 80, format: 'webp' })
  */
-export function generateCDNUrl(baseUrl, transformations = {}) {
+export const generateCDNUrl = (baseUrl, transformations = {}) => {
   const {
     width,
     height,
@@ -282,17 +278,17 @@ export function generateCDNUrl(baseUrl, transformations = {}) {
   // return `https://res.cloudinary.com/your-cloud/image/upload/${transformStr}/${baseUrl}`
 
   // Imgix
-  const params = new URLSearchParams()
-  if (width) params.append("w", width)
-  if (height) params.append("h", height)
-  if (quality) params.append("q", quality)
-  if (format) params.append("fm", format)
-  if (fit) params.append("fit", fit)
-  if (blur) params.append("blur", blur)
-  if (sharpen) params.append("sharp", sharpen)
+  const parameters = new URLSearchParams()
+  if (width) parameters.append("w", width)
+  if (height) parameters.append("h", height)
+  if (quality) parameters.append("q", quality)
+  if (format) parameters.append("fm", format)
+  if (fit) parameters.append("fit", fit)
+  if (blur) parameters.append("blur", blur)
+  if (sharpen) parameters.append("sharp", sharpen)
 
   // Return URL with params (update with your CDN logic)
-  return `${baseUrl}?${params.toString()}`
+  return `${baseUrl}?${parameters.toString()}`
 }
 
 /**

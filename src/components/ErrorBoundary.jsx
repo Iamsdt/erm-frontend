@@ -1,5 +1,5 @@
-import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary"
 import { useMemo } from "react"
+import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary"
 
 import { reportError } from "@/lib/utils/error-handler"
 import ErrorPage from "@/pages/misc/error-found"
@@ -21,7 +21,7 @@ import ErrorPage from "@/pages/misc/error-found"
 const ErrorBoundary = ({ children }) => {
   const handleError = (error, errorInfo) => {
     // Generate unique error ID
-    const errorId = `ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    const errorId = `ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
 
     // Log error to error reporting service
     const errorData = {
@@ -67,7 +67,7 @@ const ErrorBoundary = ({ children }) => {
 const ErrorFallback = ({ error, resetErrorBoundary }) => {
   // Generate error ID once
   const errorId = useMemo(
-    () => `ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    () => `ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
     []
   )
 

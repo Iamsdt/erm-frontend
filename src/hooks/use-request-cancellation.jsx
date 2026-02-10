@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react"
+
 import { cancelAllRequests } from "@/services/api"
 
 /**
  * Custom hook to handle request cancellation on component unmount
  * Automatically cancels all pending API requests when component unmounts
- *
  * @example
  * function MyComponent() {
  *   useRequestCancellation()
@@ -17,14 +17,14 @@ import { cancelAllRequests } from "@/services/api"
  *   return <div>{data?.name}</div>
  * }
  */
-export function useRequestCancellation() {
-  const cancelledRef = useRef(false)
+export const useRequestCancellation = () => {
+  const cancelledReference = useRef(false)
 
   useEffect(() => {
     return () => {
-      if (!cancelledRef.current) {
+      if (!cancelledReference.current) {
         cancelAllRequests()
-        cancelledRef.current = true
+        cancelledReference.current = true
       }
     }
   }, [])
@@ -33,9 +33,7 @@ export function useRequestCancellation() {
 /**
  * Custom hook to create an AbortController for manual request cancellation
  * Useful for cancelling requests on user actions (e.g., navigation, button clicks)
- *
  * @returns {{ signal: AbortSignal, cancel: Function }}
- *
  * @example
  * function SearchComponent() {
  *   const { signal, cancel } = useAbortController()
@@ -61,29 +59,29 @@ export function useRequestCancellation() {
  *   )
  * }
  */
-export function useAbortController() {
-  const controllerRef = useRef(null)
+export const useAbortController = () => {
+  const controllerReference = useRef(null)
 
   useEffect(() => {
-    controllerRef.current = new AbortController()
+    controllerReference.current = new AbortController()
 
     return () => {
-      if (controllerRef.current) {
-        controllerRef.current.abort()
+      if (controllerReference.current) {
+        controllerReference.current.abort()
       }
     }
   }, [])
 
   const cancel = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
+    if (controllerReference.current) {
+      controllerReference.current.abort()
       // Create new controller for subsequent requests
-      controllerRef.current = new AbortController()
+      controllerReference.current = new AbortController()
     }
   }
 
   return {
-    signal: controllerRef.current?.signal,
+    signal: controllerReference.current?.signal,
     cancel,
   }
 }
@@ -91,12 +89,10 @@ export function useAbortController() {
 /**
  * Custom hook to automatically cancel requests when a dependency changes
  * Useful for search inputs, filters, etc.
- *
  * @param {Function} requestFn - Function that makes the API request
  * @param {Array} deps - Dependencies to watch for changes
- * @param {Object} options - Configuration options
+ * @param {object} options - Configuration options
  * @returns {{ isLoading: boolean, error: Error|null, cancel: Function }}
- *
  * @example
  * function SearchComponent({ searchTerm }) {
  *   const { isLoading, error, cancel } = useCancellableRequest(
@@ -114,30 +110,34 @@ export function useAbortController() {
  *   return <div>Loading: {isLoading}</div>
  * }
  */
-export function useCancellableRequest(requestFn, deps = [], options = {}) {
+export const useCancellableRequest = (
+  requestFunction,
+  deps = [],
+  options = {}
+) => {
   const { debounce = 0, onSuccess, onError } = options
-  const controllerRef = useRef(null)
-  const timeoutRef = useRef(null)
+  const controllerReference = useRef(null)
+  const timeoutReference = useRef(null)
 
   useEffect(() => {
     // Cancel previous request
-    if (controllerRef.current) {
-      controllerRef.current.abort()
+    if (controllerReference.current) {
+      controllerReference.current.abort()
     }
 
     // Clear previous timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+    if (timeoutReference.current) {
+      clearTimeout(timeoutReference.current)
     }
 
     // Create new controller
-    controllerRef.current = new AbortController()
-    const controller = controllerRef.current
+    controllerReference.current = new AbortController()
+    const controller = controllerReference.current
 
     // Execute request with optional debounce
     const executeRequest = async () => {
       try {
-        const result = await requestFn(controller.signal)
+        const result = await requestFunction(controller.signal)
         if (onSuccess && !controller.signal.aborted) {
           onSuccess(result)
         }
@@ -153,7 +153,7 @@ export function useCancellableRequest(requestFn, deps = [], options = {}) {
     }
 
     if (debounce > 0) {
-      timeoutRef.current = setTimeout(executeRequest, debounce)
+      timeoutReference.current = setTimeout(executeRequest, debounce)
     } else {
       executeRequest()
     }
@@ -162,18 +162,18 @@ export function useCancellableRequest(requestFn, deps = [], options = {}) {
       if (controller) {
         controller.abort()
       }
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
+      if (timeoutReference.current) {
+        clearTimeout(timeoutReference.current)
       }
     }
   }, deps)
 
   const cancel = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
+    if (controllerReference.current) {
+      controllerReference.current.abort()
     }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+    if (timeoutReference.current) {
+      clearTimeout(timeoutReference.current)
     }
   }
 

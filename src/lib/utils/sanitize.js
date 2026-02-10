@@ -28,7 +28,7 @@ export const sanitizeHtml = (dirty, options = {}) => {
   try {
     // Dynamic import for DOMPurify
     // Note: DOMPurify must be installed: npm install dompurify
-    // eslint-disable-next-line import/no-unresolved
+
     const DOMPurify = require("dompurify")
 
     // Default configuration - strict by default
@@ -59,7 +59,7 @@ export const sanitizeHtml = (dirty, options = {}) => {
     }
 
     return DOMPurify.sanitize(dirty, defaultOptions)
-  } catch (error) {
+  } catch {
     console.error(
       "DOMPurify not available. Install it with: npm install dompurify"
     )
@@ -79,9 +79,9 @@ export const sanitizeText = (text) => {
 
   // Create a temporary element to decode HTML entities and strip tags
   if (typeof document !== "undefined") {
-    const temp = document.createElement("div")
-    temp.textContent = text
-    return temp.textContent || temp.innerText || ""
+    const temporary = document.createElement("div")
+    temporary.textContent = text
+    return temporary.textContent || temporary.innerText || ""
   }
 
   // Fallback for server-side
@@ -92,14 +92,14 @@ export const sanitizeText = (text) => {
  * React component wrapper for safe HTML rendering
  * Usage: <SanitizedHtml html={userContent} />
  */
-export const SanitizedHtml = ({ html, className, ...props }) => {
+export const SanitizedHtml = ({ html, className, ...properties }) => {
   const sanitized = sanitizeHtml(html)
 
   return (
     <div
       className={className}
       dangerouslySetInnerHTML={{ __html: sanitized }}
-      {...props}
+      {...properties}
     />
   )
 }

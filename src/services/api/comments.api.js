@@ -8,7 +8,7 @@ import api from "./index"
  * Makes a GET request to the comments endpoint defined in the constants.
  * @async
  * @function
- * @param {Object} options - Request options
+ * @param {object} options - Request options
  * @param {AbortSignal} options.signal - AbortSignal for request cancellation
  * @returns {Promise} The response from the API containing the comments data.
  */

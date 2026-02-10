@@ -1,6 +1,5 @@
-import { useEffect } from "react"
-
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -100,11 +99,11 @@ const RequestLeavePage = () => {
     const to = new Date(toDate)
     if (subType === "halfday") return 0.5
     let count = 0
-    const cur = new Date(from)
-    while (cur <= to) {
-      const day = cur.getDay()
+    const current = new Date(from)
+    while (current <= to) {
+      const day = current.getDay()
       if (day !== 0 && day !== 6) count++
-      cur.setDate(cur.getDate() + 1)
+      current.setDate(current.getDate() + 1)
     }
     return count
   }

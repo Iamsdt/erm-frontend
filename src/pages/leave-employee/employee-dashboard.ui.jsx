@@ -133,10 +133,19 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
   const history = data?.leaveHistory ?? []
   const upcoming = data?.upcoming ?? []
 
-  const totalUsed = balance.reduce((acc, b) => acc + b.used, 0)
-  const totalAllocated = balance.reduce((acc, b) => acc + b.allocated, 0)
-  const totalPending = balance.reduce((acc, b) => acc + b.pending, 0)
-  const totalRemaining = balance.reduce((acc, b) => acc + b.remaining, 0)
+  const totalUsed = balance.reduce((accumulator, b) => accumulator + b.used, 0)
+  const totalAllocated = balance.reduce(
+    (accumulator, b) => accumulator + b.allocated,
+    0
+  )
+  const totalPending = balance.reduce(
+    (accumulator, b) => accumulator + b.pending,
+    0
+  )
+  const totalRemaining = balance.reduce(
+    (accumulator, b) => accumulator + b.remaining,
+    0
+  )
 
   if (isError) {
     return (
@@ -200,8 +209,8 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
       {/* Quick Stats */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-xl" />
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-20 rounded-xl" />
           ))}
         </div>
       ) : (
@@ -257,8 +266,8 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-12 rounded-lg" />
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton key={index} className="h-12 rounded-lg" />
                 ))
               : balance.map((b) => (
                   <LeaveBalanceRow
@@ -283,8 +292,8 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
             <CardContent>
               {isLoading ? (
                 <div className="space-y-2">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <Skeleton key={i} className="h-8 rounded-lg" />
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <Skeleton key={index} className="h-8 rounded-lg" />
                   ))}
                 </div>
               ) : (
@@ -325,8 +334,8 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
             </CardHeader>
             <CardContent className="space-y-2">
               {isLoading ? (
-                Array.from({ length: 2 }).map((_, i) => (
-                  <Skeleton key={i} className="h-12 rounded-lg" />
+                Array.from({ length: 2 }).map((_, index) => (
+                  <Skeleton key={index} className="h-12 rounded-lg" />
                 ))
               ) : upcoming.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
@@ -361,13 +370,13 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
         <CardContent>
           {isLoading ? (
             <div className="space-y-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 rounded-lg" />
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="h-12 rounded-lg" />
               ))}
             </div>
           ) : (
             <div className="space-y-1">
-              {history.map((item, idx) => (
+              {history.map((item, index) => (
                 <div key={item.id}>
                   <div className="flex items-center justify-between py-2.5 text-sm">
                     <div className="min-w-0">
@@ -384,7 +393,7 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
                       {STATUS_LABEL[item.status]}
                     </Badge>
                   </div>
-                  {idx < history.length - 1 && <Separator />}
+                  {index < history.length - 1 && <Separator />}
                 </div>
               ))}
             </div>

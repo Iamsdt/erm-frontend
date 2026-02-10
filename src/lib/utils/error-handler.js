@@ -22,7 +22,6 @@ const errorQueue = []
 
 /**
  * Reports an error to the error monitoring service
- *
  * @param {object} errorData - Error data to report
  * @param {Error} errorData.error - The error object
  * @param {object} errorData.errorInfo - Additional error information
@@ -73,7 +72,6 @@ export const reportError = (errorData) => {
  * 2. Configure: Set VITE_SENTRY_DSN in your .env file
  * 3. Uncomment the code in reportError() function
  * 4. Uncomment this function
- *
  * @param {object} errorReport - Error report data
  */
 // const reportToSentry = async (errorReport) => {
@@ -104,7 +102,6 @@ export const reportError = (errorData) => {
 
 /**
  * Reports API error
- *
  * @param {object} apiError - API error data
  * @param {string} apiError.url - API endpoint URL
  * @param {number} apiError.status - HTTP status code
@@ -125,7 +122,7 @@ export const reportApiError = (apiError) => {
         data: apiError.config?.data,
       },
     },
-    errorId: `API-ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    errorId: `API-ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
     timestamp: new Date().toISOString(),
   }
 
@@ -162,7 +159,7 @@ export const initGlobalErrorHandlers = () => {
         lineno: event.lineno,
         colno: event.colno,
       },
-      errorId: `JS-ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      errorId: `JS-ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
       timestamp: new Date().toISOString(),
     }
 
@@ -180,7 +177,7 @@ export const initGlobalErrorHandlers = () => {
         type: "UNHANDLED_REJECTION",
         reason: event.reason,
       },
-      errorId: `PROMISE-ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      errorId: `PROMISE-ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
       timestamp: new Date().toISOString(),
     }
 
@@ -206,7 +203,7 @@ export const initGlobalErrorHandlers = () => {
             tagName: event.target.tagName,
             src: event.target.src || event.target.href,
           },
-          errorId: `RES-ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          errorId: `RES-ERR-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
           timestamp: new Date().toISOString(),
         }
 

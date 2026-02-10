@@ -2,20 +2,19 @@
 
 /**
  * Production Build Verification Script
- * 
+ *
  * Verifies that the production build doesn't contain debug code
  * such as console statements or debugger keywords.
- * 
+ *
  * Usage: node scripts/verify-production.js
  */
 
-import { readFileSync, existsSync } from "fs"
-import { join } from "path"
-import { readdirSync, statSync } from "fs"
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs"
+import { join } from "node:path"
 
-const distPath = join(process.cwd(), "dist")
+const distributionPath = join(process.cwd(), "dist")
 
-if (!existsSync(distPath)) {
+if (!existsSync(distributionPath)) {
   console.error("❌ dist/ directory not found. Run 'npm run build' first.")
   process.exit(1)
 }
@@ -23,7 +22,10 @@ if (!existsSync(distPath)) {
 let foundIssues = false
 
 // Recursively check all JS files in dist
-function checkFiles(dir) {
+/**
+ *
+ */
+const checkFiles = (dir) => {
   const files = readdirSync(dir)
 
   for (const file of files) {
@@ -37,7 +39,12 @@ function checkFiles(dir) {
         const content = readFileSync(filePath, "utf-8")
 
         // Check for console statements (excluding console.error which might be intentional)
-        if (content.includes("console.log") || content.includes("console.debug") || content.includes("console.info") || content.includes("console.warn")) {
+        if (
+          content.includes("console.log") ||
+          content.includes("console.debug") ||
+          content.includes("console.info") ||
+          content.includes("console.warn")
+        ) {
           console.error(`❌ Found console statement in: ${filePath}`)
           foundIssues = true
         }
@@ -62,11 +69,13 @@ function checkFiles(dir) {
 }
 
 console.log("🔍 Verifying production build...")
-checkFiles(distPath)
+checkFiles(distributionPath)
 
 if (foundIssues) {
   console.error("\n❌ Production build verification failed!")
-  console.error("Please ensure esbuild.drop is configured correctly in vite.config.js")
+  console.error(
+    "Please ensure esbuild.drop is configured correctly in vite.config.js"
+  )
   process.exit(1)
 } else {
   console.log("✅ Production build verified - no debug code found")

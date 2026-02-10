@@ -129,8 +129,8 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
       {/* KPI Row 1 — core metrics */}
       {isLoading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 rounded-xl" />
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-24 rounded-xl" />
           ))}
         </div>
       ) : (
@@ -169,8 +169,8 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
       {/* KPI Row 2 — WFH & Half Day */}
       {isLoading ? (
         <div className="grid grid-cols-2 gap-3">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-xl" />
+          {Array.from({ length: 2 }).map((_, index) => (
+            <Skeleton key={index} className="h-20 rounded-xl" />
           ))}
         </div>
       ) : (
@@ -200,8 +200,8 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
           </CardHeader>
           <CardContent className="space-y-3">
             {isLoading
-              ? Array.from({ length: 6 }).map((_, i) => (
-                  <Skeleton key={i} className="h-8 rounded-lg" />
+              ? Array.from({ length: 6 }).map((_, index) => (
+                  <Skeleton key={index} className="h-8 rounded-lg" />
                 ))
               : data?.leaveBreakdown?.map((item) => {
                   const pct = Math.round((item.count / totalRequests) * 100)
@@ -237,8 +237,8 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 mb-2 rounded-lg" />
+              Array.from({ length: 5 }).map((_, index) => (
+                <Skeleton key={index} className="h-10 mb-2 rounded-lg" />
               ))
             ) : (
               <div className="space-y-3">
@@ -304,12 +304,12 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 mb-2 rounded-lg" />
+            Array.from({ length: 5 }).map((_, index) => (
+              <Skeleton key={index} className="h-12 mb-2 rounded-lg" />
             ))
           ) : (
             <div className="space-y-2">
-              {data?.topLeaveTakers?.map((emp, idx) => {
+              {data?.topLeaveTakers?.map((emp, index) => {
                 const maxDays = data?.topLeaveTakers?.[0]?.totalDays || 1
                 const barW = Math.round((emp.totalDays / maxDays) * 100)
                 return (
@@ -317,16 +317,16 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
                     {/* Rank */}
                     <span
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                        idx === 0
+                        index === 0
                           ? "bg-yellow-400 text-yellow-900"
-                          : idx === 1
+                          : index === 1
                             ? "bg-slate-300 text-slate-700"
-                            : idx === 2
+                            : index === 2
                               ? "bg-amber-600 text-white"
                               : "bg-muted text-muted-foreground"
                       }`}
                     >
-                      {idx + 1}
+                      {index + 1}
                     </span>
                     {/* Name & dept */}
                     <div className="w-40 shrink-0">
@@ -383,8 +383,8 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
           </CardHeader>
           <CardContent className="space-y-2">
             {isLoading
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-14 rounded-lg" />
+              ? Array.from({ length: 3 }).map((_, index) => (
+                  <Skeleton key={index} className="h-14 rounded-lg" />
                 ))
               : data?.pendingApprovals?.slice(0, 5).map((item) => (
                   <div
@@ -422,12 +422,12 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 mb-2 rounded-lg" />
+              Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="h-10 mb-2 rounded-lg" />
               ))
             ) : (
               <div className="space-y-1">
-                {data?.recentActivity?.map((item, idx) => (
+                {data?.recentActivity?.map((item, index) => (
                   <div key={item.id}>
                     <div className="flex items-center justify-between py-2 text-sm">
                       <div className="flex items-center gap-2 min-w-0">
@@ -463,7 +463,7 @@ const AdminDashboardUI = ({ data, isLoading, isError }) => {
                         </span>
                       </div>
                     </div>
-                    {idx < (data?.recentActivity?.length ?? 0) - 1 && (
+                    {index < (data?.recentActivity?.length ?? 0) - 1 && (
                       <Separator />
                     )}
                   </div>
