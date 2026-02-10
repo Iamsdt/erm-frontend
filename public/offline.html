@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline - Frontend Base</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .offline-container {
+        text-align: center;
+        max-width: 500px;
+      }
+
+      .offline-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 30px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .offline-icon svg {
+        width: 60px;
+        height: 60px;
+        stroke: #fff;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        font-weight: 700;
+      }
+
+      p {
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+        opacity: 0.9;
+        line-height: 1.6;
+      }
+
+      .retry-button {
+        background: #fff;
+        color: #667eea;
+        border: none;
+        padding: 15px 40px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .retry-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .retry-button:active {
+        transform: translateY(0);
+      }
+
+      .features {
+        margin-top: 50px;
+        padding-top: 30px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .features h2 {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        opacity: 0.9;
+      }
+
+      .features ul {
+        list-style: none;
+        text-align: left;
+        display: inline-block;
+      }
+
+      .features li {
+        padding: 8px 0;
+        opacity: 0.8;
+        font-size: 0.95rem;
+      }
+
+      .features li:before {
+        content: "✓ ";
+        margin-right: 10px;
+        font-weight: bold;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="offline-container">
+      <div class="offline-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 3l18 18M9.75 9.75L3 3m3.75 0l-.375 11.25m7.5-9.375l.375 11.25M15.75 3l.375 11.25M9.75 20.625L12 24l2.25-3.375M9 12.75h6m-6 3h6"
+          />
+        </svg>
+      </div>
+
+      <h1>You're Offline</h1>
+      <p>
+        It looks like you've lost your internet connection. Don't worry, you can
+        still browse cached content or try reconnecting.
+      </p>
+
+      <button class="retry-button" onclick="location.reload()">
+        Try Again
+      </button>
+
+      <div class="features">
+        <h2>What you can still do:</h2>
+        <ul>
+          <li>View previously loaded pages</li>
+          <li>Access cached content</li>
+          <li>Changes will sync when online</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Check for connection every 5 seconds
+      setInterval(() => {
+        if (navigator.onLine) {
+          location.reload()
+        }
+      }, 5000)
+
+      // Listen for online event
+      window.addEventListener("online", () => {
+        location.reload()
+      })
+    </script>
+  </body>
+</html>
