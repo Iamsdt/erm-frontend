@@ -19,7 +19,7 @@ const apiConstant = {
     create: "employee-management/",
     detail: "employee-management", // /employee-management/:id/
     invite: "employee-management/invite/",
-    departments: "employee-management/departments/",
+    departments: "employee-management/departments",
     departmentDetail: "employee-management/departments", // /departments/:id/
   },
 }

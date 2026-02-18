@@ -63,31 +63,48 @@ let departments = [
 
 let nextId = departments.length + 1
 
-// ─── GET /employee-management/departments/ ────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const listDepartments = http.get("*/employee-management/departments/", () => {
+const respondWithDepartmentList = () => {
   return HttpResponse.json({
     departments,
     total: departments.length,
     totalEmployees: departments.reduce((s, d) => s + d.employeeCount, 0),
   })
-})
+}
+
+const handleCreateDepartment = async ({ request }) => {
+  const body = await request.json()
+  const newDept = {
+    id: nextId++,
+    employeeCount: 0,
+    color: "slate",
+    ...body,
+  }
+  departments = [...departments, newDept]
+  return HttpResponse.json(newDept, { status: 201 })
+}
+
+// ─── GET /employee-management/departments/ ────────────────────────────────────
+
+const listDepartments = http.get(
+  "*/employee-management/departments/",
+  () => respondWithDepartmentList()
+)
+const listDepartmentsNoSlash = http.get(
+  "*/employee-management/departments",
+  () => respondWithDepartmentList()
+)
 
 // ─── POST /employee-management/departments/ ───────────────────────────────────
 
 const createDepartment = http.post(
   "*/employee-management/departments/",
-  async ({ request }) => {
-    const body = await request.json()
-    const newDept = {
-      id: nextId++,
-      employeeCount: 0,
-      color: "slate",
-      ...body,
-    }
-    departments = [...departments, newDept]
-    return HttpResponse.json(newDept, { status: 201 })
-  }
+  handleCreateDepartment
+)
+const createDepartmentNoSlash = http.post(
+  "*/employee-management/departments",
+  handleCreateDepartment
 )
 
 // ─── PATCH /employee-management/departments/:id/ ──────────────────────────────
@@ -119,7 +136,9 @@ const removeDepartment = http.delete(
 
 const handlers = [
   listDepartments,
+  listDepartmentsNoSlash,
   createDepartment,
+  createDepartmentNoSlash,
   updateDepartment,
   removeDepartment,
 ]
