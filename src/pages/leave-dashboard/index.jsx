@@ -1,22 +1,30 @@
 import { useEffect, useState } from "react"
 
 import { toast } from "@/components/ui/use-toast"
-import { useFetchMonthlyAttendance } from "@query/leave.query"
+import {
+  useFetchAttendanceDayDetail,
+  useFetchMonthlyAttendance,
+} from "@query/leave.query"
 
 import LeaveCalendarUI from "./leave-calendar.ui"
 
 /**
- * LeaveCalendar container — manages month navigation and fetches attendance data.
+ * LeaveCalendar container — manages month navigation, fetches attendance data,
+ * and controls the day-detail sheet (opened on calendar day click).
  */
 const LeaveCalendar = () => {
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
+  const [selectedDate, setSelectedDate] = useState(null)
 
   const { data, isLoading, isError, error } = useFetchMonthlyAttendance(
     year,
     month
   )
+
+  const { data: dayDetail, isLoading: isDayLoading } =
+    useFetchAttendanceDayDetail(selectedDate)
 
   const handlePreviousMonth = () => {
     if (month === 0) {
@@ -50,6 +58,13 @@ const LeaveCalendar = () => {
     )
   })()
 
+  const handleDayClick = (record) => {
+    if (record.isWeekend || record.total === 0) return
+    setSelectedDate(record.date)
+  }
+
+  const handleSheetClose = () => setSelectedDate(null)
+
   useEffect(() => {
     if (error) {
       toast({
@@ -70,6 +85,11 @@ const LeaveCalendar = () => {
       onPrevMonth={handlePreviousMonth}
       onNextMonth={handleNextMonth}
       canGoNext={canGoNext}
+      selectedDate={selectedDate}
+      dayDetail={dayDetail}
+      isDayLoading={isDayLoading}
+      onDayClick={handleDayClick}
+      onSheetClose={handleSheetClose}
     />
   )
 }

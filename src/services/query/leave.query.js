@@ -4,9 +4,12 @@ import {
   getAdminApprovals,
   getAdminEmployees,
   getAdminLeaveSummary,
+  getAttendanceDayDetail,
   getEmployeeLeaveProfile,
+  getLeaveSettings,
   getMonthlyAttendance,
   patchLeaveApproval,
+  patchLeaveSettings,
   postLeaveRequest,
   postManualRecord,
 } from "@api/leave.api"
@@ -135,5 +138,57 @@ export const usePostLeaveRequest = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEE_PROFILE] })
     },
+  })
+}
+
+const QUERY_KEY_LEAVE_SETTINGS = "leave-admin-settings"
+
+/**
+ * React Query hook for fetching leave management settings (admin only).
+ * @returns {import("@tanstack/react-query").UseQueryResult} The query result with leave settings
+ */
+export const useFetchLeaveSettings = () => {
+  return useQuery({
+    queryKey: [QUERY_KEY_LEAVE_SETTINGS],
+    queryFn: async ({ signal }) => {
+      const response = await getLeaveSettings({ signal })
+      return response.data
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: 2,
+  })
+}
+
+/**
+ * Mutation hook to update leave management settings.
+ * Invalidates settings cache on success.
+ * @returns {import("@tanstack/react-query").UseMutationResult} The mutation result
+ */
+export const useUpdateLeaveSettings = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload) => patchLeaveSettings(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_LEAVE_SETTINGS] })
+    },
+  })
+}
+
+/**
+ * React Query hook for fetching per-employee attendance detail for a given date.
+ * Only runs when a date string is provided (enabled by click on calendar day).
+ * @param {string|null} date - ISO date string (YYYY-MM-DD) or null to skip
+ * @returns {import("@tanstack/react-query").UseQueryResult}
+ */
+export const useFetchAttendanceDayDetail = (date) => {
+  return useQuery({
+    queryKey: ["leave-attendance-day", date],
+    queryFn: async ({ signal }) => {
+      const response = await getAttendanceDayDetail({ date, signal })
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+    enabled: Boolean(date),
   })
 }

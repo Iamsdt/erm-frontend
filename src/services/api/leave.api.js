@@ -110,3 +110,45 @@ export const postManualRecord = async (payload) => {
 export const postLeaveRequest = async (payload) => {
   return api.post(ct.api.leave.employeeRequest, payload)
 }
+
+/**
+ * Fetches the leave management settings (admin only).
+ * @async
+ * @function
+ * @param {object} options - Request options
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response from the API containing leave settings
+ */
+export const getLeaveSettings = async ({ signal } = {}) => {
+  const config = { headers: { "Content-Type": "application/json" }, signal }
+  return api.get(ct.api.leave.adminSettings, config)
+}
+
+/**
+ * Saves updated leave management settings (admin only).
+ * @async
+ * @function
+ * @param {object} payload - Updated settings payload
+ * @returns {Promise} The response from the API with the saved settings
+ */
+export const patchLeaveSettings = async (payload) => {
+  return api.patch(ct.api.leave.adminSettings, payload)
+}
+
+/**
+ * Fetches per-employee attendance detail for a specific date.
+ * @async
+ * @function
+ * @param {object} options - Request options
+ * @param {string} options.date - ISO date string (YYYY-MM-DD)
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response with present/absent/onLeave employee lists
+ */
+export const getAttendanceDayDetail = async ({ date, signal } = {}) => {
+  const config = {
+    headers: { "Content-Type": "application/json" },
+    params: { date },
+    signal,
+  }
+  return api.get(ct.api.leave.attendanceDay, config)
+}

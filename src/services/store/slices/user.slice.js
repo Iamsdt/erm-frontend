@@ -10,6 +10,7 @@ export const authSlice = createSlice({
     isAuthenticated: false,
     userRole: "",
     leave_management_role: "", // "admin" | "employee" — scoped role for Leave Management module
+    employee_management_role: "", // "admin" | "" — scoped role for Employee Management module
   },
   reducers: {
     login: (state, action) => {
@@ -17,12 +18,15 @@ export const authSlice = createSlice({
       state.isAuthenticated = true
       state.userRole = action.payload.userRole
       state.leave_management_role = action.payload.leave_management_role ?? ""
+      state.employee_management_role =
+        action.payload.employee_management_role ?? ""
     },
     logout: (state) => {
       state.userName = ""
       state.isAuthenticated = false
       state.userRole = ""
       state.leave_management_role = ""
+      state.employee_management_role = ""
 
       // also clear localhost
       queryClient.clear()

@@ -1,11 +1,16 @@
 import {
+  Building2,
   CalendarDays,
   ChevronRight,
   ClipboardList,
   Home,
   LayoutDashboard,
   Layers,
+  MailPlus,
+  Plus,
+  Settings,
   UserCircle2,
+  Users,
 } from "lucide-react"
 import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
@@ -41,10 +46,22 @@ const leaveSharedItems = [
 const adminLeaveItems = [
   { title: "Admin Dashboard", url: "/leave/admin", icon: LayoutDashboard },
   { title: "Approvals", url: "/leave/admin/approvals", icon: ClipboardList },
+  { title: "Settings", url: "/leave/admin/settings", icon: Settings },
 ]
 
 const employeeLeaveItems = [
   { title: "My Dashboard", url: "/leave/employee", icon: UserCircle2 },
+]
+
+const employeeManagementItems = [
+  { title: "All Employees", url: "/employee-management", icon: Users },
+  {
+    title: "Departments",
+    url: "/employee-management/departments",
+    icon: Building2,
+  },
+  { title: "New Employee", url: "/employee-management/create", icon: Plus },
+  { title: "Invite User", url: "/employee-management/invite", icon: MailPlus },
 ]
 
 // ─── Simple nav group (Application) ──────────────────────────────────────────
@@ -80,90 +97,118 @@ NavGroup.propTypes = {
   ).isRequired,
 }
 
-// ─── Collapsible Leave Management group ──────────────────────────────────────
+// ─── Reusable collapsible module group ───────────────────────────────────────
 
-const LeaveNavGroup = ({ isAdmin, isEmployee }) => {
-  const roleItems = isAdmin
+const CollapsibleNavGroup = ({ title, icon: Icon, items }) => (
+  <SidebarMenu>
+    <Collapsible asChild defaultOpen className="group/collapsible">
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton tooltip={title}>
+            <Icon />
+            <span>{title}</span>
+            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {items.map((item) => (
+              <SidebarMenuSubItem key={item.title}>
+                <SidebarMenuSubButton asChild>
+                  <a href={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
+  </SidebarMenu>
+)
+
+CollapsibleNavGroup.propTypes = {
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+      icon: PropTypes.elementType.isRequired,
+    })
+  ).isRequired,
+}
+
+// ─── Modules section ──────────────────────────────────────────────────────────
+
+const ModulesNavGroup = ({ isLeaveAdmin, isLeaveEmployee, isEmpAdmin }) => {
+  const roleItems = isLeaveAdmin
     ? adminLeaveItems
-    : isEmployee
+    : isLeaveEmployee
       ? employeeLeaveItems
       : []
+
+  const leaveItems = [...leaveSharedItems, ...roleItems]
+  const showLeave = isLeaveAdmin || isLeaveEmployee
+  const showEmpMgmt = isEmpAdmin
+
+  if (!showLeave && !showEmpMgmt) return null
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Modules</SidebarGroupLabel>
       <SidebarGroupContent>
-        <SidebarMenu>
-          <Collapsible asChild defaultOpen className="group/collapsible">
-            <SidebarMenuItem>
-              {/* Collapsible trigger — acts as the "Leave Management" parent row */}
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip="Leave Management">
-                  <Layers />
-                  <span>Leave Management</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {/* Shared — Calendar View */}
-                  {leaveSharedItems.map((item) => (
-                    <SidebarMenuSubItem key={item.title}>
-                      <SidebarMenuSubButton asChild>
-                        <a href={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-
-                  {/* Role-specific items */}
-                  {roleItems.map((item) => (
-                    <SidebarMenuSubItem key={item.title}>
-                      <SidebarMenuSubButton asChild>
-                        <a href={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-        </SidebarMenu>
+        {showLeave && (
+          <CollapsibleNavGroup
+            title="Leave Management"
+            icon={Layers}
+            items={leaveItems}
+          />
+        )}
+        {showEmpMgmt && (
+          <CollapsibleNavGroup
+            title="Employee Management"
+            icon={Users}
+            items={employeeManagementItems}
+          />
+        )}
       </SidebarGroupContent>
     </SidebarGroup>
   )
 }
 
-LeaveNavGroup.propTypes = {
-  isAdmin: PropTypes.bool.isRequired,
-  isEmployee: PropTypes.bool.isRequired,
+ModulesNavGroup.propTypes = {
+  isLeaveAdmin: PropTypes.bool.isRequired,
+  isLeaveEmployee: PropTypes.bool.isRequired,
+  isEmpAdmin: PropTypes.bool.isRequired,
 }
 
 // ─── AppSidebar ───────────────────────────────────────────────────────────────
 
 /**
  * AppSidebar renders a collapsible sidebar.
- * The Leave Management section collapses and shows role-specific items.
+ * Each module collapses independently and shows role-specific items.
  */
 const AppSidebar = () => {
   const leaveRole = useSelector(
     (s) => s[ct.store.USER_STORE].leave_management_role
   )
-
-  const isAdmin = leaveRole === "admin"
-  const isEmployee = leaveRole === "employee"
+  const empMgmtRole = useSelector(
+    (s) => s[ct.store.USER_STORE].employee_management_role
+  )
 
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <NavGroup label="Application" items={mainItems} />
-        <LeaveNavGroup isAdmin={isAdmin} isEmployee={isEmployee} />
+        <ModulesNavGroup
+          isLeaveAdmin={leaveRole === "admin"}
+          isLeaveEmployee={leaveRole === "employee"}
+          isEmpAdmin={empMgmtRole === "admin"}
+        />
       </SidebarContent>
     </Sidebar>
   )

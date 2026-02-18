@@ -39,6 +39,7 @@ const Login = () => {
         userName: data.email,
         userRole: data.role,
         leave_management_role: data.role,
+        employee_management_role: data.role,
       })
     )
     toast({
