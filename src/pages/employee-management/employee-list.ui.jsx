@@ -165,12 +165,12 @@ EmployeeRow.propTypes = {
 // ─── Employee list content ────────────────────────────────────────────────────
 
 /**
- * EmployeeListContent — renders the employee list with proper state handling
- * @param {{isLoading: boolean, isError: boolean, employees: Array, onDelete: Function}} props - Props for managing loading, error, employee data, and delete action
- * @param {boolean} props.isLoading - Whether the employee data is currently loading
- * @param {boolean} props.isError - Whether there was an error loading the employee data
- * @param {Array} props.employees - The array of employee objects to display
- * @param {Function} props.onDelete - Callback function to call when an employee is deleted, receives the employee ID as an argument
+ * EmployeeListContent — renders the employee list with proper state handling.
+ * @param {object} props - Component props.
+ * @param {boolean} props.isLoading - Whether the employee data is currently loading.
+ * @param {boolean} props.isError - Whether there was an error loading the employee data.
+ * @param {Array} props.employees - The array of employee objects to display.
+ * @param {(id: string) => void} props.onDelete - Callback function to call when an employee is deleted, receives the employee ID as an argument.
  */
 const EmployeeListContent = ({ isLoading, isError, employees, onDelete }) => {
   if (isError) {

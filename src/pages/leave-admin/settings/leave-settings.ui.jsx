@@ -51,8 +51,9 @@ const SettingsSkeleton = () => (
 // ─── Form field components ────────────────────────────────────────────────────
 
 /**
- * LeaveQuotasCard — renders the leave quotas configuration section
- * @param {{form: object}} props - Props containing the form object for managing state and validation
+ * LeaveQuotasCard — renders the leave quotas configuration section.
+ * @param {object} props - Component props.
+ * @param {object} props.form - React Hook Form instance for managing form state and validation.
  */
 const LeaveQuotasCard = ({ form }) => (
   <Card>
@@ -129,8 +130,9 @@ LeaveQuotasCard.propTypes = {
 }
 
 /**
- * CarryForwardCard — renders the carry forward configuration section
- * @param {{form: object}} props - Props containing the form object for managing state and validation
+ * CarryForwardCard — renders the carry forward configuration section.
+ * @param {object} props - Component props.
+ * @param {object} props.form - React Hook Form instance for managing form state and validation.
  */
 const CarryForwardCard = ({ form }) => (
   <Card>
@@ -192,8 +194,9 @@ CarryForwardCard.propTypes = {
 }
 
 /**
- * LeaveOptionsCard — renders the leave options configuration section
- * @param {{form: object}} props - Props containing the form object for managing state and validation
+ * LeaveOptionsCard — renders the leave options configuration section.
+ * @param {object} props - Component props.
+ * @param {object} props.form - React Hook Form instance for managing form state and validation.
  */
 const LeaveOptionsCard = ({ form }) => (
   <Card>
@@ -254,8 +257,9 @@ LeaveOptionsCard.propTypes = {
 }
 
 /**
- * LeaveYearCard — renders the leave year configuration section
- * @param {{form: object}} props - Props containing the form object for managing state and validation
+ * LeaveYearCard — renders the leave year configuration section.
+ * @param {object} props - Component props.
+ * @param {object} props.form - React Hook Form instance for managing form state and validation.
  */
 const LeaveYearCard = ({ form }) => (
   <Card>

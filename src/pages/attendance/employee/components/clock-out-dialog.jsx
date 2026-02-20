@@ -19,8 +19,8 @@ const MIN_LENGTH = 10
  * Requires them to write a work summary (min 10 chars) before confirming.
  * @param {object} props - Component props.
  * @param {boolean} props.open - Whether the dialog is open.
- * @param {Function} props.onClose - Callback when dialog is closed.
- * @param {Function} props.onConfirm - Called with { workSummary }
+ * @param {() => void} props.onClose - Callback when dialog is closed.
+ * @param {(data: {workSummary: string}) => void} props.onConfirm - Called with { workSummary }.
  * @param {boolean} props.isLoading - Whether the clock-out operation is in progress.
  */
 const ClockOutDialog = ({ open, onClose, onConfirm, isLoading }) => {

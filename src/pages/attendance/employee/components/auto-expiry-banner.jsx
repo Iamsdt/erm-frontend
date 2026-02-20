@@ -13,9 +13,9 @@ const formatTime = (seconds) => {
 /**
  * AutoExpiryBanner — shown when willAutoExpire = true (< 30 min left).
  * Urges the employee to clock out manually before auto-expiry.
- * @param {object} props
- * @param {number} props.expiresInSeconds
- * @param {Function} props.onClockOut - Triggers the clock-out dialog
+ * @param {object} props - Component props.
+ * @param {number} props.expiresInSeconds - Seconds until auto-expiry.
+ * @param {() => void} props.onClockOut - Callback to trigger the clock-out dialog.
  */
 const AutoExpiryBanner = ({ expiresInSeconds, onClockOut }) => {
   if (!expiresInSeconds || expiresInSeconds <= 0) return null

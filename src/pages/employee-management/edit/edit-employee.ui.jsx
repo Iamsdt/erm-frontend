@@ -74,8 +74,11 @@ const EditFormSkeleton = () => (
 
 // ─── Form component ──────────────────────────────────────────────────────────
 /**
- * EditEmployeeForm — renders the employee edit form
- * @param {{form: object, onSubmit: Function, isSubmitting: boolean}} props
+ * EditEmployeeForm — renders the employee edit form with all employee fields.
+ * @param {object} props - Component props.
+ * @param {object} props.form - React Hook Form instance with methods and control.
+ * @param {(data: object) => void} props.onSubmit - Callback when form is submitted with employee data.
+ * @param {boolean} props.isSubmitting - Whether the form submission is in progress.
  */
 const EditEmployeeForm = ({ form, onSubmit, isSubmitting }) => (
   <Card>

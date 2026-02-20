@@ -354,8 +354,13 @@ DeptStatsCards.propTypes = {
 }
 
 /**
- * DeptGridSection — displays departments grid or loading skeletons
- * @param {{isLoading: boolean, isError: boolean, departments: Array, onEdit: Function, onDelete: Function}} props - Props for the department grid section component
+ * DeptGridSection — displays departments grid or loading skeletons.
+ * @param {object} props - Component props.
+ * @param {boolean} props.isLoading - Whether department data is loading.
+ * @param {boolean} props.isError - Whether an error occurred loading departments.
+ * @param {Array} props.departments - Array of department objects to display.
+ * @param {(dept: object) => void} props.onEdit - Callback when editing a department.
+ * @param {(id: string) => void} props.onDelete - Callback when deleting a department.
  */
 const DeptGridSection = ({
   isLoading,

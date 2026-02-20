@@ -6,18 +6,19 @@ import ClockOutDialog from "./components/clock-out-dialog"
 import SessionTable from "./components/session-table"
 
 /**
+/**
  * ClockUI — Presenter layer for the employee attendance clock page.
- * @param {object} props
- * @param {object} [props.status]
- * @param {boolean} props.statusLoading
- * @param {object} [props.todayData]
- * @param {boolean} props.todayLoading
- * @param {boolean} props.clockOutDialogOpen
- * @param {boolean} props.isMutating
- * @param {Function} props.onClockIn
- * @param {Function} props.onOpenClockOutDialog
- * @param {Function} props.onCloseClockOutDialog
- * @param {Function} props.onClockOutConfirm
+ * @param {object} props - Component props.
+ * @param {object} [props.status] - Current attendance status object.
+ * @param {boolean} props.statusLoading - Whether status is loading.
+ * @param {object} [props.todayData] - Today's attendance data.
+ * @param {boolean} props.todayLoading - Whether today's data is loading.
+ * @param {boolean} props.clockOutDialogOpen - Whether the clock out dialog is open.
+ * @param {boolean} props.isMutating - Whether a clock in/out operation is in progress.
+ * @param {() => void} props.onClockIn - Callback to clock in.
+ * @param {() => void} props.onOpenClockOutDialog - Callback to open clock out dialog.
+ * @param {() => void} props.onCloseClockOutDialog - Callback to close clock out dialog.
+ * @param {(summary: string) => void} props.onClockOutConfirm - Callback to confirm clock out with summary.
  */
 const ClockUI = ({
   status,

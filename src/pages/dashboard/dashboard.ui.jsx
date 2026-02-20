@@ -62,14 +62,14 @@ StatsWidgets.propTypes = {
 
 /**
  * CommentsSection — displays comments with pagination
- * @param {{isLoading: boolean, isError: boolean, displayComments: any, currentPage: number, canGoNext: boolean, onPreviousPage: Function, onNextPage: Function}} props
- * - props.isLoading: Whether the comments are currently loading
- * - props.isError: Whether there was an error loading the comments
- * - props.displayComments: The rendered comment components to display
- * - props.currentPage: The current page number of comments being displayed
- * - props.canGoNext: Whether there are more comments to load for the next page
- * - props.onPreviousPage: Callback function to go to the previous page of comments
- * - props.onNextPage: Callback function to go to the next page of comments
+ * @param {object} props - Component props.
+ * @param {boolean} props.isLoading - Whether the comments are currently loading.
+ * @param {boolean} props.isError - Whether there was an error loading the comments.
+ * @param {Array} props.displayComments - The rendered comment components to display.
+ * @param {number} props.currentPage - The current page number of comments being displayed.
+ * @param {boolean} props.canGoNext - Whether there are more comments to load for the next page.
+ * @param {() => void} props.onPreviousPage - Callback function to go to the previous page of comments.
+ * @param {() => void} props.onNextPage - Callback function to go to the next page of comments.
  */
 const CommentsSection = ({
   isLoading,
@@ -157,6 +157,27 @@ CommentsSection.defaultProps = {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
+
+/**
+ * DashboardUI — main dashboard presenter component.
+ * Displays clock status widget, stats, and community comments with pagination.
+ * @param {object} props - Component props.
+ * @param {boolean} props.isLoading - Whether comment data is loading.
+ * @param {boolean} props.isError - Whether there was an error loading comments.
+ * @param {Array} props.displayComments - Rendered comment components.
+ * @param {number} props.currentPage - Current page of comments.
+ * @param {() => void} props.onPreviousPage - Callback to go to previous page.
+ * @param {() => void} props.onNextPage - Callback to go to next page.
+ * @param {boolean} props.canGoNext - Whether more comments exist for next page.
+ * @param {number} props.totalComments - Total number of comments.
+ * @param {object} props.attendanceStatus - Current attendance/clock status.
+ * @param {boolean} props.attendanceStatus.isClocked - Whether currently clocked in.
+ * @param {string} props.attendanceStatus.clockedInAt - ISO timestamp of clock-in.
+ * @param {number} props.attendanceStatus.elapsedSeconds - Seconds since clock-in.
+ * @param {boolean} props.attendanceStatus.willAutoExpire - Whether session will auto-expire soon.
+ * @param {number} props.attendanceStatus.todayTotalMinutes - Total work minutes today.
+ * @param {boolean} props.attendanceLoading - Whether attendance status is loading.
+ */
 
 const DashboardUI = ({
   isLoading,
