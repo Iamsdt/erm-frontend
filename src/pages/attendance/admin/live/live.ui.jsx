@@ -50,7 +50,7 @@ const LiveRow = ({ entry }) => {
 
   // Calculate elapsed time on each render - this is intentional as we want
   // the time to update on each render cycle without external dependencies
-  // eslint-disable-next-line react-hooks/purity
+
   const elapsedMinutes = Math.floor(
     (Date.now() - clockedInAt.getTime()) / 60000
   )

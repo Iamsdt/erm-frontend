@@ -36,7 +36,14 @@ const WORK_SUMMARIES = [
 ]
 
 const generateLogs = (count = 20) => {
-  const statuses = ["COMPLETED", "COMPLETED", "COMPLETED", "AUTO_EXPIRED", "EDITED", "MANUAL"]
+  const statuses = [
+    "COMPLETED",
+    "COMPLETED",
+    "COMPLETED",
+    "AUTO_EXPIRED",
+    "EDITED",
+    "MANUAL",
+  ]
   const logs = []
   for (let i = 0; i < count; i++) {
     const emp = EMPLOYEES[i % EMPLOYEES.length]
@@ -53,18 +60,29 @@ const generateLogs = (count = 20) => {
       date: today,
       clockIn,
       clockOut: status === "IN_PROGRESS" ? null : clockOut,
-      durationMinutes: status === "IN_PROGRESS" ? null : 240 + (i * 11) % 180,
-      workSummary: status === "IN_PROGRESS" ? null : WORK_SUMMARIES[i % WORK_SUMMARIES.length],
+      durationMinutes: status === "IN_PROGRESS" ? null : 240 + ((i * 11) % 180),
+      workSummary:
+        status === "IN_PROGRESS"
+          ? null
+          : WORK_SUMMARIES[i % WORK_SUMMARIES.length],
       status,
       isManualEntry: status === "MANUAL",
-      manualEntryReason: status === "MANUAL" ? "Employee forgot to clock in — verified via email" : null,
+      manualEntryReason:
+        status === "MANUAL"
+          ? "Employee forgot to clock in — verified via email"
+          : null,
       isFlagged,
-      flagReason: isFlagged ? "Duration inconsistent with reported tasks" : null,
+      flagReason: isFlagged
+        ? "Duration inconsistent with reported tasks"
+        : null,
       flaggedBy: isFlagged ? "Admin User" : null,
       flaggedAt: isFlagged ? makeISO(16, 0) : null,
       editedBy: status === "EDITED" ? "Admin User" : null,
       editedAt: status === "EDITED" ? makeISO(17, 30) : null,
-      editReason: status === "EDITED" ? "Employee reported incorrect time captured" : null,
+      editReason:
+        status === "EDITED"
+          ? "Employee reported incorrect time captured"
+          : null,
     })
   }
   return logs
@@ -76,7 +94,9 @@ let mockLogs = generateLogs(20)
 
 const getStatusMock = http.get("*/attendance/status/", () => {
   if (session.isClocked) {
-    const elapsed = Math.floor((Date.now() - new Date(session.clockedInAt).getTime()) / 1000)
+    const elapsed = Math.floor(
+      (Date.now() - new Date(session.clockedInAt).getTime()) / 1000
+    )
     const maxSeconds = 4 * 60 * 60 // 4 hours
     const expiresInSeconds = Math.max(0, maxSeconds - elapsed)
     return HttpResponse.json({
@@ -109,34 +129,58 @@ const clockInMock = http.post("*/attendance/clock-in/", async ({ request }) => {
   })
 })
 
-const clockOutMock = http.post("*/attendance/clock-out/", async ({ request }) => {
-  const body = await request.json().catch(() => ({}))
-  if (!session.isClocked) {
-    return HttpResponse.json({ detail: "Not clocked in." }, { status: 400 })
+const clockOutMock = http.post(
+  "*/attendance/clock-out/",
+  async ({ request }) => {
+    const body = await request.json().catch(() => ({}))
+    if (!session.isClocked) {
+      return HttpResponse.json({ detail: "Not clocked in." }, { status: 400 })
+    }
+    const clockOut = new Date().toISOString()
+    const elapsed = Math.floor(
+      (Date.now() - new Date(session.clockedInAt).getTime()) / 60000
+    )
+    session.todayTotalMinutes += elapsed
+    session.isClocked = false
+    session.clockedInAt = null
+    return HttpResponse.json({
+      id: Math.floor(Math.random() * 9000) + 1000,
+      clockOut,
+      durationMinutes: elapsed,
+      workSummary: body.workSummary,
+    })
   }
-  const clockOut = new Date().toISOString()
-  const elapsed = Math.floor((Date.now() - new Date(session.clockedInAt).getTime()) / 60000)
-  session.todayTotalMinutes += elapsed
-  session.isClocked = false
-  session.clockedInAt = null
-  return HttpResponse.json({
-    id: Math.floor(Math.random() * 9000) + 1000,
-    clockOut,
-    durationMinutes: elapsed,
-    workSummary: body.workSummary,
-  })
-})
+)
 
 const getTodayMock = http.get("*/attendance/today/", () => {
   return HttpResponse.json({
     date: today,
     totalWorkMinutes: session.todayTotalMinutes,
-    firstClockIn: session.isClocked ? session.clockedInAt : (session.todayTotalMinutes > 0 ? makeISO(9, 2) : null),
-    lastClockOut: session.isClocked ? null : (session.todayTotalMinutes > 0 ? makeISO(13, 0) : null),
+    firstClockIn: session.isClocked
+      ? session.clockedInAt
+      : session.todayTotalMinutes > 0
+        ? makeISO(9, 2)
+        : null,
+    lastClockOut: session.isClocked
+      ? null
+      : session.todayTotalMinutes > 0
+        ? makeISO(13, 0)
+        : null,
     isCurrentlyIn: session.isClocked,
     hasAutoExpiredEntry: false,
     entries: session.isClocked
-      ? [{ id: 99, clockIn: session.clockedInAt, clockOut: null, durationMinutes: null, workSummary: null, status: "IN_PROGRESS", isManualEntry: false, isFlagged: false }]
+      ? [
+          {
+            id: 99,
+            clockIn: session.clockedInAt,
+            clockOut: null,
+            durationMinutes: null,
+            workSummary: null,
+            status: "IN_PROGRESS",
+            isManualEntry: false,
+            isFlagged: false,
+          },
+        ]
       : [],
   })
 })
@@ -151,20 +195,30 @@ const getHistoryMock = http.get("*/attendance/history/", () => {
     const status = i === 3 ? "AUTO_EXPIRED" : "COMPLETED"
     return {
       date: dateStr,
-      totalWorkMinutes: 420 + (i * 17) % 120,
-      entries: [{
-        id: 100 + i,
-        clockIn: new Date(d.setHours(9, 0)).toISOString(),
-        clockOut: status === "AUTO_EXPIRED" ? new Date(d.setHours(13, 0)).toISOString() : new Date(d.setHours(17, 30)).toISOString(),
-        durationMinutes: status === "AUTO_EXPIRED" ? 240 : 510,
-        workSummary: WORK_SUMMARIES[i % WORK_SUMMARIES.length],
-        status,
-        isManualEntry: false,
-        isFlagged: false,
-      }],
+      totalWorkMinutes: 420 + ((i * 17) % 120),
+      entries: [
+        {
+          id: 100 + i,
+          clockIn: new Date(d.setHours(9, 0)).toISOString(),
+          clockOut:
+            status === "AUTO_EXPIRED"
+              ? new Date(d.setHours(13, 0)).toISOString()
+              : new Date(d.setHours(17, 30)).toISOString(),
+          durationMinutes: status === "AUTO_EXPIRED" ? 240 : 510,
+          workSummary: WORK_SUMMARIES[i % WORK_SUMMARIES.length],
+          status,
+          isManualEntry: false,
+          isFlagged: false,
+        },
+      ],
     }
   })
-  return HttpResponse.json({ entries, totalDaysWorked: 12, totalWorkMinutes: 5040, avgMinutesPerDay: 420 })
+  return HttpResponse.json({
+    entries,
+    totalDaysWorked: 12,
+    totalWorkMinutes: 5040,
+    avgMinutesPerDay: 420,
+  })
 })
 
 // Admin endpoints
@@ -189,57 +243,83 @@ const adminLogsMock = http.get("*/attendance/admin/logs/", ({ request }) => {
   })
 })
 
-const adminEditMock = http.patch("*/attendance/admin/logs/:id/", async ({ params, request }) => {
-  const body = await request.json().catch(() => ({}))
-  const id = parseInt(params.id)
-  mockLogs = mockLogs.map((l) =>
-    l.id === id
-      ? { ...l, ...(body.clockIn && { clockIn: body.clockIn }), ...(body.clockOut && { clockOut: body.clockOut }), status: "EDITED", editedBy: "Admin User", editedAt: new Date().toISOString(), editReason: body.editReason }
-      : l
-  )
-  return HttpResponse.json({ success: true })
-})
-
-const adminFlagMock = http.patch("*/attendance/admin/logs/:id/flag/", async ({ params, request }) => {
-  const body = await request.json().catch(() => ({}))
-  const id = parseInt(params.id)
-  mockLogs = mockLogs.map((l) =>
-    l.id === id
-      ? { ...l, isFlagged: body.isFlagged, flagReason: body.flagReason ?? null, flaggedBy: body.isFlagged ? "Admin User" : null, flaggedAt: body.isFlagged ? new Date().toISOString() : null }
-      : l
-  )
-  return HttpResponse.json({ success: true })
-})
-
-const adminManualEntryMock = http.post("*/attendance/admin/manual-entry/", async ({ request }) => {
-  const body = await request.json().catch(() => ({}))
-  const emp = EMPLOYEES.find((e) => e.id === body.employeeId) ?? EMPLOYEES[0]
-  const newEntry = {
-    id: mockLogs.length + 1,
-    employeeId: emp.id,
-    employeeName: emp.name,
-    department: emp.department,
-    date: body.clockIn?.split("T")[0] ?? today,
-    clockIn: body.clockIn,
-    clockOut: body.clockOut,
-    durationMinutes: body.clockIn && body.clockOut
-      ? Math.floor((new Date(body.clockOut) - new Date(body.clockIn)) / 60000)
-      : null,
-    workSummary: body.workSummary,
-    status: "MANUAL",
-    isManualEntry: true,
-    manualEntryReason: body.manualEntryReason,
-    isFlagged: false,
-    flagReason: null,
-    flaggedBy: null,
-    flaggedAt: null,
-    editedBy: null,
-    editedAt: null,
-    editReason: null,
+const adminEditMock = http.patch(
+  "*/attendance/admin/logs/:id/",
+  async ({ params, request }) => {
+    const body = await request.json().catch(() => ({}))
+    const id = parseInt(params.id)
+    mockLogs = mockLogs.map((l) =>
+      l.id === id
+        ? {
+            ...l,
+            ...(body.clockIn && { clockIn: body.clockIn }),
+            ...(body.clockOut && { clockOut: body.clockOut }),
+            status: "EDITED",
+            editedBy: "Admin User",
+            editedAt: new Date().toISOString(),
+            editReason: body.editReason,
+          }
+        : l
+    )
+    return HttpResponse.json({ success: true })
   }
-  mockLogs = [newEntry, ...mockLogs]
-  return HttpResponse.json(newEntry, { status: 201 })
-})
+)
+
+const adminFlagMock = http.patch(
+  "*/attendance/admin/logs/:id/flag/",
+  async ({ params, request }) => {
+    const body = await request.json().catch(() => ({}))
+    const id = parseInt(params.id)
+    mockLogs = mockLogs.map((l) =>
+      l.id === id
+        ? {
+            ...l,
+            isFlagged: body.isFlagged,
+            flagReason: body.flagReason ?? null,
+            flaggedBy: body.isFlagged ? "Admin User" : null,
+            flaggedAt: body.isFlagged ? new Date().toISOString() : null,
+          }
+        : l
+    )
+    return HttpResponse.json({ success: true })
+  }
+)
+
+const adminManualEntryMock = http.post(
+  "*/attendance/admin/manual-entry/",
+  async ({ request }) => {
+    const body = await request.json().catch(() => ({}))
+    const emp = EMPLOYEES.find((e) => e.id === body.employeeId) ?? EMPLOYEES[0]
+    const newEntry = {
+      id: mockLogs.length + 1,
+      employeeId: emp.id,
+      employeeName: emp.name,
+      department: emp.department,
+      date: body.clockIn?.split("T")[0] ?? today,
+      clockIn: body.clockIn,
+      clockOut: body.clockOut,
+      durationMinutes:
+        body.clockIn && body.clockOut
+          ? Math.floor(
+              (new Date(body.clockOut) - new Date(body.clockIn)) / 60000
+            )
+          : null,
+      workSummary: body.workSummary,
+      status: "MANUAL",
+      isManualEntry: true,
+      manualEntryReason: body.manualEntryReason,
+      isFlagged: false,
+      flagReason: null,
+      flaggedBy: null,
+      flaggedAt: null,
+      editedBy: null,
+      editedAt: null,
+      editReason: null,
+    }
+    mockLogs = [newEntry, ...mockLogs]
+    return HttpResponse.json(newEntry, { status: 201 })
+  }
+)
 
 const adminLiveMock = http.get("*/attendance/admin/live/", () => {
   const liveEmployees = EMPLOYEES.slice(0, 3).map((e, i) => ({
@@ -247,7 +327,7 @@ const adminLiveMock = http.get("*/attendance/admin/live/", () => {
     employeeName: e.name,
     department: e.department,
     clockedInAt: makeISO(8 + i, 15 + i * 10),
-    elapsedSeconds: (3600 + i * 1200),
+    elapsedSeconds: 3600 + i * 1200,
     expiresInSeconds: 14400 - (3600 + i * 1200),
     willAutoExpire: 14400 - (3600 + i * 1200) <= 1800,
   }))
@@ -256,7 +336,11 @@ const adminLiveMock = http.get("*/attendance/admin/live/", () => {
     employeeName: e.name,
     department: e.department,
   }))
-  return HttpResponse.json({ liveCount: liveEmployees.length, liveEmployees, notClockedIn })
+  return HttpResponse.json({
+    liveCount: liveEmployees.length,
+    liveEmployees,
+    notClockedIn,
+  })
 })
 
 const adminSummaryMock = http.get("/api/attendance/admin/summary/", () => {

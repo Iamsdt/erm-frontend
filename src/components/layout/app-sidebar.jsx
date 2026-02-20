@@ -71,7 +71,11 @@ const employeeAttendanceItems = [
 ]
 
 const adminAttendanceItems = [
-  { title: "Activity Logs", url: "/attendance/admin/logs", icon: ClipboardList },
+  {
+    title: "Activity Logs",
+    url: "/attendance/admin/logs",
+    icon: ClipboardList,
+  },
   { title: "Live Status", url: "/attendance/admin/live", icon: Clock },
   { title: "Summary", url: "/attendance/admin/summary", icon: LayoutDashboard },
 ]
@@ -166,7 +170,7 @@ const ModulesNavGroup = ({ isLeaveAdmin, isLeaveEmployee, isEmpAdmin }) => {
   const leaveItems = [...leaveSharedItems, ...roleItems]
   const showLeave = isLeaveAdmin || isLeaveEmployee
   const showEmpMgmt = isEmpAdmin
-  
+
   // Attendance is visible to all authenticated users for employee items
   // Admin items visible only to admins (using isLeaveAdmin as admin check)
   const attendanceItems = isLeaveAdmin

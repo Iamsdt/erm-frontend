@@ -87,9 +87,8 @@ const handleCreateDepartment = async ({ request }) => {
 
 // ─── GET /employee-management/departments/ ────────────────────────────────────
 
-const listDepartments = http.get(
-  "*/employee-management/departments/",
-  () => respondWithDepartmentList()
+const listDepartments = http.get("*/employee-management/departments/", () =>
+  respondWithDepartmentList()
 )
 const listDepartmentsNoSlash = http.get(
   "*/employee-management/departments",
