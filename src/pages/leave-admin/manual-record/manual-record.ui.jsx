@@ -59,7 +59,6 @@ const ManualInfoCallout = () => (
   </div>
 )
 
-/* eslint-disable react/jsx-handler-names */
 /**
  * ManualRecordUI — form for admin to manually record an employee attendance status.
  */
@@ -268,7 +267,6 @@ const ManualRecordUI = ({
     </div>
   )
 }
-/* eslint-enable react/jsx-handler-names */
 
 ManualRecordUI.propTypes = {
   form: PropTypes.object.isRequired,

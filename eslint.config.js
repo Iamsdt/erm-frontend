@@ -47,9 +47,14 @@ export default [
                 PerformanceObserver: "readonly",
                 module: "readonly",
                 alert: "readonly",
+                AbortSignal: "readonly",
             },
         },
 
+        rules: {
+            // disable handler naming rule for our project conventions
+            'react/jsx-handler-names': 'off',
+        },
         settings: {
             "import/resolver": {
                 alias: {

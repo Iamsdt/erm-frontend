@@ -22,9 +22,9 @@ const EmployeeList = () => {
     if (!search.trim()) return list
     const lower = search.toLowerCase()
     return list.filter(
-      (e) =>
-        e.name.toLowerCase().includes(lower) ||
-        e.email.toLowerCase().includes(lower)
+      (employee) =>
+        employee.name.toLowerCase().includes(lower) ||
+        employee.email.toLowerCase().includes(lower)
     )
   }, [data, search])
 

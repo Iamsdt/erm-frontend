@@ -178,7 +178,7 @@ export const useUpdateLeaveSettings = () => {
  * React Query hook for fetching per-employee attendance detail for a given date.
  * Only runs when a date string is provided (enabled by click on calendar day).
  * @param {string|null} date - ISO date string (YYYY-MM-DD) or null to skip
- * @returns {import("@tanstack/react-query").UseQueryResult}
+ * @returns {import("@tanstack/react-query").UseQueryResult} The query result with attendance detail for the specified date
  */
 export const useFetchAttendanceDayDetail = (date) => {
   return useQuery({

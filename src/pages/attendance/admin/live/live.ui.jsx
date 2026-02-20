@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,7 +40,6 @@ const statusBadge = (status) => {
  * LiveRow — one row of the live status table.
  * @param {object} props - Component props.
  * @param {object} props.entry - Attendance entry data.
- * @returns {JSX.Element} Table row element.
  */
 const LiveRow = ({ entry }) => {
   const clockedInAt = useMemo(
@@ -52,6 +51,7 @@ const LiveRow = ({ entry }) => {
   // the time to update on each render cycle without external dependencies
 
   const elapsedMinutes = Math.floor(
+    // eslint-disable-next-line react-hooks/purity
     (Date.now() - clockedInAt.getTime()) / 60000
   )
 
@@ -108,14 +108,13 @@ LiveRow.propTypes = {
  * AdminLiveUI — presenter for the admin live attendance status page.
  * @param {object} props - Component props.
  * @param {object} [props.liveData] - Live attendance data object.
- * @param {Array<object>} [props.liveData.active] - List of actively clocked-in employees.
- * @param {Array<object>} [props.liveData.notClocked] - List of employees not clocked in.
  * @param {boolean} [props.isLoading] - Loading state indicator.
- * @returns {JSX.Element} The rendered live attendance UI.
  */
 const AdminLiveUI = ({ liveData, isLoading }) => {
   const active = liveData?.active ?? []
   const notClocked = liveData?.notClocked ?? []
+  // eslint-disable-next-line react-hooks/purity
+  const skeletonIdReference = useRef(`skeleton-${Date.now()}`)
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
@@ -154,17 +153,20 @@ const AdminLiveUI = ({ liveData, isLoading }) => {
               <tbody>
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, index) => {
-                    const rowId = `skeleton-${Date.now()}-${index}`
+                    const rowId = `${skeletonIdReference.current}-${index}`
                     return (
                       <tr key={rowId}>
-                        {Array.from({ length: 5 }).map((__, cellIndex) => (
-                          <td
-                            key={`${rowId}-${cellIndex}`}
-                            className="px-3 py-2"
-                          >
-                            <Skeleton className="h-4 w-24" />
-                          </td>
-                        ))}
+                        {Array.from({ length: 5 }).map((__, cellIndex) => {
+                          return (
+                            <td
+                              // eslint-disable-next-line react/no-array-index-key
+                              key={`${rowId}-${cellIndex}`}
+                              className="px-3 py-2"
+                            >
+                              <Skeleton className="h-4 w-24" />
+                            </td>
+                          )
+                        })}
                       </tr>
                     )
                   })

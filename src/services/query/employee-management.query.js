@@ -10,6 +10,7 @@ import {
 } from "@api/employee-management.api"
 
 const QUERY_KEY_EMPLOYEES = "employee-management-list"
+const QUERY_KEY_EMPLOYEE_DETAIL = "employee-management-detail"
 
 /**
  * React Query hook for fetching the full employee list.
@@ -34,7 +35,7 @@ export const useFetchEmployees = () => {
  */
 export const useFetchEmployee = (id) => {
   return useQuery({
-    queryKey: ["employee-management-detail", id],
+    queryKey: [QUERY_KEY_EMPLOYEE_DETAIL, id],
     queryFn: async ({ signal }) => {
       const response = await getEmployee(id, { signal })
       return response.data
@@ -72,7 +73,7 @@ export const useUpdateEmployee = () => {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEES] })
       queryClient.invalidateQueries({
-        queryKey: ["employee-management-detail", variables.id],
+        queryKey: [QUERY_KEY_EMPLOYEE_DETAIL, variables.id],
       })
     },
   })

@@ -10,13 +10,7 @@ import PropTypes from "prop-types"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -314,7 +308,106 @@ DeptSheet.propTypes = {
   form: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
-  editingDept: PropTypes.object,
+  editingDept: PropTypes.object.isRequired,
+}
+
+// ─── Sub-components for stats and grid ────────────────────────────────────────
+
+/**
+ * DeptStatsCards — displays department stats
+ * @param {{isLoading: boolean, stats: object}} props - Props for the stats cards component
+ */
+const DeptStatsCards = ({ isLoading, stats }) => (
+  <div className="grid grid-cols-2 gap-4">
+    <Card>
+      <CardContent className="flex items-center gap-3 pt-5 pb-4">
+        <Building2 className="h-8 w-8 text-primary/60" />
+        <div>
+          {isLoading ? (
+            <Skeleton className="h-7 w-8 mb-1" />
+          ) : (
+            <p className="text-2xl font-bold">{stats?.total ?? 0}</p>
+          )}
+          <p className="text-xs text-muted-foreground">Departments</p>
+        </div>
+      </CardContent>
+    </Card>
+    <Card>
+      <CardContent className="flex items-center gap-3 pt-5 pb-4">
+        <Users className="h-8 w-8 text-primary/60" />
+        <div>
+          {isLoading ? (
+            <Skeleton className="h-7 w-12 mb-1" />
+          ) : (
+            <p className="text-2xl font-bold">{stats?.totalEmployees ?? 0}</p>
+          )}
+          <p className="text-xs text-muted-foreground">Total Employees</p>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+)
+
+DeptStatsCards.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  stats: PropTypes.object.isRequired,
+}
+
+/**
+ * DeptGridSection — displays departments grid or loading skeletons
+ * @param {{isLoading: boolean, isError: boolean, departments: Array, onEdit: Function, onDelete: Function}} props - Props for the department grid section component
+ */
+const DeptGridSection = ({
+  isLoading,
+  isError,
+  departments,
+  onEdit,
+  onDelete,
+}) => {
+  if (isError) {
+    return (
+      <p className="text-sm text-center text-destructive py-10">
+        Failed to load departments. Please try again.
+      </p>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <DeptCardSkeleton key={index} />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {departments?.map((dept) => (
+        <DeptCard
+          key={dept.id}
+          dept={dept}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      ))}
+      {!departments?.length && (
+        <div className="col-span-full py-16 text-center text-muted-foreground text-sm">
+          No departments yet. Click &quot;New Department&quot; to get started.
+        </div>
+      )}
+    </div>
+  )
+}
+
+DeptGridSection.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  isError: PropTypes.bool.isRequired,
+  departments: PropTypes.array.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 }
 
 // ─── Main UI ──────────────────────────────────────────────────────────────────
@@ -350,65 +443,16 @@ const DepartmentListUI = ({
     </div>
 
     {/* Stats */}
-    <div className="grid grid-cols-2 gap-4">
-      <Card>
-        <CardContent className="flex items-center gap-3 pt-5 pb-4">
-          <Building2 className="h-8 w-8 text-primary/60" />
-          <div>
-            {isLoading ? (
-              <Skeleton className="h-7 w-8 mb-1" />
-            ) : (
-              <p className="text-2xl font-bold">{stats?.total ?? 0}</p>
-            )}
-            <p className="text-xs text-muted-foreground">Departments</p>
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="flex items-center gap-3 pt-5 pb-4">
-          <Users className="h-8 w-8 text-primary/60" />
-          <div>
-            {isLoading ? (
-              <Skeleton className="h-7 w-12 mb-1" />
-            ) : (
-              <p className="text-2xl font-bold">{stats?.totalEmployees ?? 0}</p>
-            )}
-            <p className="text-xs text-muted-foreground">Total Employees</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <DeptStatsCards isLoading={isLoading} stats={stats} />
 
     {/* Grid */}
-    {isError && (
-      <p className="text-sm text-center text-destructive py-10">
-        Failed to load departments. Please try again.
-      </p>
-    )}
-
-    {isLoading ? (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <DeptCardSkeleton key={index} />
-        ))}
-      </div>
-    ) : (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {departments?.map((dept) => (
-          <DeptCard
-            key={dept.id}
-            dept={dept}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        ))}
-        {!departments?.length && (
-          <div className="col-span-full py-16 text-center text-muted-foreground text-sm">
-            No departments yet. Click &quot;New Department&quot; to get started.
-          </div>
-        )}
-      </div>
-    )}
+    <DeptGridSection
+      isLoading={isLoading}
+      isError={isError}
+      departments={departments}
+      onEdit={onEdit}
+      onDelete={onDelete}
+    />
 
     {/* Add / Edit Sheet */}
     <DeptSheet
@@ -423,16 +467,16 @@ const DepartmentListUI = ({
 )
 
 DepartmentListUI.propTypes = {
-  departments: PropTypes.array,
+  departments: PropTypes.array.isRequired,
   stats: PropTypes.shape({
     total: PropTypes.number,
     totalEmployees: PropTypes.number,
-  }),
+  }).isRequired,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   sheetOpen: PropTypes.bool.isRequired,
   onSheetOpenChange: PropTypes.func.isRequired,
-  editingDept: PropTypes.object,
+  editingDept: PropTypes.object.isRequired,
   form: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired,

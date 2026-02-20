@@ -133,18 +133,32 @@ ClockedOutBody.propTypes = {
  * @param {object|null} status - Raw status from useAttendanceStatus().
  * @returns {{ isClocked: boolean, elapsed: number, todayMinutes: number, clockedInAt: string|null, willAutoExpire: boolean }} Derived state.
  */
-const deriveState = (status) => ({
-  isClocked: status?.isClocked ?? false,
-  elapsed: status?.elapsedSeconds ?? 0,
-  todayMinutes: status?.todayTotalMinutes ?? 0,
-  clockedInAt: status?.clockedInAt
+const deriveState = (status) => {
+  if (!status) {
+    return {
+      isClocked: false,
+      elapsed: 0,
+      todayMinutes: 0,
+      clockedInAt: null,
+      willAutoExpire: false,
+    }
+  }
+
+  const clockedInAt = status.clockedInAt
     ? new Date(status.clockedInAt).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       })
-    : null,
-  willAutoExpire: status?.willAutoExpire ?? false,
-})
+    : null
+
+  return {
+    isClocked: status.isClocked ?? false,
+    elapsed: status.elapsedSeconds ?? 0,
+    todayMinutes: status.todayTotalMinutes ?? 0,
+    clockedInAt,
+    willAutoExpire: status.willAutoExpire ?? false,
+  }
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 

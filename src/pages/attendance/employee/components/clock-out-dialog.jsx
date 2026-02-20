@@ -17,11 +17,11 @@ const MIN_LENGTH = 10
 /**
  * ClockOutDialog — shown when the employee clicks "Clock Out".
  * Requires them to write a work summary (min 10 chars) before confirming.
- * @param {object} props
- * @param {boolean} props.open
- * @param {Function} props.onClose
+ * @param {object} props - Component props.
+ * @param {boolean} props.open - Whether the dialog is open.
+ * @param {Function} props.onClose - Callback when dialog is closed.
  * @param {Function} props.onConfirm - Called with { workSummary }
- * @param {boolean} props.isLoading
+ * @param {boolean} props.isLoading - Whether the clock-out operation is in progress.
  */
 const ClockOutDialog = ({ open, onClose, onConfirm, isLoading }) => {
   const [summary, setSummary] = useState("")
@@ -51,7 +51,7 @@ const ClockOutDialog = ({ open, onClose, onConfirm, isLoading }) => {
             placeholder="e.g. Reviewed pull requests, fixed login bug, attended sprint planning…"
             rows={4}
             value={summary}
-            onChange={(e) => setSummary(e.target.value)}
+            onChange={(event) => setSummary(event.target.value)}
             disabled={isLoading}
             className="resize-none"
           />

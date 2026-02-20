@@ -302,8 +302,8 @@ EmptyState.propTypes = { label: PropTypes.string.isRequired }
 DayDetailSheet.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  date: PropTypes.string,
-  dayDetail: PropTypes.object,
+  date: PropTypes.string.isRequired,
+  dayDetail: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
 }
 
@@ -489,6 +489,7 @@ const LeaveCalendarUI = ({
                 const isClickable = !record.isWeekend && record.total > 0
 
                 return (
+                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
                   <div
                     key={record.date}
                     onClick={() => isClickable && onDayClick(record)}
@@ -626,14 +627,14 @@ LeaveCalendarUI.propTypes = {
         total: PropTypes.number,
       })
     ),
-  }),
+  }).isRequired,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   onPrevMonth: PropTypes.func.isRequired,
   onNextMonth: PropTypes.func.isRequired,
   canGoNext: PropTypes.bool.isRequired,
-  selectedDate: PropTypes.string,
-  dayDetail: PropTypes.object,
+  selectedDate: PropTypes.string.isRequired,
+  dayDetail: PropTypes.object.isRequired,
   isDayLoading: PropTypes.bool.isRequired,
   onDayClick: PropTypes.func.isRequired,
   onSheetClose: PropTypes.func.isRequired,

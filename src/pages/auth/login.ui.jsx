@@ -86,7 +86,7 @@ const LoginUI = ({ form, onSubmit }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  {/* eslint-disable-next-line react/jsx-handler-names */}
+                  {}
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>

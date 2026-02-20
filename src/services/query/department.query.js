@@ -11,7 +11,6 @@ const QUERY_KEY = "departments"
 
 /**
  * React Query hook for fetching the department list.
- * @returns {import("@tanstack/react-query").UseQueryResult}
  */
 export const useFetchDepartments = () => {
   return useQuery({
@@ -27,7 +26,6 @@ export const useFetchDepartments = () => {
 
 /**
  * Mutation hook to create a department.
- * @returns {import("@tanstack/react-query").UseMutationResult}
  */
 export const useCreateDepartment = () => {
   const queryClient = useQueryClient()
@@ -41,7 +39,6 @@ export const useCreateDepartment = () => {
 
 /**
  * Mutation hook to update a department.
- * @returns {import("@tanstack/react-query").UseMutationResult}
  */
 export const useUpdateDepartment = () => {
   const queryClient = useQueryClient()
@@ -55,7 +52,6 @@ export const useUpdateDepartment = () => {
 
 /**
  * Mutation hook to delete a department.
- * @returns {import("@tanstack/react-query").UseMutationResult}
  */
 export const useDeleteDepartment = () => {
   const queryClient = useQueryClient()

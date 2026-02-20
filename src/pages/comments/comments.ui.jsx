@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-handler-names */
 import PropTypes from "prop-types"
 
 import { Button } from "@/components/ui/button"

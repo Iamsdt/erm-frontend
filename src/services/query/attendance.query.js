@@ -28,7 +28,6 @@ const QK_ADMIN_SUMMARY = "attendance-admin-summary"
 /**
  * Hook to poll the current clock-in status for the authenticated employee.
  * Provides `willAutoExpire` and `expiresInSeconds` for the warning banner.
- * @returns {import("@tanstack/react-query").UseQueryResult}
  */
 export const useAttendanceStatus = () => {
   return useQuery({
@@ -45,7 +44,6 @@ export const useAttendanceStatus = () => {
 
 /**
  * Hook to fetch today's full attendance detail.
- * @returns {import("@tanstack/react-query").UseQueryResult}
  */
 export const useTodayAttendance = () => {
   return useQuery({
@@ -61,9 +59,8 @@ export const useTodayAttendance = () => {
 
 /**
  * Hook to fetch paginated personal attendance history.
- * @param {number} year
+ * @param {number} year - 4-digit year
  * @param {number} month - 1-indexed
- * @returns {import("@tanstack/react-query").UseQueryResult}
  */
 export const useAttendanceHistory = (year, month) => {
   return useQuery({
@@ -81,7 +78,6 @@ export const useAttendanceHistory = (year, month) => {
 
 /**
  * Mutation to clock in the current employee.
- * @returns {import("@tanstack/react-query").UseMutationResult}
  */
 export const useClockIn = () => {
   const qc = useQueryClient()
@@ -96,7 +92,6 @@ export const useClockIn = () => {
 
 /**
  * Mutation to clock out the current employee. Requires { workSummary }.
- * @returns {import("@tanstack/react-query").UseMutationResult}
  */
 export const useClockOut = () => {
   const qc = useQueryClient()
@@ -113,8 +108,7 @@ export const useClockOut = () => {
 
 /**
  * Hook to fetch the admin activity log with filters.
- * @param {object} filters
- * @returns {import("@tanstack/react-query").UseQueryResult}
+ * @param {object} filters - Filter object with optional keys: employeeId, dateFrom, dateTo, showSuspiciousOnly
  */
 export const useAdminAttendanceLogs = (filters = {}) => {
   return useQuery({
@@ -130,7 +124,6 @@ export const useAdminAttendanceLogs = (filters = {}) => {
 
 /**
  * Hook to poll who is currently clocked in (admin live view).
- * @returns {import("@tanstack/react-query").UseQueryResult}
  */
 export const useAdminLiveStatus = () => {
   return useQuery({
@@ -149,7 +142,6 @@ export const useAdminLiveStatus = () => {
 
 /**
  * Mutation to edit an attendance entry's times (admin).
- * @returns {import("@tanstack/react-query").UseMutationResult}
  */
 export const useEditAttendanceEntry = () => {
   const qc = useQueryClient()
@@ -163,7 +155,6 @@ export const useEditAttendanceEntry = () => {
 
 /**
  * Mutation to flag / unflag an attendance entry as suspicious (admin).
- * @returns {import("@tanstack/react-query").UseMutationResult}
  */
 export const useFlagAttendanceEntry = () => {
   const qc = useQueryClient()
@@ -177,7 +168,6 @@ export const useFlagAttendanceEntry = () => {
 
 /**
  * Mutation to add a manual attendance entry on behalf of an employee (admin).
- * @returns {import("@tanstack/react-query").UseMutationResult}
  */
 export const useAddManualAttendanceEntry = () => {
   const qc = useQueryClient()
@@ -193,7 +183,6 @@ export const useAddManualAttendanceEntry = () => {
 /**
  * Fetch daily/weekly/monthly attendance summary stats (admin only).
  * Cached for 5 minutes.
- * @returns {import("@tanstack/react-query").UseQueryResult}
  */
 export const useAdminAttendanceSummary = () => {
   return useQuery({

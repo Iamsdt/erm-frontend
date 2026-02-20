@@ -10,6 +10,11 @@ import {
 
 import ClockUI from "./clock.ui"
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+const DEFAULT_ERROR_MESSAGE = "Something went wrong."
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 /**
  * AttendanceClock — container that wires queries and mutations for the employee
  * clock-in/out page.
@@ -41,8 +46,7 @@ const AttendanceClock = () => {
         onError: (error) => {
           toast({
             title: "Clock-in failed",
-            description:
-              error?.response?.data?.detail ?? "Something went wrong.",
+            description: error?.response?.data?.detail ?? DEFAULT_ERROR_MESSAGE,
             variant: "destructive",
           })
         },
@@ -64,8 +68,7 @@ const AttendanceClock = () => {
         onError: (error) => {
           toast({
             title: "Clock-out failed",
-            description:
-              error?.response?.data?.detail ?? "Something went wrong.",
+            description: error?.response?.data?.detail ?? DEFAULT_ERROR_MESSAGE,
             variant: "destructive",
           })
         },

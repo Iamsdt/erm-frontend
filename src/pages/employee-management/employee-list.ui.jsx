@@ -86,7 +86,7 @@ const StatsCard = ({ icon: Icon, label, value, isLoading }) => (
 StatsCard.propTypes = {
   icon: PropTypes.elementType.isRequired,
   label: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   isLoading: PropTypes.bool.isRequired,
 }
 
@@ -159,6 +159,52 @@ EmployeeRow.propTypes = {
     department: PropTypes.string,
     status: PropTypes.string.isRequired,
   }).isRequired,
+  onDelete: PropTypes.func.isRequired,
+}
+
+// ─── Employee list content ────────────────────────────────────────────────────
+
+/**
+ * EmployeeListContent — renders the employee list with proper state handling
+ * @param {{isLoading: boolean, isError: boolean, employees: Array, onDelete: Function}} props - Props for managing loading, error, employee data, and delete action
+ * @param {boolean} props.isLoading - Whether the employee data is currently loading
+ * @param {boolean} props.isError - Whether there was an error loading the employee data
+ * @param {Array} props.employees - The array of employee objects to display
+ * @param {Function} props.onDelete - Callback function to call when an employee is deleted, receives the employee ID as an argument
+ */
+const EmployeeListContent = ({ isLoading, isError, employees, onDelete }) => {
+  if (isError) {
+    return (
+      <p className="px-4 py-6 text-sm text-center text-destructive">
+        Failed to load employees. Please try again.
+      </p>
+    )
+  }
+
+  if (isLoading) {
+    return Array.from({ length: 5 }).map((_, index) => (
+      // eslint-disable-next-line react/no-array-index-key
+      <EmployeeRowSkeleton key={index} />
+    ))
+  }
+
+  if (employees?.length === 0) {
+    return (
+      <p className="px-4 py-10 text-sm text-center text-muted-foreground">
+        No employees found.
+      </p>
+    )
+  }
+
+  return employees?.map((emp) => (
+    <EmployeeRow key={emp.id} employee={emp} onDelete={onDelete} />
+  ))
+}
+
+EmployeeListContent.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  isError: PropTypes.bool.isRequired,
+  employees: PropTypes.array.isRequired,
   onDelete: PropTypes.func.isRequired,
 }
 
@@ -238,7 +284,7 @@ const EmployeeListUI = ({
               <Input
                 placeholder="Search by name or email…"
                 value={search}
-                onChange={(e) => onSearchChange(e.target.value)}
+                onChange={(event) => onSearchChange(event.target.value)}
                 className="pl-8 h-8 text-sm"
               />
             </div>
@@ -246,28 +292,12 @@ const EmployeeListUI = ({
         </CardHeader>
 
         <CardContent className="p-0">
-          {isError && (
-            <p className="px-4 py-6 text-sm text-center text-destructive">
-              Failed to load employees. Please try again.
-            </p>
-          )}
-
-          {isLoading &&
-            Array.from({ length: 5 }).map((_, index) => (
-              <EmployeeRowSkeleton key={index} />
-            ))}
-
-          {!isLoading && !isError && employees?.length === 0 && (
-            <p className="px-4 py-10 text-sm text-center text-muted-foreground">
-              No employees found.
-            </p>
-          )}
-
-          {!isLoading &&
-            !isError &&
-            employees?.map((emp) => (
-              <EmployeeRow key={emp.id} employee={emp} onDelete={onDelete} />
-            ))}
+          <EmployeeListContent
+            isLoading={isLoading}
+            isError={isError}
+            employees={employees}
+            onDelete={onDelete}
+          />
         </CardContent>
       </Card>
     </div>
@@ -275,12 +305,12 @@ const EmployeeListUI = ({
 }
 
 EmployeeListUI.propTypes = {
-  employees: PropTypes.array,
+  employees: PropTypes.array.isRequired,
   stats: PropTypes.shape({
     total: PropTypes.number,
     active: PropTypes.number,
     invited: PropTypes.number,
-  }),
+  }).isRequired,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   search: PropTypes.string.isRequired,

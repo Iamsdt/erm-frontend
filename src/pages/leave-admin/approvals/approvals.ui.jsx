@@ -7,8 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 
-/* eslint-disable react/jsx-handler-names */
-
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const FILTER_TABS = [

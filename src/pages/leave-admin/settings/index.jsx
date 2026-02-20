@@ -11,30 +11,35 @@ import {
 
 import LeaveSettingsUI from "./leave-settings.ui"
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+const MIN_LEAVE_ERROR = "Must be 0 or more"
+const MAX_LEAVE_ERROR = "Cannot exceed 365 days"
+const MAX_DAYS = 365
+
 // ─── Validation schema ────────────────────────────────────────────────────────
 
 const schema = z.object({
   annualLeaveQuota: z
     .number()
     .int()
-    .min(0, "Must be 0 or more")
-    .max(365, "Cannot exceed 365 days"),
+    .min(0, MIN_LEAVE_ERROR)
+    .max(MAX_DAYS, MAX_LEAVE_ERROR),
   sickLeaveQuota: z
     .number()
     .int()
-    .min(0, "Must be 0 or more")
-    .max(365, "Cannot exceed 365 days"),
+    .min(0, MIN_LEAVE_ERROR)
+    .max(MAX_DAYS, MAX_LEAVE_ERROR),
   casualLeaveQuota: z
     .number()
     .int()
-    .min(0, "Must be 0 or more")
-    .max(365, "Cannot exceed 365 days"),
+    .min(0, MIN_LEAVE_ERROR)
+    .max(MAX_DAYS, MAX_LEAVE_ERROR),
   carryForwardEnabled: z.boolean(),
   carryForwardLimit: z
     .number()
     .int()
-    .min(0, "Must be 0 or more")
-    .max(365, "Cannot exceed 365 days"),
+    .min(0, MIN_LEAVE_ERROR)
+    .max(MAX_DAYS, MAX_LEAVE_ERROR),
   halfDayEnabled: z.boolean(),
   wfhEnabled: z.boolean(),
   leaveYearStart: z
