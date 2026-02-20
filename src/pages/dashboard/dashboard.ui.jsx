@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-handler-names */
 import PropTypes from "prop-types"
 
+import ClockStatusWidget from "@/components/attendance/clock-status-widget"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
@@ -13,6 +14,8 @@ const DashboardUI = ({
   onNextPage,
   canGoNext,
   totalComments,
+  attendanceStatus,
+  attendanceLoading,
 }) => {
   return (
     <div className="bg-linear-to-br from-slate-100 to-slate-300 dark:from-slate-900 dark:to-slate-800 p-8">
@@ -26,6 +29,17 @@ const DashboardUI = ({
           </p>
         </header>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Clock Status Widget */}
+          <div className="lg:col-span-2">
+            <ClockStatusWidget
+              isClocked={attendanceStatus?.isClocked ?? false}
+              clockedInAt={attendanceStatus?.clockedInAt}
+              elapsedSeconds={attendanceStatus?.elapsedSeconds}
+              willAutoExpire={attendanceStatus?.willAutoExpire ?? false}
+              todayTotalMinutes={attendanceStatus?.todayTotalMinutes ?? 0}
+              isLoading={attendanceLoading}
+            />
+          </div>
           {/* Widget 1: Total Comments */}
           <div className="bg-white dark:bg-slate-900 shadow rounded-xl p-6 flex flex-col items-start">
             <span className="text-slate-500 dark:text-slate-400 text-xs mb-2">
@@ -143,10 +157,20 @@ DashboardUI.propTypes = {
   onNextPage: PropTypes.func.isRequired,
   canGoNext: PropTypes.bool.isRequired,
   totalComments: PropTypes.number.isRequired,
+  attendanceStatus: PropTypes.shape({
+    isClocked: PropTypes.bool,
+    clockedInAt: PropTypes.string,
+    elapsedSeconds: PropTypes.number,
+    willAutoExpire: PropTypes.bool,
+    todayTotalMinutes: PropTypes.number,
+  }),
+  attendanceLoading: PropTypes.bool,
 }
 
 DashboardUI.defaultProps = {
   displayComments: null,
+  attendanceStatus: null,
+  attendanceLoading: false,
 }
 
 export default DashboardUI

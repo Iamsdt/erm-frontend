@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 
 import CommentCard from "@/components/comments/comment-card"
 import { toast } from "@/components/ui/use-toast"
+import { useAttendanceStatus } from "@query/attendance.query"
 import { useFetchComments } from "@query/comments.query"
 
 import DashboardUI from "./dashboard.ui"
@@ -11,6 +12,8 @@ import DashboardUI from "./dashboard.ui"
  */
 const Dashboard = () => {
   const { data, isError, isLoading, error } = useFetchComments()
+  const { data: attendanceStatus, isLoading: attendanceLoading } =
+    useAttendanceStatus()
 
   const [currentPage, setCurrentPage] = useState(1)
   const commentsPerPage = 4
@@ -75,6 +78,8 @@ const Dashboard = () => {
       onNextPage={handleNextPage}
       canGoNext={canGoNext}
       totalComments={totalComments}
+      attendanceStatus={attendanceStatus}
+      attendanceLoading={attendanceLoading}
     />
   )
 }

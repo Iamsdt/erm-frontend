@@ -20,6 +20,13 @@ const routes = {
     INVITE: "/employee-management/invite",
     DEPARTMENTS: "/employee-management/departments",
   },
+  attendance: {
+    EMPLOYEE_CLOCK: "/attendance",
+    EMPLOYEE_HISTORY: "/attendance/history",
+    ADMIN_LOGS: "/attendance/admin/logs",
+    ADMIN_LIVE: "/attendance/admin/live",
+    ADMIN_SUMMARY: "/attendance/admin/summary",
+  },
 }
 
 export default routes

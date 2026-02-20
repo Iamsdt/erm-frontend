@@ -2,6 +2,7 @@ import {
   Building2,
   CalendarDays,
   ChevronRight,
+  Clock,
   ClipboardList,
   Home,
   LayoutDashboard,
@@ -62,6 +63,17 @@ const employeeManagementItems = [
   },
   { title: "New Employee", url: "/employee-management/create", icon: Plus },
   { title: "Invite User", url: "/employee-management/invite", icon: MailPlus },
+]
+
+const employeeAttendanceItems = [
+  { title: "Clock In/Out", url: "/attendance", icon: Clock },
+  { title: "My History", url: "/attendance/history", icon: ClipboardList },
+]
+
+const adminAttendanceItems = [
+  { title: "Activity Logs", url: "/attendance/admin/logs", icon: ClipboardList },
+  { title: "Live Status", url: "/attendance/admin/live", icon: Clock },
+  { title: "Summary", url: "/attendance/admin/summary", icon: LayoutDashboard },
 ]
 
 // ─── Simple nav group (Application) ──────────────────────────────────────────
@@ -154,6 +166,12 @@ const ModulesNavGroup = ({ isLeaveAdmin, isLeaveEmployee, isEmpAdmin }) => {
   const leaveItems = [...leaveSharedItems, ...roleItems]
   const showLeave = isLeaveAdmin || isLeaveEmployee
   const showEmpMgmt = isEmpAdmin
+  
+  // Attendance is visible to all authenticated users for employee items
+  // Admin items visible only to admins (using isLeaveAdmin as admin check)
+  const attendanceItems = isLeaveAdmin
+    ? [...employeeAttendanceItems, ...adminAttendanceItems]
+    : employeeAttendanceItems
 
   if (!showLeave && !showEmpMgmt) return null
 
@@ -168,6 +186,11 @@ const ModulesNavGroup = ({ isLeaveAdmin, isLeaveEmployee, isEmpAdmin }) => {
             items={leaveItems}
           />
         )}
+        <CollapsibleNavGroup
+          title="Attendance"
+          icon={Clock}
+          items={attendanceItems}
+        />
         {showEmpMgmt && (
           <CollapsibleNavGroup
             title="Employee Management"

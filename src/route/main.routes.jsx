@@ -15,6 +15,15 @@ const LeaveSettingsPage = lazy(() => import("@pages/leave-admin/settings"))
 const EmployeeDashboard = lazy(() => import("@pages/leave-employee"))
 const RequestLeavePage = lazy(() => import("@pages/leave-employee/request"))
 
+// Attendance pages
+const AttendanceClock = lazy(() => import("@pages/attendance/employee"))
+const AttendanceHistory = lazy(
+  () => import("@pages/attendance/employee/history")
+)
+const AdminAttendanceLogs = lazy(() => import("@pages/attendance/admin/logs"))
+const AdminLiveStatus = lazy(() => import("@pages/attendance/admin/live"))
+const AdminSummary = lazy(() => import("@pages/attendance/admin/summary"))
+
 // Employee Management pages (admin-only module)
 const EmployeeList = lazy(() => import("@pages/employee-management"))
 const CreateEmployee = lazy(() => import("@pages/employee-management/create"))
@@ -63,6 +72,27 @@ const mainRoutes = [
   {
     path: ct.route.leave.EMPLOYEE_REQUEST,
     element: leaveGuard(<RequestLeavePage />, ["employee"]),
+  },
+
+  // Attendance — employee routes (accessible to all authenticated users)
+  { path: ct.route.attendance.EMPLOYEE_CLOCK, element: <AttendanceClock /> },
+  {
+    path: ct.route.attendance.EMPLOYEE_HISTORY,
+    element: <AttendanceHistory />,
+  },
+
+  // Attendance — admin-only routes
+  {
+    path: ct.route.attendance.ADMIN_LOGS,
+    element: leaveGuard(<AdminAttendanceLogs />, ["admin"]),
+  },
+  {
+    path: ct.route.attendance.ADMIN_LIVE,
+    element: leaveGuard(<AdminLiveStatus />, ["admin"]),
+  },
+  {
+    path: ct.route.attendance.ADMIN_SUMMARY,
+    element: leaveGuard(<AdminSummary />, ["admin"]),
   },
 
   // Employee Management — admin-only routes
