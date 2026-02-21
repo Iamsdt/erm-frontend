@@ -66,7 +66,6 @@ const employeeManagementItems = [
 ]
 
 const employeeAttendanceItems = [
-  { title: "Clock In/Out", url: "/attendance", icon: Clock },
   { title: "My History", url: "/attendance/history", icon: ClipboardList },
 ]
 
@@ -160,7 +159,13 @@ CollapsibleNavGroup.propTypes = {
 
 // ─── Modules section ──────────────────────────────────────────────────────────
 
-const ModulesNavGroup = ({ isLeaveAdmin, isLeaveEmployee, isEmpAdmin }) => {
+const ModulesNavGroup = ({
+  isLeaveAdmin,
+  isLeaveEmployee,
+  isEmpAdmin,
+  isAttendanceAdmin,
+  isAttendanceEmployee,
+}) => {
   const roleItems = isLeaveAdmin
     ? adminLeaveItems
     : isLeaveEmployee
@@ -170,14 +175,14 @@ const ModulesNavGroup = ({ isLeaveAdmin, isLeaveEmployee, isEmpAdmin }) => {
   const leaveItems = [...leaveSharedItems, ...roleItems]
   const showLeave = isLeaveAdmin || isLeaveEmployee
   const showEmpMgmt = isEmpAdmin
+  const showAttendance = isAttendanceAdmin || isAttendanceEmployee
 
-  // Attendance is visible to all authenticated users for employee items
-  // Admin items visible only to admins (using isLeaveAdmin as admin check)
-  const attendanceItems = isLeaveAdmin
+  // Attendance: employee items visible to all with attendance role, admin items only to admins
+  const attendanceItems = isAttendanceAdmin
     ? [...employeeAttendanceItems, ...adminAttendanceItems]
     : employeeAttendanceItems
 
-  if (!showLeave && !showEmpMgmt) return null
+  if (!showLeave && !showEmpMgmt && !showAttendance) return null
 
   return (
     <SidebarGroup>
@@ -190,11 +195,13 @@ const ModulesNavGroup = ({ isLeaveAdmin, isLeaveEmployee, isEmpAdmin }) => {
             items={leaveItems}
           />
         )}
-        <CollapsibleNavGroup
-          title="Attendance"
-          icon={Clock}
-          items={attendanceItems}
-        />
+        {showAttendance && (
+          <CollapsibleNavGroup
+            title="Attendance"
+            icon={Clock}
+            items={attendanceItems}
+          />
+        )}
         {showEmpMgmt && (
           <CollapsibleNavGroup
             title="Employee Management"
@@ -211,6 +218,8 @@ ModulesNavGroup.propTypes = {
   isLeaveAdmin: PropTypes.bool.isRequired,
   isLeaveEmployee: PropTypes.bool.isRequired,
   isEmpAdmin: PropTypes.bool.isRequired,
+  isAttendanceAdmin: PropTypes.bool.isRequired,
+  isAttendanceEmployee: PropTypes.bool.isRequired,
 }
 
 // ─── AppSidebar ───────────────────────────────────────────────────────────────
@@ -226,6 +235,9 @@ const AppSidebar = () => {
   const empMgmtRole = useSelector(
     (s) => s[ct.store.USER_STORE].employee_management_role
   )
+  const attendanceRole = useSelector(
+    (s) => s[ct.store.USER_STORE].attendance_management_role
+  )
 
   return (
     <Sidebar collapsible="icon">
@@ -235,6 +247,8 @@ const AppSidebar = () => {
           isLeaveAdmin={leaveRole === "admin"}
           isLeaveEmployee={leaveRole === "employee"}
           isEmpAdmin={empMgmtRole === "admin"}
+          isAttendanceAdmin={attendanceRole === "admin"}
+          isAttendanceEmployee={attendanceRole === "employee"}
         />
       </SidebarContent>
     </Sidebar>

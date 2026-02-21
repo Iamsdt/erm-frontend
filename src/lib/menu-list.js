@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux"
 import {
   Users,
   Settings,
@@ -6,6 +7,8 @@ import {
   Clock,
   ClipboardList,
 } from "lucide-react"
+
+import ct from "@constants/"
 
 const POSTS_NEW_PATH = "/posts/new"
 const ATTENDANCE_EMPLOYEE = "/attendance"
@@ -73,16 +76,10 @@ const getAttendanceMenuGroup = (pathname) => ({
     {
       href: "",
       label: "My Attendance",
-      active:
-        pathname.startsWith(ATTENDANCE_EMPLOYEE) &&
+      active: pathname.startsWith(ATTENDANCE_EMPLOYEE) &&
         !pathname.startsWith(ATTENDANCE_ADMIN),
       icon: Clock,
       submenus: [
-        {
-          href: ATTENDANCE_EMPLOYEE,
-          label: "Clock In / Out",
-          active: pathname === ATTENDANCE_EMPLOYEE,
-        },
         {
           href: ATTENDANCE_HISTORY,
           label: "My History",
@@ -163,4 +160,29 @@ export const getMenuList = (pathname) => [
   getAttendanceMenuGroup(pathname),
   getAttendanceAdminMenuGroup(pathname),
   getSettingsMenuGroup(pathname),
-]
+]{
+  // Get the attendance role from Redux (requires useSelector in the caller)
+  // This function is used in the sidebar which should have access to Redux
+  const menuList = [
+    getDashboardMenuGroup(pathname),
+    getContentsMenuGroup(pathname),
+    getAttendanceMenuGroup(pathname),
+    getSettingsMenuGroup(pathname),
+  ]
+
+  return menuList
+}
+
+/**
+ * Conditionally include attendance admin menu based on user role.
+ * This should be called separately in the sidebar component with Redux access.
+ * @param {string} pathname - The current pathname.
+ * @param {string} attendanceRole - The user's attendance_management_role
+ * @returns {object|null} The admin attendance menu group or null
+ */
+export const getConditionalAttendanceAdminMenu = (pathname, attendanceRole) => {
+  if (attendanceRole === "admin") {
+    return getAttendanceAdminMenuGroup(pathname)
+  }
+  return null
+}

@@ -2,6 +2,7 @@ import { lazy } from "react"
 
 import EmployeeManagementGuard from "@/components/guards/employee-management-guard"
 import LeaveRoleGuard from "@/components/guards/leave-role-guard"
+import AttendanceRoleGuard from "@/components/guards/attendance-role-guard"
 import ct from "@constants/"
 
 // Lazy load route components for code splitting
@@ -41,6 +42,10 @@ const empGuard = (element) => (
   <EmployeeManagementGuard>{element}</EmployeeManagementGuard>
 )
 
+const attendanceGuard = (element, allowedRoles) => (
+  <AttendanceRoleGuard allowedRoles={allowedRoles}>{element}</AttendanceRoleGuard>
+)
+
 const mainRoutes = [
   { path: ct.route.ROOT, element: <Dashboard /> },
   { path: "/comments", element: <Comments /> },
@@ -74,25 +79,24 @@ const mainRoutes = [
     element: leaveGuard(<RequestLeavePage />, ["employee"]),
   },
 
-  // Attendance — employee routes (accessible to all authenticated users)
-  { path: ct.route.attendance.EMPLOYEE_CLOCK, element: <AttendanceClock /> },
+  // Attendance — employee routes (accessible to authenticated users)
   {
     path: ct.route.attendance.EMPLOYEE_HISTORY,
-    element: <AttendanceHistory />,
+    element: attendanceGuard(<AttendanceHistory />, ["admin", "employee"]),
   },
 
   // Attendance — admin-only routes
   {
     path: ct.route.attendance.ADMIN_LOGS,
-    element: leaveGuard(<AdminAttendanceLogs />, ["admin"]),
+    element: attendanceGuard(<AdminAttendanceLogs />, ["admin"]),
   },
   {
     path: ct.route.attendance.ADMIN_LIVE,
-    element: leaveGuard(<AdminLiveStatus />, ["admin"]),
+    element: attendanceGuard(<AdminLiveStatus />, ["admin"]),
   },
   {
     path: ct.route.attendance.ADMIN_SUMMARY,
-    element: leaveGuard(<AdminSummary />, ["admin"]),
+    element: attendanceGuard(<AdminSummary />, ["admin"]),
   },
 
   // Employee Management — admin-only routes
