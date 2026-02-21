@@ -1,8 +1,8 @@
 import { lazy } from "react"
 
+import AttendanceRoleGuard from "@/components/guards/attendance-role-guard"
 import EmployeeManagementGuard from "@/components/guards/employee-management-guard"
 import LeaveRoleGuard from "@/components/guards/leave-role-guard"
-import AttendanceRoleGuard from "@/components/guards/attendance-role-guard"
 import ct from "@constants/"
 
 // Lazy load route components for code splitting
@@ -34,6 +34,21 @@ const DepartmentList = lazy(
   () => import("@pages/employee-management/departments")
 )
 
+// Project Management pages
+const Projects = lazy(() => import("@pages/projects"))
+const ProjectDetails = lazy(() => import("@pages/projects/project-details"))
+const SprintBoard = lazy(() => import("@pages/sprint-board"))
+
+// Daily Update pages
+const DailyStandupPage = lazy(() => import("@pages/daily-update/standup"))
+const TeamUpdatesPage = lazy(() => import("@pages/daily-update/team"))
+const ProgressLogPage = lazy(() => import("@pages/daily-update/progress"))
+
+// AI & Analytics pages
+const AIInsightsPage = lazy(() => import("@pages/ai/insights"))
+const AIRecommendationsPage = lazy(() => import("@pages/ai/recommendations"))
+const AIAnalyticsPage = lazy(() => import("@pages/ai/analytics"))
+
 const leaveGuard = (element, allowedRoles) => (
   <LeaveRoleGuard allowedRoles={allowedRoles}>{element}</LeaveRoleGuard>
 )
@@ -43,7 +58,9 @@ const empGuard = (element) => (
 )
 
 const attendanceGuard = (element, allowedRoles) => (
-  <AttendanceRoleGuard allowedRoles={allowedRoles}>{element}</AttendanceRoleGuard>
+  <AttendanceRoleGuard allowedRoles={allowedRoles}>
+    {element}
+  </AttendanceRoleGuard>
 )
 
 const mainRoutes = [
@@ -119,6 +136,48 @@ const mainRoutes = [
   {
     path: ct.route.employeeManagement.DEPARTMENTS,
     element: empGuard(<DepartmentList />),
+  },
+
+  // Project Management routes
+  {
+    path: ct.route.project.LIST,
+    element: <Projects />,
+  },
+  {
+    path: ct.route.project.DETAIL,
+    element: <ProjectDetails />,
+  },
+  {
+    path: ct.route.project.SPRINT,
+    element: <SprintBoard />,
+  },
+
+  // Daily Updates routes
+  {
+    path: "/daily-update/standup",
+    element: <DailyStandupPage />,
+  },
+  {
+    path: "/daily-update/team",
+    element: <TeamUpdatesPage />,
+  },
+  {
+    path: "/daily-update/progress",
+    element: <ProgressLogPage />,
+  },
+
+  // AI & Analytics routes
+  {
+    path: "/ai/insights",
+    element: <AIInsightsPage />,
+  },
+  {
+    path: "/ai/recommendations",
+    element: <AIRecommendationsPage />,
+  },
+  {
+    path: "/ai/analytics",
+    element: <AIAnalyticsPage />,
   },
 ]
 

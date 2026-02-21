@@ -6,6 +6,7 @@ import {
   LayoutGrid,
   Clock,
   ClipboardList,
+  FolderOpen,
 } from "lucide-react"
 
 import ct from "@constants/"
@@ -150,6 +151,24 @@ const getSettingsMenuGroup = (pathname) => ({
 })
 
 /**
+ * Returns the project management menu group configuration.
+ * @param {string} pathname - The current pathname.
+ * @returns {object} The project menu group object.
+ */
+const getProjectMenuGroup = (pathname) => ({
+  groupLabel: "Project Management",
+  menus: [
+    {
+      href: "/projects",
+      label: "Projects",
+      active: pathname.startsWith("/projects"),
+      icon: FolderOpen,
+      submenus: [],
+    },
+  ],
+})
+
+/**
  * Returns the complete menu list configuration.
  * @param {string} pathname - The current pathname.
  * @returns {Array<object>} The array of menu group objects.
@@ -159,19 +178,9 @@ export const getMenuList = (pathname) => [
   getContentsMenuGroup(pathname),
   getAttendanceMenuGroup(pathname),
   getAttendanceAdminMenuGroup(pathname),
+  getProjectMenuGroup(pathname),
   getSettingsMenuGroup(pathname),
-]{
-  // Get the attendance role from Redux (requires useSelector in the caller)
-  // This function is used in the sidebar which should have access to Redux
-  const menuList = [
-    getDashboardMenuGroup(pathname),
-    getContentsMenuGroup(pathname),
-    getAttendanceMenuGroup(pathname),
-    getSettingsMenuGroup(pathname),
-  ]
-
-  return menuList
-}
+]
 
 /**
  * Conditionally include attendance admin menu based on user role.

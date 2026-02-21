@@ -40,5 +40,14 @@ const apiConstant = {
     adminSummary: "attendance/admin/summary/",
     adminLive: "attendance/admin/live/",
   },
+  project: {
+    list: "projects/",
+    detail: "projects/", // append {id}/
+    sprints: (projectId) => `projects/${projectId}/sprints/`,
+    sprintDetail: (projectId, sprintId) =>
+      `projects/${projectId}/sprints/${sprintId}/`,
+    tasks: (projectId, sprintId) =>
+      `projects/${projectId}/sprints/${sprintId}/tasks/`,
+  },
 }
 export default apiConstant

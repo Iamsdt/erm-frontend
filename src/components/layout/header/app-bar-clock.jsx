@@ -44,7 +44,9 @@ const AppBarClock = () => {
     }
 
     const update = () => {
-      const diff = Math.floor((Date.now() - new Date(clockedInAt).getTime()) / 1000)
+      const diff = Math.floor(
+        (Date.now() - new Date(clockedInAt).getTime()) / 1000
+      )
       setLiveElapsed(diff)
     }
 

@@ -4,12 +4,15 @@ import {
   ChevronRight,
   Clock,
   ClipboardList,
+  FolderOpen,
   Home,
   LayoutDashboard,
   Layers,
   MailPlus,
   Plus,
   Settings,
+  Sparkles,
+  Sun,
   UserCircle2,
   Users,
 } from "lucide-react"
@@ -77,6 +80,30 @@ const adminAttendanceItems = [
   },
   { title: "Live Status", url: "/attendance/admin/live", icon: Clock },
   { title: "Summary", url: "/attendance/admin/summary", icon: LayoutDashboard },
+]
+
+const projectManagementItems = [
+  { title: "Projects", url: "/projects", icon: FolderOpen },
+]
+
+const dailyUpdateItems = [
+  { title: "Daily Standup", url: "/daily-update/standup", icon: Sun },
+  {
+    title: "Team Updates",
+    url: "/daily-update/team",
+    icon: Users,
+  },
+  { title: "Progress Log", url: "/daily-update/progress", icon: ClipboardList },
+]
+
+const aiRelatedItems = [
+  { title: "AI Insights", url: "/ai/insights", icon: Sparkles },
+  {
+    title: "AI Recommendations",
+    url: "/ai/recommendations",
+    icon: LayoutDashboard,
+  },
+  { title: "AI Analytics", url: "/ai/analytics", icon: LayoutDashboard },
 ]
 
 // ─── Simple nav group (Application) ──────────────────────────────────────────
@@ -243,6 +270,9 @@ const AppSidebar = () => {
     <Sidebar collapsible="icon">
       <SidebarContent>
         <NavGroup label="Application" items={mainItems} />
+        <NavGroup label="Project Management" items={projectManagementItems} />
+        <NavGroup label="Daily Updates" items={dailyUpdateItems} />
+        <NavGroup label="AI & Analytics" items={aiRelatedItems} />
         <ModulesNavGroup
           isLeaveAdmin={leaveRole === "admin"}
           isLeaveEmployee={leaveRole === "employee"}

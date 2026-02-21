@@ -27,6 +27,12 @@ const routes = {
     ADMIN_LIVE: "/attendance/admin/live",
     ADMIN_SUMMARY: "/attendance/admin/summary",
   },
+  project: {
+    LIST: "/projects",
+    DETAIL: "/projects/:projectId",
+    SPRINT: "/projects/:projectId/sprints/:sprintId",
+    REPORTS: "/projects/reports",
+  },
 }
 
 export default routes
