@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster"
 import ct from "@constants/"
 
 import AppSidebar from "./app-sidebar"
+import AppBarClock from "./header/app-bar-clock"
 import LanguageNav from "./header/language-nav"
 import UserNav from "./header/user-nav"
 
@@ -39,6 +40,7 @@ const MainLayout = () => {
             <SidebarTrigger />
           </div>
           <div className="flex items-center gap-2 ml-auto">
+            <AppBarClock />
             <LanguageNav />
             <ModeToggle />
             <UserNav />
