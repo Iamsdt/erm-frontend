@@ -1,42 +1,19 @@
-import { CalendarDays } from "lucide-react"
+import { CalendarDays, Clock } from "lucide-react"
 import { useSelector } from "react-redux"
 import { Link } from "react-router"
 
 import ModeToggle from "@/components/layout/header/theme-switch"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import ct from "@constants/"
 
 import LanguageNav from "./language-nav"
 import UserNav from "./user-nav"
-// import SheetMenu from "../sidebars/sheet-menu"
-
-/**
- * Navbar component renders the top navigation bar with user controls.
- */
-const STATUS_LABEL = "Standup:"
-const STATUS_DONE = "Done"
-const STATUS_IN_REVIEW = "In Review"
-const COLOR_DONE = "bg-green-600"
-const COLOR_IN_REVIEW = "bg-blue-600"
 
 const Navbar = () => {
   const appState = useSelector((state) => state[ct.store.APP_STORE])
   const { currentModule, standupStatus } = appState || {
     currentModule: "ERM",
     standupStatus: "Not Submitted",
-  }
-
-  const getStandupStatusBadgeVariant = () => {
-    if (standupStatus === STATUS_DONE) return "default"
-    if (standupStatus === STATUS_IN_REVIEW) return "secondary"
-    return "outline"
-  }
-
-  const getStandupStatusColor = () => {
-    if (standupStatus === STATUS_DONE) return COLOR_DONE
-    if (standupStatus === STATUS_IN_REVIEW) return COLOR_IN_REVIEW
-    return "bg-gray-400"
   }
 
   return (
@@ -61,6 +38,18 @@ const Navbar = () => {
             <Link to="/daily-update/standup/new">
               <CalendarDays className="h-4 w-4" />
               Standup: {standupStatus}
+            </Link>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="hidden sm:flex gap-2"
+          >
+            <Link to="/daily-update/standup/new">
+              <Clock className="h-4 w-4" />
+              Clock IN
             </Link>
           </Button>
           <LanguageNav />
