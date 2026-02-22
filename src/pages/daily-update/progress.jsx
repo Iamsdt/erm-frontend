@@ -1,8 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, CheckCircle2, Clock, AlertCircle } from "lucide-react"
 import { Link } from "react-router"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 /**
  * Progress Log Page - Track accomplishments and milestones
@@ -130,11 +131,11 @@ const ProgressLogPage = () => {
             </div>
 
             <div className="space-y-3 ml-4">
-              {section.entries.map((entry, idx) => {
+              {section.entries.map((entry, index) => {
                 const IconComponent = entry.icon
                 return (
                   <Card
-                    key={idx}
+                    key={index}
                     className={`${getStatusColor(entry.status)} transition-all hover:shadow-md`}
                   >
                     <CardContent className="pt-6">

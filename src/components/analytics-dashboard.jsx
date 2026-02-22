@@ -1,5 +1,5 @@
-import PropTypes from "prop-types"
 import { BarChart3, PieChart, TrendingUp } from "lucide-react"
+import PropTypes from "prop-types"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -55,14 +55,7 @@ const BurndownChart = ({ data }) => {
       />
 
       {/* Chart axes */}
-      <line
-        x1="20"
-        y1="20"
-        x2="20"
-        y2="170"
-        stroke="#374151"
-        strokeWidth="2"
-      />
+      <line x1="20" y1="20" x2="20" y2="170" stroke="#374151" strokeWidth="2" />
       <line
         x1="20"
         y1="170"
@@ -133,11 +126,15 @@ const AnalyticsDashboard = ({ analytics, isLoading, error }) => {
           <div className="mt-2 grid gap-2 md:grid-cols-2 text-xs">
             <div className="rounded-lg border p-2">
               <p className="text-muted-foreground">Planned Velocity</p>
-              <p className="text-lg font-bold">{analytics.plannedVelocity} pts</p>
+              <p className="text-lg font-bold">
+                {analytics.plannedVelocity} pts
+              </p>
             </div>
             <div className="rounded-lg border p-2">
               <p className="text-muted-foreground">Actual Velocity</p>
-              <p className="text-lg font-bold">{analytics.actualVelocity} pts</p>
+              <p className="text-lg font-bold">
+                {analytics.actualVelocity} pts
+              </p>
             </div>
           </div>
         </CardContent>
@@ -162,7 +159,9 @@ const AnalyticsDashboard = ({ analytics, isLoading, error }) => {
                   <div className="flex-1 rounded-full bg-gray-200 h-2">
                     <div
                       className="bg-blue-500 h-full rounded-full"
-                      style={{ width: `${(capacity.completed / capacity.allocated) * 100}%` }}
+                      style={{
+                        width: `${(capacity.completed / capacity.allocated) * 100}%`,
+                      }}
                     />
                   </div>
                   <span className="whitespace-nowrap">
@@ -190,25 +189,25 @@ const AnalyticsDashboard = ({ analytics, isLoading, error }) => {
                 By Status
               </p>
               <div className="flex gap-1">
-                {Object.entries(
-                  analytics.taskDistribution.byStatus
-                ).map(([status, count]) => {
-                  const colors = {
-                    Todo: "bg-gray-200",
-                    "In Progress": "bg-blue-200",
-                    "In Review": "bg-yellow-200",
-                    Done: "bg-green-200",
+                {Object.entries(analytics.taskDistribution.byStatus).map(
+                  ([status, count]) => {
+                    const colors = {
+                      Todo: "bg-gray-200",
+                      "In Progress": "bg-blue-200",
+                      "In Review": "bg-yellow-200",
+                      Done: "bg-green-200",
+                    }
+                    return (
+                      <div
+                        key={status}
+                        className={`flex-1 h-6 rounded flex items-center justify-center text-xs font-bold ${colors[status]}`}
+                        title={`${status}: ${count}`}
+                      >
+                        {count}
+                      </div>
+                    )
                   }
-                  return (
-                    <div
-                      key={status}
-                      className={`flex-1 h-6 rounded flex items-center justify-center text-xs font-bold ${colors[status]}`}
-                      title={`${status}: ${count}`}
-                    >
-                      {count}
-                    </div>
-                  )
-                })}
+                )}
               </div>
             </div>
 
@@ -217,24 +216,24 @@ const AnalyticsDashboard = ({ analytics, isLoading, error }) => {
                 By Priority
               </p>
               <div className="flex gap-1">
-                {Object.entries(
-                  analytics.taskDistribution.byPriority
-                ).map(([priority, count]) => {
-                  const colors = {
-                    High: "bg-red-200",
-                    Medium: "bg-yellow-200",
-                    Low: "bg-green-200",
+                {Object.entries(analytics.taskDistribution.byPriority).map(
+                  ([priority, count]) => {
+                    const colors = {
+                      High: "bg-red-200",
+                      Medium: "bg-yellow-200",
+                      Low: "bg-green-200",
+                    }
+                    return (
+                      <div
+                        key={priority}
+                        className={`flex-1 h-6 rounded flex items-center justify-center text-xs font-bold ${colors[priority]}`}
+                        title={`${priority}: ${count}`}
+                      >
+                        {count}
+                      </div>
+                    )
                   }
-                  return (
-                    <div
-                      key={priority}
-                      className={`flex-1 h-6 rounded flex items-center justify-center text-xs font-bold ${colors[priority]}`}
-                      title={`${priority}: ${count}`}
-                    >
-                      {count}
-                    </div>
-                  )
-                })}
+                )}
               </div>
             </div>
           </CardContent>
@@ -259,21 +258,29 @@ const AnalyticsDashboard = ({ analytics, isLoading, error }) => {
           <div className="rounded-lg border p-2">
             <p className="text-muted-foreground">On-Time Rate</p>
             <p className="text-lg font-bold text-green-600">
-              {(analytics.onTimeHistory[analytics.onTimeHistory.length - 1] * 100).toFixed(0)}%
+              {(
+                analytics.onTimeHistory[analytics.onTimeHistory.length - 1] *
+                100
+              ).toFixed(0)}
+              %
             </p>
           </div>
           <div className="rounded-lg border p-2">
             <p className="text-muted-foreground">Trend</p>
             <div className="flex gap-1 mt-1">
-            {analytics.onTimeHistory.map((rate, historyIndex) => (
-              <div
-                key={`ontime-${historyIndex}`}
-                className="flex-1 h-4 rounded"
-                style={{
-                  backgroundColor:
-                    rate >= 0.9 ? "#10b981" : rate >= 0.8 ? "#f59e0b" : "#ef4444",
-                }}
-                title={`${(rate * 100).toFixed(0)}%`}
+              {analytics.onTimeHistory.map((rate, historyIndex) => (
+                <div
+                  key={`ontime-${historyIndex}`}
+                  className="flex-1 h-4 rounded"
+                  style={{
+                    backgroundColor:
+                      rate >= 0.9
+                        ? "#10b981"
+                        : rate >= 0.8
+                          ? "#f59e0b"
+                          : "#ef4444",
+                  }}
+                  title={`${(rate * 100).toFixed(0)}%`}
                 />
               ))}
             </div>

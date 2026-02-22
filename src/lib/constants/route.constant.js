@@ -32,6 +32,7 @@ const routes = {
     DETAIL: "/projects/:projectId",
     SPRINT: "/projects/:projectId/sprints/:sprintId",
     REPORTS: "/projects/reports",
+    SETTINGS: "/projects/:projectId/settings",
   },
 }
 

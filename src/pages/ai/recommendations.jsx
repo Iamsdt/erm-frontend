@@ -1,8 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, CheckCircle2, Clock, Lightbulb } from "lucide-react"
 import { Link } from "react-router"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 /**
  * AI Recommendations Page - AI-generated process improvement recommendations
@@ -115,9 +116,12 @@ const AIRecommendationsPage = () => {
       </Button>
 
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">AI Recommendations</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          AI Recommendations
+        </h1>
         <p className="mt-2 text-muted-foreground">
-          Smart recommendations to optimize your team's processes and improve productivity
+          Smart recommendations to optimize your team's processes and improve
+          productivity
         </p>
       </div>
 
@@ -127,7 +131,9 @@ const AIRecommendationsPage = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-3xl font-bold">5</p>
-              <p className="text-sm text-muted-foreground mt-1">Total Recommendations</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Total Recommendations
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -151,7 +157,9 @@ const AIRecommendationsPage = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-3xl font-bold">17.5h</p>
-              <p className="text-sm text-muted-foreground mt-1">Potential Savings</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Potential Savings
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -200,7 +208,9 @@ const AIRecommendationsPage = () => {
                     </Badge>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Savings</p>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Savings
+                    </p>
                     <p className="text-sm font-semibold">{rec.saving}</p>
                   </div>
                 </div>

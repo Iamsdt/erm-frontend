@@ -1,8 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, TrendingUp, TrendingDown } from "lucide-react"
 import { Link } from "react-router"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 /**
  * AI Analytics Page - Advanced machine learning analytics
@@ -112,7 +113,9 @@ const AIAnalyticsPage = () => {
             <Card key={metric.title}>
               <CardContent className="pt-6">
                 <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">{metric.title}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {metric.title}
+                  </p>
                   <p className="text-2xl font-bold">{metric.value}</p>
                   <div className="flex items-center justify-between pt-2 border-t">
                     <p className="text-xs text-muted-foreground">
@@ -126,9 +129,7 @@ const AIAnalyticsPage = () => {
                       )}
                       <span
                         className={`text-sm font-semibold ${
-                          metric.positive
-                            ? "text-green-600"
-                            : "text-red-600"
+                          metric.positive ? "text-green-600" : "text-red-600"
                         }`}
                       >
                         {metric.trend}
@@ -153,7 +154,9 @@ const AIAnalyticsPage = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Prediction</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Prediction
+                  </p>
                   <p className="text-lg font-bold text-blue-600">
                     {pred.prediction}
                   </p>

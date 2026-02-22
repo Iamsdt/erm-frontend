@@ -1,7 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { ArrowLeft, Sparkles, TrendingUp, Lightbulb } from "lucide-react"
 import { Link } from "react-router"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 /**
  * AI Hub - Landing page for AI features
@@ -10,14 +11,16 @@ const AIHub = () => {
   const aiFeatures = [
     {
       title: "AI Insights",
-      description: "Get AI-powered insights about your team's performance and recommendations",
+      description:
+        "Get AI-powered insights about your team's performance and recommendations",
       url: "/ai/insights",
       icon: Sparkles,
       color: "from-purple-500 to-pink-600",
     },
     {
       title: "AI Recommendations",
-      description: "Smart recommendations for process improvements and optimizations",
+      description:
+        "Smart recommendations for process improvements and optimizations",
       url: "/ai/recommendations",
       icon: Lightbulb,
       color: "from-yellow-500 to-orange-600",
@@ -46,8 +49,8 @@ const AIHub = () => {
           AI & Analytics Hub
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Leverage artificial intelligence to optimize your team's workflow and make
-          data-driven decisions
+          Leverage artificial intelligence to optimize your team's workflow and
+          make data-driven decisions
         </p>
       </div>
 
@@ -59,7 +62,9 @@ const AIHub = () => {
               key={feature.title}
               className="cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
             >
-              <div className={`bg-gradient-to-r ${feature.color} h-32 flex items-center justify-center`}>
+              <div
+                className={`bg-gradient-to-r ${feature.color} h-32 flex items-center justify-center`}
+              >
                 <IconComponent className="h-16 w-16 text-white opacity-20" />
               </div>
               <CardHeader>

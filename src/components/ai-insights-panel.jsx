@@ -1,5 +1,5 @@
-import PropTypes from "prop-types"
 import { AlertCircle, Lightbulb, TrendingUp, Zap } from "lucide-react"
+import PropTypes from "prop-types"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,7 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton"
  * AIInsightsPanel - Displays AI-powered insights for sprint management
  */
 const AIInsightsPanel = ({ insights, isLoading }) => {
-
   if (isLoading) {
     return (
       <div className="space-y-4">

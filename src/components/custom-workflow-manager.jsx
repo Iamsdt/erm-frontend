@@ -1,12 +1,10 @@
+import { Plus, Trash2 } from "lucide-react"
 import PropTypes from "prop-types"
 import { useState } from "react"
-import { Plus, Trash2 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
 import {
   Dialog,
   DialogContent,
@@ -14,6 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 
 /**
  * Custom Workflow Manager - Define and manage kanban columns
@@ -21,7 +21,10 @@ import {
 const CustomWorkflowManager = ({ workflow, onSave, isLoading, isSaving }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [columns, setColumns] = useState(workflow?.columns || [])
-  const [newColumn, setNewColumn] = useState({ title: "", color: "bg-gray-100" })
+  const [newColumn, setNewColumn] = useState({
+    title: "",
+    color: "bg-gray-100",
+  })
 
   if (isLoading) {
     return (
@@ -174,7 +177,10 @@ const CustomWorkflowManager = ({ workflow, onSave, isLoading, isSaving }) => {
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddColumn} disabled={!newColumn.title.trim()}>
+            <Button
+              onClick={handleAddColumn}
+              disabled={!newColumn.title.trim()}
+            >
               Add Column
             </Button>
           </DialogFooter>

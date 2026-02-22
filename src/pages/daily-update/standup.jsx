@@ -1,10 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Send } from "lucide-react"
-import { Link } from "react-router"
 import { useState } from "react"
+import { Link } from "react-router"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
 
 /**
  * Daily Standup Page - Team members share their daily progress
@@ -67,7 +68,9 @@ const DailyStandupPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium">What did you accomplish today?</label>
+              <label className="text-sm font-medium">
+                What did you accomplish today?
+              </label>
               <Textarea
                 placeholder="Share your progress..."
                 value={standup}
@@ -94,11 +97,16 @@ const DailyStandupPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             {teamUpdates.map((update) => (
-              <div key={update.name} className="border-l-4 border-blue-500 pl-4 py-2">
+              <div
+                key={update.name}
+                className="border-l-4 border-blue-500 pl-4 py-2"
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <p className="font-semibold">{update.name}</p>
-                    <p className="text-sm text-muted-foreground">{update.role}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {update.role}
+                    </p>
                   </div>
                   <Badge variant="outline" className="text-xs">
                     {update.time}

@@ -1,4 +1,3 @@
-import { useSelector } from "react-redux"
 import {
   Users,
   Settings,
@@ -8,6 +7,7 @@ import {
   ClipboardList,
   FolderOpen,
 } from "lucide-react"
+import { useSelector } from "react-redux"
 
 import ct from "@constants/"
 
@@ -77,7 +77,8 @@ const getAttendanceMenuGroup = (pathname) => ({
     {
       href: "",
       label: "My Attendance",
-      active: pathname.startsWith(ATTENDANCE_EMPLOYEE) &&
+      active:
+        pathname.startsWith(ATTENDANCE_EMPLOYEE) &&
         !pathname.startsWith(ATTENDANCE_ADMIN),
       icon: Clock,
       submenus: [

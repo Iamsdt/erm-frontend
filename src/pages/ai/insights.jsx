@@ -1,8 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, TrendingUp, AlertCircle, Zap, BarChart3 } from "lucide-react"
+import {
+  ArrowLeft,
+  TrendingUp,
+  AlertCircle,
+  Zap,
+  BarChart3,
+} from "lucide-react"
 import { Link } from "react-router"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 /**
  * AI Insights Page - AI-powered insights and predictions
@@ -78,7 +85,8 @@ const AIInsightsPage = () => {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Insights</h1>
         <p className="mt-2 text-muted-foreground">
-          Machine learning-powered insights about your team's performance and workflows
+          Machine learning-powered insights about your team's performance and
+          workflows
         </p>
       </div>
 
@@ -88,7 +96,9 @@ const AIInsightsPage = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-3xl font-bold text-blue-600">4</p>
-              <p className="text-sm text-muted-foreground mt-1">Active Insights</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Active Insights
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -96,7 +106,9 @@ const AIInsightsPage = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-3xl font-bold text-green-600">89%</p>
-              <p className="text-sm text-muted-foreground mt-1">Avg Confidence</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Avg Confidence
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -104,7 +116,9 @@ const AIInsightsPage = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-3xl font-bold text-yellow-600">3</p>
-              <p className="text-sm text-muted-foreground mt-1">Actionable Items</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Actionable Items
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -112,7 +126,9 @@ const AIInsightsPage = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-3xl font-bold text-purple-600">Last 24h</p>
-              <p className="text-sm text-muted-foreground mt-1">Update Frequency</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Update Frequency
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -147,9 +163,7 @@ const AIInsightsPage = () => {
                           </p>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <Badge
-                            className={getCategoryColor(insight.category)}
-                          >
+                          <Badge className={getCategoryColor(insight.category)}>
                             {insight.category}
                           </Badge>
                           <p className="text-sm font-semibold text-gray-600 mt-2">

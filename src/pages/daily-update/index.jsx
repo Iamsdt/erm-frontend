@@ -1,7 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { Link } from "react-router"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 /**
  * Daily Update Hub - Landing page for daily updates
@@ -48,8 +49,13 @@ const DailyUpdateHub = () => {
 
       <div className="grid gap-4 md:grid-cols-3">
         {sections.map((section) => (
-          <Card key={section.title} className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader className={`bg-gradient-to-r ${section.color} text-white`}>
+          <Card
+            key={section.title}
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+          >
+            <CardHeader
+              className={`bg-gradient-to-r ${section.color} text-white`}
+            >
               <CardTitle className="text-lg">{section.title}</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">

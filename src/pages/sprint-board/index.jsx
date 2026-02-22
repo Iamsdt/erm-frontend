@@ -68,13 +68,11 @@ const SprintBoard = () => {
     const activeWorkflow = workflows?.find((w) => w.isActive)
     if (!activeWorkflow) return
 
-    updateWorkflowMutation.mutate(
-      {
-        projectId,
-        workflowId: activeWorkflow.id,
-        data: workflowData,
-      }
-    )
+    updateWorkflowMutation.mutate({
+      projectId,
+      workflowId: activeWorkflow.id,
+      data: workflowData,
+    })
   }
 
   return (

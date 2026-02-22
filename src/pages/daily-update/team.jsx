@@ -1,9 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, Avatar as AvatarComponent } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, MessageSquare } from "lucide-react"
 import { Link } from "react-router"
+
+import { Avatar, Avatar as AvatarComponent } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 /**
  * Team Updates Page - View all team member updates
@@ -88,12 +89,17 @@ const TeamUpdatesPage = () => {
         {teams.map((team) => (
           <div key={team.id} className="space-y-4">
             <div className="border-b pb-2">
-              <h2 className="text-xl font-semibold text-blue-600">{team.name}</h2>
+              <h2 className="text-xl font-semibold text-blue-600">
+                {team.name}
+              </h2>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               {team.members.map((member) => (
-                <Card key={member.id} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={member.id}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">

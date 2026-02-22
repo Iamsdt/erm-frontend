@@ -1,23 +1,32 @@
-import { ArrowLeft, Plus, LayoutDashboard, Sparkles, BarChart3, Settings, Clock, CheckCircle2, CircleDashed, AlertCircle } from "lucide-react"
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
+import {
+  ArrowLeft,
+  Plus,
+  LayoutDashboard,
+  Sparkles,
+  BarChart3,
+  Settings,
+  Clock,
+  CheckCircle2,
+  CircleDashed,
+  AlertCircle,
+} from "lucide-react"
 import PropTypes from "prop-types"
 import { useState } from "react"
 import { Link } from "react-router"
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-} from "@hello-pangea/dnd"
 
-import TaskModal from "@/components/task-modal"
 import AIInsightsPanel from "@/components/ai-insights-panel"
 import AnalyticsDashboard from "@/components/analytics-dashboard"
 import CustomWorkflowManager from "@/components/custom-workflow-manager"
+import TaskModal from "@/components/task-modal"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+import { CreateIssueModal } from "../projects/components/create-issue-modal"
 
 /**
  * TaskCard - Individual task card component for kanban board
@@ -43,11 +52,17 @@ const TaskCard = ({ task, onClick }) => {
     >
       <CardContent className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-2">
-          <h4 className="font-medium text-sm leading-tight line-clamp-2">{task.title}</h4>
+          <h4 className="font-medium text-sm leading-tight line-clamp-2">
+            {task.title}
+          </h4>
         </div>
 
         <div className="flex items-center gap-2">
-          <Badge className={getPriorityColor(task.priority)} variant="outline" size="sm">
+          <Badge
+            className={getPriorityColor(task.priority)}
+            variant="outline"
+            size="sm"
+          >
             {task.priority || "No Priority"}
           </Badge>
           {task.type && (
@@ -61,7 +76,10 @@ const TaskCard = ({ task, onClick }) => {
           <div className="flex items-center gap-2">
             {task.assignee ? (
               <Avatar className="h-6 w-6 border">
-                <AvatarImage src={task.assignee.avatar} alt={task.assignee.name} />
+                <AvatarImage
+                  src={task.assignee.avatar}
+                  alt={task.assignee.name}
+                />
                 <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-medium">
                   {task.assignee.name.charAt(0)}
                 </AvatarFallback>
@@ -72,12 +90,13 @@ const TaskCard = ({ task, onClick }) => {
               </div>
             )}
           </div>
-          
+
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             {task.subtasks && task.subtasks.length > 0 && (
               <span className="flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3" />
-                {task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length}
+                {task.subtasks.filter((s) => s.completed).length}/
+                {task.subtasks.length}
               </span>
             )}
             {task.estimatedHours && (
@@ -123,13 +142,19 @@ const KanbanColumn = ({ title, tasks, columnId, onTaskClick, onAddTask }) => {
           <div className="flex items-center justify-between px-1 pb-2 border-b border-border/50">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm text-foreground">{title}</h3>
-              <Badge variant="secondary" className="h-5 px-1.5 text-xs font-medium bg-background">
+              <Badge
+                variant="secondary"
+                className="h-5 px-1.5 text-xs font-medium bg-background"
+              >
                 {tasks.length}
               </Badge>
             </div>
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground" onClick={() => onAddTask?.(columnId)}>
-              <Plus className="h-4 w-4" />
-            </Button>
+            <CreateIssueModal
+              triggerText=""
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground"
+            />
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto py-1 custom-scrollbar">
@@ -149,7 +174,9 @@ const KanbanColumn = ({ title, tasks, columnId, onTaskClick, onAddTask }) => {
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       className={`transition-all ${
-                        snapshot.isDragging ? "opacity-70 scale-105 shadow-xl z-50" : ""
+                        snapshot.isDragging
+                          ? "opacity-70 scale-105 shadow-xl z-50"
+                          : ""
                       }`}
                       style={{
                         ...provided.draggableProps.style,
@@ -167,15 +194,12 @@ const KanbanColumn = ({ title, tasks, columnId, onTaskClick, onAddTask }) => {
             {provided.placeholder}
           </div>
 
-          <Button
+          <CreateIssueModal
+            triggerText="Add Task"
             variant="ghost"
             size="sm"
             className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-background/80 border border-transparent hover:border-border/50"
-            onClick={() => onAddTask?.(columnId)}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Task
-          </Button>
+          />
         </div>
       )}
     </Droppable>
@@ -256,9 +280,9 @@ const SprintBoardUI = ({
     { id: "Done", title: "Done" },
   ]
 
-  const tasksByStatus = columns.reduce((acc, col) => {
-    acc[col.id] = tasks?.filter((t) => t.status === col.id) || []
-    return acc
+  const tasksByStatus = columns.reduce((accumulator, col) => {
+    accumulator[col.id] = tasks?.filter((t) => t.status === col.id) || []
+    return accumulator
   }, {})
 
   const handleTaskClick = (task) => {
@@ -302,7 +326,12 @@ const SprintBoardUI = ({
       <div className="flex-none border-b bg-card/50 backdrop-blur-sm px-6 py-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" asChild className="h-9 w-9 rounded-full">
+            <Button
+              variant="outline"
+              size="icon"
+              asChild
+              className="h-9 w-9 rounded-full"
+            >
               <Link to={`/projects/${project.id}`}>
                 <ArrowLeft className="h-4 w-4" />
               </Link>
@@ -312,7 +341,10 @@ const SprintBoardUI = ({
                 <h1 className="text-2xl font-bold tracking-tight text-foreground">
                   Sprint {sprintId}
                 </h1>
-                <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/10 text-primary hover:bg-primary/20"
+                >
                   Active Sprint
                 </Badge>
               </div>
@@ -324,10 +356,15 @@ const SprintBoardUI = ({
           </div>
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2 mr-4">
-              {project.members?.slice(0, 4).map((member, i) => (
-                <Avatar key={i} className="h-8 w-8 border-2 border-background">
+              {project.members?.slice(0, 4).map((member, index) => (
+                <Avatar
+                  key={index}
+                  className="h-8 w-8 border-2 border-background"
+                >
                   <AvatarImage src={member.avatar} />
-                  <AvatarFallback className="bg-muted text-xs">{member.name?.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="bg-muted text-xs">
+                    {member.name?.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
               ))}
               {project.members?.length > 4 && (
@@ -340,39 +377,40 @@ const SprintBoardUI = ({
               <Settings className="h-4 w-4" />
               Board Settings
             </Button>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Issue
-            </Button>
+            <CreateIssueModal
+              triggerText="Create Issue"
+              variant="default"
+              size="default"
+            />
           </div>
         </div>
 
         {/* Tabs Navigation */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-transparent border-b border-border/50 w-full justify-start h-auto p-0 rounded-none space-x-6">
-            <TabsTrigger 
-              value="kanban" 
+            <TabsTrigger
+              value="kanban"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-2.5 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all"
             >
               <LayoutDashboard className="h-4 w-4 mr-2" />
               Board
             </TabsTrigger>
-            <TabsTrigger 
-              value="insights" 
+            <TabsTrigger
+              value="insights"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-2.5 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all"
             >
               <Sparkles className="h-4 w-4 mr-2 text-amber-500" />
               AI Insights
             </TabsTrigger>
-            <TabsTrigger 
-              value="analytics" 
+            <TabsTrigger
+              value="analytics"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-2.5 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all"
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Analytics
             </TabsTrigger>
-            <TabsTrigger 
-              value="workflow" 
+            <TabsTrigger
+              value="workflow"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-2.5 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all"
             >
               <Settings className="h-4 w-4 mr-2" />
@@ -385,7 +423,9 @@ const SprintBoardUI = ({
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden bg-muted/10">
         {/* Kanban Tab */}
-        <div className={`h-full p-6 overflow-x-auto ${activeTab === 'kanban' ? 'block' : 'hidden'}`}>
+        <div
+          className={`h-full p-6 overflow-x-auto ${activeTab === "kanban" ? "block" : "hidden"}`}
+        >
           <DragDropContext onDragEnd={handleDragEnd}>
             <div className="flex gap-6 h-full min-w-max pb-4">
               {columns.map((col) => (
@@ -404,9 +444,11 @@ const SprintBoardUI = ({
         </div>
 
         {/* Other Tabs */}
-        <div className={`h-full p-6 overflow-y-auto ${activeTab !== 'kanban' ? 'block' : 'hidden'}`}>
+        <div
+          className={`h-full p-6 overflow-y-auto ${activeTab !== "kanban" ? "block" : "hidden"}`}
+        >
           <div className="max-w-5xl mx-auto">
-            {activeTab === 'insights' && (
+            {activeTab === "insights" && (
               <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
                 <CardHeader className="border-b bg-muted/20">
                   <CardTitle className="flex items-center gap-2">
@@ -415,12 +457,15 @@ const SprintBoardUI = ({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <AIInsightsPanel insights={insights} isLoading={isInsightsLoading} />
+                  <AIInsightsPanel
+                    insights={insights}
+                    isLoading={isInsightsLoading}
+                  />
                 </CardContent>
               </Card>
             )}
 
-            {activeTab === 'analytics' && (
+            {activeTab === "analytics" && (
               <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm">
                 <CardHeader className="border-b bg-muted/20">
                   <CardTitle className="flex items-center gap-2">
@@ -429,12 +474,15 @@ const SprintBoardUI = ({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <AnalyticsDashboard analytics={analytics} isLoading={isAnalyticsLoading} />
+                  <AnalyticsDashboard
+                    analytics={analytics}
+                    isLoading={isAnalyticsLoading}
+                  />
                 </CardContent>
               </Card>
             )}
 
-            {activeTab === 'workflow' && (
+            {activeTab === "workflow" && (
               <Card className="border-none shadow-md bg-card/50 backdrop-blur-sm max-w-3xl mx-auto">
                 <CardHeader className="border-b bg-muted/20">
                   <CardTitle className="flex items-center gap-2">
