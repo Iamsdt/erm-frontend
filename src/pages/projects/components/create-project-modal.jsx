@@ -4,9 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
 import {
   Sheet,
   SheetContent,
@@ -14,6 +12,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
 
 /**
  * CreateProjectSidebar - Sheet-based sidebar for creating new projects
@@ -33,7 +33,7 @@ export const CreateProjectSidebar = ({
   })
 
   const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((previous) => ({ ...previous, [field]: value }))
   }
 
   const handleSubmit = (e) => {

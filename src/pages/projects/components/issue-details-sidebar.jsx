@@ -1,17 +1,9 @@
 import { Activity, CheckSquare, Plus, CheckCircle2, Circle } from "lucide-react"
-import { useState } from "react"
 import PropTypes from "prop-types"
+import { useState } from "react"
 
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-} from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -20,6 +12,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet"
 
 /**
  * IssueDetailsSidebar - Shows issue details, activity logs, and subtasks (view only)
@@ -255,7 +255,7 @@ export const IssueDetailsSidebar = ({
                         <span className="text-muted-foreground">
                           {activity.actor}
                         </span>
-                        {" " + activity.action}
+                        {` ${activity.action}`}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {activity.timestamp}

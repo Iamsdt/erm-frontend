@@ -1,10 +1,12 @@
 import { Plus, Layers, ListTodo } from "lucide-react"
-import { useState } from "react"
 import PropTypes from "prop-types"
+import { useState } from "react"
 
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
@@ -15,8 +17,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
 // Sample data - in real app, would come from props or API
@@ -69,22 +69,22 @@ export const CreateSprintModal = ({ projectId = null }) => {
   })
 
   const handleFormChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((previous) => ({ ...previous, [field]: value }))
   }
 
   const toggleEpic = (epicId) => {
-    setSelectedEpics((prev) =>
-      prev.includes(epicId)
-        ? prev.filter((id) => id !== epicId)
-        : [...prev, epicId]
+    setSelectedEpics((previous) =>
+      previous.includes(epicId)
+        ? previous.filter((id) => id !== epicId)
+        : [...previous, epicId]
     )
   }
 
   const toggleTask = (taskId) => {
-    setSelectedTasks((prev) =>
-      prev.includes(taskId)
-        ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId]
+    setSelectedTasks((previous) =>
+      previous.includes(taskId)
+        ? previous.filter((id) => id !== taskId)
+        : [...previous, taskId]
     )
   }
 

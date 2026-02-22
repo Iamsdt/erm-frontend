@@ -1,18 +1,9 @@
 import { Edit, Trash2, X, Activity, Zap, Calendar } from "lucide-react"
-import { useState } from "react"
 import PropTypes from "prop-types"
+import { useState } from "react"
 
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-} from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -28,6 +19,15 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { Progress } from "@/components/ui/progress"
+import { Separator } from "@/components/ui/separator"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet"
 
 // Sample activity log data
 const SAMPLE_ACTIVITY = [
@@ -257,7 +257,7 @@ export const EpicDetailsSidebar = ({
                         <span className="text-muted-foreground">
                           {activity.actor}
                         </span>
-                        {" " + activity.action + " "}
+                        {` ${activity.action} `}
                         <span className="font-semibold text-foreground">
                           {activity.details}
                         </span>

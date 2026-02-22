@@ -187,6 +187,119 @@ CommentsSection.defaultProps = {
   displayComments: null,
 }
 
+const ProjectProgress = ({ projects }) => {
+  const displayProjects = projects?.slice(0, 3) ?? []
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Project Progress</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {displayProjects.map((project) => (
+          <div key={project.id} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{project.name}</span>
+                <Badge
+                  variant={
+                    project.status === "Active" ? "default" : "secondary"
+                  }
+                >
+                  {project.status}
+                </Badge>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                {project.progress}%
+              </span>
+            </div>
+            <Progress value={project.progress} className="h-2" />
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex -space-x-2">
+                {project.members?.slice(0, 3).map((member) => (
+                  <Avatar
+                    key={member.id}
+                    className="w-6 h-6 border-2 border-background"
+                  >
+                    <AvatarImage src={member.avatar} />
+                    <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+              <span>Due: {new Date(project.endDate).toLocaleDateString()}</span>
+            </div>
+          </div>
+        ))}
+        {displayProjects.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No active projects found.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+ProjectProgress.propTypes = {
+  projects: PropTypes.array,
+}
+
+ProjectProgress.defaultProps = {
+  projects: [],
+}
+
+const PendingApprovals = ({ leaveSummary }) => {
+  const displayLeaves = leaveSummary?.pendingApprovals?.slice(0, 4) ?? []
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Pending Approvals</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {displayLeaves.map((leave) => (
+          <div
+            key={leave.id}
+            className="flex items-center justify-between p-3 rounded-lg border bg-slate-50/50 dark:bg-slate-800/50"
+          >
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <AvatarImage src={leave.avatar} />
+                <AvatarFallback>{leave.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium text-sm">{leave.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {leave.type} • {leave.days} days
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" className="h-8 text-xs">
+                Reject
+              </Button>
+              <Button size="sm" className="h-8 text-xs">
+                Approve
+              </Button>
+            </div>
+          </div>
+        ))}
+        {displayLeaves.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No pending leave requests.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+PendingApprovals.propTypes = {
+  leaveSummary: PropTypes.object,
+}
+
+PendingApprovals.defaultProps = {
+  leaveSummary: {},
+}
+
 /**
  * DashboardUI — main dashboard presenter component.
  */
@@ -254,7 +367,6 @@ const DashboardUI = ({
         employees={employees}
         projects={projects}
         leaveSummary={leaveSummary}
-        todayAttendance={todayAttendance}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -266,106 +378,10 @@ const DashboardUI = ({
               <TabsTrigger value="leaves">Recent Leave Requests</TabsTrigger>
             </TabsList>
             <TabsContent value="projects" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Project Progress</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {projects?.slice(0, 3).map((project) => (
-                    <div key={project.id} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{project.name}</span>
-                          <Badge
-                            variant={
-                              project.status === "Active"
-                                ? "default"
-                                : "secondary"
-                            }
-                          >
-                            {project.status}
-                          </Badge>
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {project.progress}%
-                        </span>
-                      </div>
-                      <Progress value={project.progress} className="h-2" />
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <div className="flex -space-x-2">
-                          {project.members?.slice(0, 3).map((member) => (
-                            <Avatar
-                              key={member.id}
-                              className="w-6 h-6 border-2 border-background"
-                            >
-                              <AvatarImage src={member.avatar} />
-                              <AvatarFallback>
-                                {member.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                          ))}
-                        </div>
-                        <span>
-                          Due: {new Date(project.endDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  {(!projects || projects.length === 0) && (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      No active projects found.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+              <ProjectProgress projects={projects} />
             </TabsContent>
             <TabsContent value="leaves" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pending Approvals</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {leaveSummary?.pendingApprovals?.slice(0, 4).map((leave) => (
-                    <div
-                      key={leave.id}
-                      className="flex items-center justify-between p-3 rounded-lg border bg-slate-50/50 dark:bg-slate-800/50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={leave.avatar} />
-                          <AvatarFallback>
-                            {leave.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-sm">{leave.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {leave.type} • {leave.days} days
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 text-xs"
-                        >
-                          Reject
-                        </Button>
-                        <Button size="sm" className="h-8 text-xs">
-                          Approve
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  {(!leaveSummary?.pendingApprovals ||
-                    leaveSummary.pendingApprovals.length === 0) && (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      No pending leave requests.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+              <PendingApprovals leaveSummary={leaveSummary} />
             </TabsContent>
           </Tabs>
         </div>
@@ -373,10 +389,10 @@ const DashboardUI = ({
         {/* Right Column */}
         <div className="space-y-8">
           <ClockStatusWidget
-            isClocked={attendanceStatus?.isClocked || false}
-            liveElapsed={attendanceStatus?.elapsedSeconds || 0}
-            willAutoExpire={attendanceStatus?.willAutoExpire || false}
-            todayTotalMinutes={todayAttendance?.totalMinutes || 0}
+            isClocked={attendanceStatus?.isClocked ?? false}
+            liveElapsed={attendanceStatus?.elapsedSeconds ?? 0}
+            willAutoExpire={attendanceStatus?.willAutoExpire ?? false}
+            todayTotalMinutes={todayAttendance?.totalMinutes ?? 0}
             onClockIn={onClockIn}
             onGoToAttendance={onGoToAttendance}
           />

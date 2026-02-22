@@ -76,6 +76,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -85,13 +92,6 @@ import { CreateSprintModal } from "../components/create-sprint-modal"
 import { EditProjectSidebar } from "../components/edit-project-sidebar"
 import { EpicDetailsSidebar } from "../components/epic-details-sidebar"
 import { IssueDetailsSidebar } from "../components/issue-details-sidebar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
 
 const getStatusColor = (status) => {
   switch (status?.toLowerCase()) {

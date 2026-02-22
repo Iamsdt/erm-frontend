@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom"
 
 import CommentCard from "@/components/comments/comment-card"
 import { toast } from "@/components/ui/use-toast"
+import {
+  useAttendanceStatus,
+  useTodayAttendance,
+  useClockIn,
+} from "@query/attendance.query"
 import { useFetchComments } from "@query/comments.query"
-import { useAttendanceStatus, useTodayAttendance, useClockIn } from "@query/attendance.query"
-import { useGetProjects } from "@query/project.query"
-import { useFetchAdminLeaveSummary } from "@query/leave.query"
 import { useFetchEmployees } from "@query/employee-management.query"
+import { useFetchAdminLeaveSummary } from "@query/leave.query"
+import { useGetProjects } from "@query/project.query"
 
 import DashboardUI from "./dashboard.ui"
 
@@ -18,12 +22,21 @@ const Dashboard = () => {
   const navigate = useNavigate()
 
   // Fetch data
-  const { data: commentsData, isError: commentsError, isLoading: commentsLoading, error } = useFetchComments()
-  const { data: attendanceStatus, isLoading: statusLoading } = useAttendanceStatus()
-  const { data: todayAttendance, isLoading: todayLoading } = useTodayAttendance()
+  const {
+    data: commentsData,
+    isError: commentsError,
+    isLoading: commentsLoading,
+    error,
+  } = useFetchComments()
+  const { data: attendanceStatus, isLoading: statusLoading } =
+    useAttendanceStatus()
+  const { data: todayAttendance, isLoading: todayLoading } =
+    useTodayAttendance()
   const { data: projectsData, isLoading: projectsLoading } = useGetProjects()
-  const { data: leaveSummary, isLoading: leaveLoading } = useFetchAdminLeaveSummary()
-  const { data: employeesData, isLoading: employeesLoading } = useFetchEmployees()
+  const { data: leaveSummary, isLoading: leaveLoading } =
+    useFetchAdminLeaveSummary()
+  const { data: employeesData, isLoading: employeesLoading } =
+    useFetchEmployees()
 
   const { mutate: clockIn } = useClockIn()
 
@@ -66,7 +79,8 @@ const Dashboard = () => {
   }
 
   const canGoNext =
-    Array.isArray(commentsData) && currentPage * commentsPerPage < commentsData.length
+    Array.isArray(commentsData) &&
+    currentPage * commentsPerPage < commentsData.length
 
   const handleClockIn = () => {
     clockIn(undefined, {
@@ -75,7 +89,7 @@ const Dashboard = () => {
       },
       onError: () => {
         toast({ title: "Failed to clock in", variant: "destructive" })
-      }
+      },
     })
   }
 
@@ -93,7 +107,13 @@ const Dashboard = () => {
     }
   }, [error])
 
-  const isLoading = commentsLoading || statusLoading || todayLoading || projectsLoading || leaveLoading || employeesLoading
+  const isLoading =
+    commentsLoading ||
+    statusLoading ||
+    todayLoading ||
+    projectsLoading ||
+    leaveLoading ||
+    employeesLoading
 
   return (
     <DashboardUI
@@ -104,12 +124,10 @@ const Dashboard = () => {
       onPreviousPage={handlePreviousPage}
       onNextPage={handleNextPage}
       canGoNext={canGoNext}
-      
       attendanceStatus={attendanceStatus}
       todayAttendance={todayAttendance}
       onClockIn={handleClockIn}
       onGoToAttendance={handleGoToAttendance}
-      
       projects={projectsData}
       leaveSummary={leaveSummary}
       employees={employeesData}

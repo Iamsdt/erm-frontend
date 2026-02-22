@@ -4,11 +4,11 @@ import { Link } from "react-router"
 
 import ModeToggle from "@/components/layout/header/theme-switch"
 import { Button } from "@/components/ui/button"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 import ct from "@constants/"
 
 import LanguageNav from "./language-nav"
 import UserNav from "./user-nav"
-import { SidebarTrigger } from "@/components/ui/sidebar"
 
 const Navbar = () => {
   const appState = useSelector((state) => state[ct.store.APP_STORE])
