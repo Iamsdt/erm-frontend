@@ -8,6 +8,7 @@ import ct from "@constants/"
 
 import LanguageNav from "./language-nav"
 import UserNav from "./user-nav"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 
 const Navbar = () => {
   const appState = useSelector((state) => state[ct.store.APP_STORE])
@@ -20,6 +21,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-10 w-full bg-background/95 shadow-sm backdrop-blur-sm supports-backdrop-filter:bg-background/60 dark:shadow-secondary">
       <div className="mx-4 sm:mx-8 flex h-14 items-center">
         {/* Left Side - Current Module */}
+        <SidebarTrigger />
         <div className="flex items-center gap-2 text-sm">
           <span className="font-semibold text-foreground">{currentModule}</span>
         </div>

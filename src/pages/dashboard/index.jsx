@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 import CommentCard from "@/components/comments/comment-card"
 import { toast } from "@/components/ui/use-toast"
 import { useFetchComments } from "@query/comments.query"
+import { useAttendanceStatus, useTodayAttendance, useClockIn } from "@query/attendance.query"
+import { useGetProjects } from "@query/project.query"
+import { useFetchAdminLeaveSummary } from "@query/leave.query"
+import { useFetchEmployees } from "@query/employee-management.query"
 
 import DashboardUI from "./dashboard.ui"
 
@@ -10,20 +15,30 @@ import DashboardUI from "./dashboard.ui"
  * Dashboard component that displays dashboard widgets and comments
  */
 const Dashboard = () => {
-  const { data, isError, isLoading, error } = useFetchComments()
+  const navigate = useNavigate()
+
+  // Fetch data
+  const { data: commentsData, isError: commentsError, isLoading: commentsLoading, error } = useFetchComments()
+  const { data: attendanceStatus, isLoading: statusLoading } = useAttendanceStatus()
+  const { data: todayAttendance, isLoading: todayLoading } = useTodayAttendance()
+  const { data: projectsData, isLoading: projectsLoading } = useGetProjects()
+  const { data: leaveSummary, isLoading: leaveLoading } = useFetchAdminLeaveSummary()
+  const { data: employeesData, isLoading: employeesLoading } = useFetchEmployees()
+
+  const { mutate: clockIn } = useClockIn()
 
   const [currentPage, setCurrentPage] = useState(1)
   const commentsPerPage = 4
 
   const displayComments = useMemo(() => {
-    if (!data || !Array.isArray(data)) {
+    if (!commentsData || !Array.isArray(commentsData)) {
       return (
         <p className="text-xl px-5 py-5 text-black">No Data Found for User</p>
       )
     }
 
     const startIndex = (currentPage - 1) * commentsPerPage
-    const selectedComments = data.slice(
+    const selectedComments = commentsData.slice(
       startIndex,
       startIndex + commentsPerPage
     )
@@ -40,7 +55,7 @@ const Dashboard = () => {
         />
       </div>
     ))
-  }, [data, currentPage])
+  }, [commentsData, currentPage])
 
   const handleNextPage = () => {
     setCurrentPage((np) => np + 1)
@@ -51,9 +66,22 @@ const Dashboard = () => {
   }
 
   const canGoNext =
-    Array.isArray(data) && currentPage * commentsPerPage < data.length
+    Array.isArray(commentsData) && currentPage * commentsPerPage < commentsData.length
 
-  const totalComments = Array.isArray(data) ? data.length : 0
+  const handleClockIn = () => {
+    clockIn(undefined, {
+      onSuccess: () => {
+        toast({ title: "Clocked in successfully" })
+      },
+      onError: () => {
+        toast({ title: "Failed to clock in", variant: "destructive" })
+      }
+    })
+  }
+
+  const handleGoToAttendance = () => {
+    navigate("/attendance")
+  }
 
   useEffect(() => {
     if (error) {
@@ -65,16 +93,26 @@ const Dashboard = () => {
     }
   }, [error])
 
+  const isLoading = commentsLoading || statusLoading || todayLoading || projectsLoading || leaveLoading || employeesLoading
+
   return (
     <DashboardUI
       isLoading={isLoading}
-      isError={isError}
+      isError={commentsError}
       displayComments={displayComments}
       currentPage={currentPage}
       onPreviousPage={handlePreviousPage}
       onNextPage={handleNextPage}
       canGoNext={canGoNext}
-      totalComments={totalComments}
+      
+      attendanceStatus={attendanceStatus}
+      todayAttendance={todayAttendance}
+      onClockIn={handleClockIn}
+      onGoToAttendance={handleGoToAttendance}
+      
+      projects={projectsData}
+      leaveSummary={leaveSummary}
+      employees={employeesData}
     />
   )
 }

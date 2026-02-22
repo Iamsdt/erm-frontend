@@ -81,7 +81,13 @@ const adminAttendanceItems = [
 ]
 
 const projectManagementItems = [
-  { title: "Projects", url: "/projects", icon: FolderOpen },
+  { title: "Project", url: "/projects", icon: FolderOpen },
+]
+
+const listOfProjects = [
+  { title: "Admin Dashboard", url: "/leave/admin", icon: LayoutDashboard },
+  { title: "Approvals", url: "/leave/admin/approvals", icon: ClipboardList },
+  { title: "Settings", url: "/leave/admin/settings", icon: Settings },
 ]
 
 // ─── Simple nav group (Application) ──────────────────────────────────────────
@@ -154,6 +160,78 @@ CollapsibleNavGroup.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.elementType.isRequired,
   items: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+      icon: PropTypes.elementType.isRequired,
+    })
+  ).isRequired,
+}
+
+const ProjectCollapsibleNavGroup = ({
+  title,
+  icon: Icon,
+  items,
+  projectLabel,
+  projectItems,
+}) => (
+  <SidebarMenu>
+    <SidebarGroupLabel>{projectLabel}</SidebarGroupLabel>
+    <SidebarGroupContent>
+      <SidebarMenu>
+        {projectItems.map((item) => (
+          <SidebarMenuItem key={item.title}>
+            <SidebarMenuButton asChild>
+              <a href={item.url}>
+                <item.icon />
+                <span>{item.title}</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
+      </SidebarMenu>
+    </SidebarGroupContent>
+    <Collapsible asChild defaultOpen className="group/collapsible">
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton tooltip={title}>
+            <Icon />
+            <span>{title}</span>
+            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {items.map((item) => (
+              <SidebarMenuSubItem key={item.title}>
+                <SidebarMenuSubButton asChild>
+                  <a href={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
+  </SidebarMenu>
+)
+
+ProjectCollapsibleNavGroup.propTypes = {
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+      icon: PropTypes.elementType.isRequired,
+    })
+  ).isRequired,
+  projectLabel: PropTypes.string.isRequired,
+  projectItems: PropTypes.arrayOf(
     PropTypes.shape({
       title: PropTypes.string.isRequired,
       url: PropTypes.string.isRequired,
@@ -244,17 +322,25 @@ const AppSidebar = () => {
     (s) => s[ct.store.USER_STORE].attendance_management_role
   )
 
+  const leaveItems = [...leaveSharedItems]
+
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <NavGroup label="Application" items={mainItems} />
-        <NavGroup label="Project Management" items={projectManagementItems} />
         <ModulesNavGroup
           isLeaveAdmin={leaveRole === "admin"}
           isLeaveEmployee={leaveRole === "employee"}
           isEmpAdmin={empMgmtRole === "admin"}
           isAttendanceAdmin={attendanceRole === "admin"}
           isAttendanceEmployee={attendanceRole === "employee"}
+        />
+        <ProjectCollapsibleNavGroup
+          title="Project Management"
+          icon={FolderOpen}
+          items={listOfProjects}
+          projectLabel="Projects"
+          projectItems={projectManagementItems}
         />
       </SidebarContent>
     </Sidebar>
