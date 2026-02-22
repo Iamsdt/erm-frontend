@@ -23,9 +23,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
  * StatsWidgets — displays dashboard stat cards
  */
 const StatsWidgets = ({ employees, projects, leaveSummary }) => {
-  const totalEmployees = employees?.length ?? 0
-  const activeProjects =
-    projects?.filter((p) => p.status === "Active")?.length ?? 0
+  const totalEmployees = Array.isArray(employees) ? employees.length : 0
+  const activeProjects = Array.isArray(projects)
+    ? projects.filter((p) => p.status === "Active").length
+    : 0
   const pendingLeaves = leaveSummary?.pendingApprovals?.length ?? 0
   const todayPresent = leaveSummary?.thisMonth?.totalPresent ?? 0
 
@@ -188,7 +189,8 @@ CommentsSection.defaultProps = {
 }
 
 const ProjectProgress = ({ projects }) => {
-  const displayProjects = projects?.slice(0, 3) ?? []
+  const projectArray = Array.isArray(projects) ? projects : []
+  const displayProjects = projectArray.slice(0, 3)
   return (
     <Card>
       <CardHeader>
@@ -248,7 +250,8 @@ ProjectProgress.defaultProps = {
 }
 
 const PendingApprovals = ({ leaveSummary }) => {
-  const displayLeaves = leaveSummary?.pendingApprovals?.slice(0, 4) ?? []
+  const leaves = leaveSummary?.pendingApprovals ?? []
+  const displayLeaves = Array.isArray(leaves) ? leaves.slice(0, 4) : []
   return (
     <Card>
       <CardHeader>
@@ -304,13 +307,13 @@ PendingApprovals.defaultProps = {
  * DashboardUI — main dashboard presenter component.
  */
 const DashboardUI = ({
-  isLoading,
-  isError,
-  displayComments,
-  currentPage,
-  onPreviousPage,
-  onNextPage,
-  canGoNext,
+  _isLoading,
+  _isError,
+  _displayComments,
+  _currentPage,
+  _onPreviousPage,
+  _onNextPage,
+  _canGoNext,
   attendanceStatus,
   todayAttendance,
   onClockIn,
@@ -406,16 +409,6 @@ const DashboardUI = ({
           </div>
         </div>
       </div>
-
-      <CommentsSection
-        isLoading={isLoading}
-        isError={isError}
-        displayComments={displayComments}
-        currentPage={currentPage}
-        canGoNext={canGoNext}
-        onPreviousPage={onPreviousPage}
-        onNextPage={onNextPage}
-      />
     </div>
   )
 }

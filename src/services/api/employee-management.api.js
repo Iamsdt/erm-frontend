@@ -16,6 +16,19 @@ export const getEmployees = async ({ signal } = {}) => {
 }
 
 /**
+ * Fetches the current employee's performance data (sprint tasks & recognition).
+ * @async
+ * @function
+ * @param {object} options - Request options
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response from the API containing performance data
+ */
+export const getEmployeePerformance = async ({ signal } = {}) => {
+  const config = { headers: { "Content-Type": "application/json" }, signal }
+  return api.get(ct.api.employeeManagement.performance, config)
+}
+
+/**
  * Fetches a single employee by ID.
  * @async
  * @function

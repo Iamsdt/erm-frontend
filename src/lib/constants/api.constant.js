@@ -26,6 +26,7 @@ const apiConstant = {
     invite: `${EMPLOYEE_MANAGEMENT}invite/`,
     departments: EMPLOYEE_MANAGEMENT_DEPARTMENTS,
     departmentDetail: EMPLOYEE_MANAGEMENT_DEPARTMENTS, // /departments/:id/
+    performance: "employee/performance/",
   },
   attendance: {
     clockIn: "attendance/clock-in/",

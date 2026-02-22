@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   deleteEmployee,
   getEmployee,
+  getEmployeePerformance,
   getEmployees,
   patchEmployee,
   postEmployee,
@@ -11,6 +12,7 @@ import {
 
 const QUERY_KEY_EMPLOYEES = "employee-management-list"
 const QUERY_KEY_EMPLOYEE_DETAIL = "employee-management-detail"
+const QUERY_KEY_EMPLOYEE_PERFORMANCE = "employee-performance"
 
 /**
  * React Query hook for fetching the full employee list.
@@ -106,5 +108,21 @@ export const useInviteUser = () => {
       // Invited users may appear in the employee list as "invited"
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEES] })
     },
+  })
+}
+
+/**
+ * React Query hook for fetching the current employee's performance data.
+ * @returns {import("@tanstack/react-query").UseQueryResult} Sprint tasks, performance & recognition
+ */
+export const useFetchEmployeePerformance = () => {
+  return useQuery({
+    queryKey: [QUERY_KEY_EMPLOYEE_PERFORMANCE],
+    queryFn: async ({ signal }) => {
+      const response = await getEmployeePerformance({ signal })
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
   })
 }

@@ -149,6 +149,82 @@ const inviteUser = http.post(
   }
 )
 
+const mockEmployeePerformance = {
+  currentSprint: {
+    id: 102,
+    name: "Sprint 2: UI Components",
+    sprintNumber: 2,
+    projectName: "ERM Frontend Revamp",
+    allocated: 10,
+    completed: 7,
+    inProgress: 2,
+    pending: 1,
+    efficiency: 0.86,
+    onTimeRate: 0.88,
+    estimatedHours: 22,
+    actualHours: 19,
+  },
+  sprintHistory: [
+    { sprint: "S1", allocated: 8, completed: 8, efficiency: 1.0 },
+    { sprint: "S2", allocated: 10, completed: 7, efficiency: 0.86 },
+    { sprint: "S3", allocated: 9, completed: 6, efficiency: 0.75 },
+    { sprint: "S4", allocated: 11, completed: 10, efficiency: 0.91 },
+    { sprint: "S5", allocated: 8, completed: 8, efficiency: 1.0 },
+  ],
+  performance: {
+    velocityScore: 88,
+    qualityScore: 92,
+    collaborationScore: 85,
+    overallScore: 88,
+  },
+  recognition: [
+    {
+      id: 1,
+      title: "Star Performer",
+      givenBy: "Sarah (Manager)",
+      date: "2026-02-10",
+      type: "badge",
+      emoji: "⭐",
+      message: "Outstanding work on the theme switcher component!",
+      color: "bg-yellow-50 border-yellow-200",
+    },
+    {
+      id: 2,
+      title: "Team Player",
+      givenBy: "Bob Jones",
+      date: "2026-01-28",
+      type: "kudos",
+      emoji: "🤝",
+      message: "Always willing to help others unblock themselves.",
+      color: "bg-blue-50 border-blue-200",
+    },
+    {
+      id: 3,
+      title: "Sprint MVP",
+      givenBy: "Engineering Team",
+      date: "2026-01-24",
+      type: "award",
+      emoji: "🏆",
+      message: "Completed Sprint 1 with 100% on-time delivery.",
+      color: "bg-purple-50 border-purple-200",
+    },
+    {
+      id: 4,
+      title: "Bug Crusher",
+      givenBy: "QA Team",
+      date: "2026-01-15",
+      type: "badge",
+      emoji: "🐛",
+      message: "Resolved 12 critical bugs in a single sprint.",
+      color: "bg-green-50 border-green-200",
+    },
+  ],
+}
+
+const getEmployeePerformance = http.get("*/employee/performance/", () =>
+  HttpResponse.json(mockEmployeePerformance)
+)
+
 const handlers = [
   listEmployees,
   getEmployee,
@@ -156,6 +232,7 @@ const handlers = [
   updateEmployee,
   removeEmployee,
   inviteUser,
+  getEmployeePerformance,
 ]
 
 export default handlers

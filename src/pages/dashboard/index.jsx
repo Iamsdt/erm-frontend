@@ -1,136 +1,120 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
+import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
-import CommentCard from "@/components/comments/comment-card"
-import { toast } from "@/components/ui/use-toast"
 import {
   useAttendanceStatus,
-  useTodayAttendance,
   useClockIn,
+  useTodayAttendance,
 } from "@query/attendance.query"
-import { useFetchComments } from "@query/comments.query"
-import { useFetchEmployees } from "@query/employee-management.query"
-import { useFetchAdminLeaveSummary } from "@query/leave.query"
+import {
+  useFetchEmployeePerformance,
+  useFetchEmployees,
+} from "@query/employee-management.query"
+import {
+  useFetchAdminLeaveSummary,
+  useFetchEmployeeLeaveProfile,
+} from "@query/leave.query"
 import { useGetProjects } from "@query/project.query"
 
-import DashboardUI from "./dashboard.ui"
+import AdminDashboardUI from "./admin-dashboard.ui"
+import EmployeeDashboardUI from "./employee-dashboard.ui"
 
 /**
- * Dashboard component that displays dashboard widgets and comments
+ * Extract array from various API response shapes.
+ * @param {*} data - Raw API data
+ * @param {string} [key] - Object key to extract from
+ * @returns {Array}
+ */
+const extractArray = (data, key) => {
+  if (Array.isArray(data)) return data
+  if (key && data?.[key] && Array.isArray(data[key])) return data[key]
+  return []
+}
+
+/**
+ * Dashboard — routes to Admin or Employee view based on role.
  */
 const Dashboard = () => {
   const navigate = useNavigate()
+  const { userName, employee_management_role: empRole } = useSelector(
+    (state) => state.user
+  )
+  const isAdmin = empRole === "admin"
 
-  // Fetch data
-  const {
-    data: commentsData,
-    isError: commentsError,
-    isLoading: commentsLoading,
-    error,
-  } = useFetchComments()
   const { data: attendanceStatus, isLoading: statusLoading } =
     useAttendanceStatus()
   const { data: todayAttendance, isLoading: todayLoading } =
     useTodayAttendance()
-  const { data: projectsData, isLoading: projectsLoading } = useGetProjects()
+  const { data: projectsRaw, isLoading: projectsLoading } = useGetProjects()
   const { data: leaveSummary, isLoading: leaveLoading } =
     useFetchAdminLeaveSummary()
-  const { data: employeesData, isLoading: employeesLoading } =
+  const { data: employeesRaw, isLoading: employeesLoading } =
     useFetchEmployees()
-
+  const { data: leaveProfile, isLoading: profileLoading } =
+    useFetchEmployeeLeaveProfile()
+  const { data: employeePerformance, isLoading: performanceLoading } =
+    useFetchEmployeePerformance()
   const { mutate: clockIn } = useClockIn()
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const commentsPerPage = 4
+  const projects = useMemo(
+    () => extractArray(projectsRaw, "results"),
+    [projectsRaw]
+  )
+  const employees = useMemo(
+    () => extractArray(employeesRaw, "employees"),
+    [employeesRaw]
+  )
 
-  const displayComments = useMemo(() => {
-    if (!commentsData || !Array.isArray(commentsData)) {
-      return (
-        <p className="text-xl px-5 py-5 text-black">No Data Found for User</p>
-      )
-    }
+  const handleClockIn = useCallback(() => {
+    clockIn()
+  }, [clockIn])
 
-    const startIndex = (currentPage - 1) * commentsPerPage
-    const selectedComments = commentsData.slice(
-      startIndex,
-      startIndex + commentsPerPage
+  const handleNavigate = useCallback(
+    (path) => {
+      navigate(path)
+    },
+    [navigate]
+  )
+
+  if (isAdmin) {
+    return (
+      <AdminDashboardUI
+        userName={userName}
+        employees={employees}
+        projects={projects}
+        leaveSummary={leaveSummary}
+        attendanceStatus={attendanceStatus}
+        todayAttendance={todayAttendance}
+        isLoading={
+          statusLoading ||
+          todayLoading ||
+          projectsLoading ||
+          leaveLoading ||
+          employeesLoading
+        }
+        onNavigate={handleNavigate}
+      />
     )
-
-    return selectedComments.map((comment) => (
-      <div key={comment.id}>
-        <CommentCard
-          email={comment.email}
-          body={comment.body}
-          name={comment.name}
-          avatar={comment.avatar}
-          date={comment.date}
-          likes={comment.likes}
-        />
-      </div>
-    ))
-  }, [commentsData, currentPage])
-
-  const handleNextPage = () => {
-    setCurrentPage((np) => np + 1)
   }
-
-  const handlePreviousPage = () => {
-    setCurrentPage((pp) => Math.max(pp - 1, 1))
-  }
-
-  const canGoNext =
-    Array.isArray(commentsData) &&
-    currentPage * commentsPerPage < commentsData.length
-
-  const handleClockIn = () => {
-    clockIn(undefined, {
-      onSuccess: () => {
-        toast({ title: "Clocked in successfully" })
-      },
-      onError: () => {
-        toast({ title: "Failed to clock in", variant: "destructive" })
-      },
-    })
-  }
-
-  const handleGoToAttendance = () => {
-    navigate("/attendance")
-  }
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong",
-        variant: "destructive",
-      })
-    }
-  }, [error])
-
-  const isLoading =
-    commentsLoading ||
-    statusLoading ||
-    todayLoading ||
-    projectsLoading ||
-    leaveLoading ||
-    employeesLoading
 
   return (
-    <DashboardUI
-      isLoading={isLoading}
-      isError={commentsError}
-      displayComments={displayComments}
-      currentPage={currentPage}
-      onPreviousPage={handlePreviousPage}
-      onNextPage={handleNextPage}
-      canGoNext={canGoNext}
+    <EmployeeDashboardUI
+      userName={userName}
+      projects={projects}
+      leaveProfile={leaveProfile}
       attendanceStatus={attendanceStatus}
       todayAttendance={todayAttendance}
+      performance={employeePerformance}
       onClockIn={handleClockIn}
-      onGoToAttendance={handleGoToAttendance}
-      projects={projectsData}
-      leaveSummary={leaveSummary}
-      employees={employeesData}
+      onNavigate={handleNavigate}
+      isLoading={
+        statusLoading ||
+        todayLoading ||
+        projectsLoading ||
+        profileLoading ||
+        performanceLoading
+      }
     />
   )
 }
