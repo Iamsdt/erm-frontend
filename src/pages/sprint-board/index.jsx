@@ -7,8 +7,6 @@ import {
   useUpdateTask,
   useGetAIInsights,
   useGetSprintAnalytics,
-  useGetWorkflows,
-  useUpdateWorkflow,
 } from "@/services/query/project.query"
 
 import SprintBoardUI from "./sprint-board.ui"
@@ -37,14 +35,8 @@ const SprintBoard = () => {
     isLoading: isAnalyticsLoading,
     error: analyticsError,
   } = useGetSprintAnalytics(projectId, sprintId)
-  const {
-    data: workflows,
-    isLoading: isWorkflowsLoading,
-    error: workflowsError,
-  } = useGetWorkflows(projectId)
 
   const updateTaskMutation = useUpdateTask()
-  const updateWorkflowMutation = useUpdateWorkflow()
 
   const handleSaveTask = (formData) => {
     if (!selectedTask) return
@@ -64,17 +56,6 @@ const SprintBoard = () => {
     )
   }
 
-  const handleSaveWorkflow = (workflowData) => {
-    const activeWorkflow = workflows?.find((w) => w.isActive)
-    if (!activeWorkflow) return
-
-    updateWorkflowMutation.mutate({
-      projectId,
-      workflowId: activeWorkflow.id,
-      data: workflowData,
-    })
-  }
-
   return (
     <SprintBoardUI
       project={project}
@@ -82,18 +63,14 @@ const SprintBoard = () => {
       sprintId={sprintId}
       insights={insights}
       analytics={analytics}
-      workflows={workflows}
       isLoading={isProjectLoading || isTasksLoading}
       isInsightsLoading={isInsightsLoading}
       isAnalyticsLoading={isAnalyticsLoading}
-      isWorkflowsLoading={isWorkflowsLoading}
       error={projectError || tasksError}
       selectedTask={selectedTask}
       onSelectTask={setSelectedTask}
       onSaveTask={handleSaveTask}
       isSavingTask={updateTaskMutation.isPending}
-      onSaveWorkflow={handleSaveWorkflow}
-      isSavingWorkflow={updateWorkflowMutation.isPending}
     />
   )
 }
