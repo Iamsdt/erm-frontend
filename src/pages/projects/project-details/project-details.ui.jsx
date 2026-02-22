@@ -79,6 +79,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import { CreateIssueModal } from "../components/create-issue-modal"
 import { CreateSprintModal } from "../components/create-sprint-modal"
+import { EditProjectSidebar } from "../components/edit-project-sidebar"
 
 const getStatusColor = (status) => {
   switch (status?.toLowerCase()) {
@@ -813,7 +814,7 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
               Settings
             </Link>
           </Button>
-          <Button>Edit Project</Button>
+          <EditProjectSidebar project={project} />
         </div>
       </div>
 
