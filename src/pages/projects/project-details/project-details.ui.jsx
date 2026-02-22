@@ -12,13 +12,56 @@ import {
   TrendingUp,
   FileText,
   Lightbulb,
-  GitMerge,
-  Box,
   Settings,
   Layers,
+  Trash2,
 } from "lucide-react"
 import PropTypes from "prop-types"
 import { Link } from "react-router"
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Legend
+} from 'recharts';
+
+const VELOCITY_DATA = [
+  { name: 'Sprint 1', points: 45 },
+  { name: 'Sprint 2', points: 52 },
+  { name: 'Sprint 3', points: 48 },
+  { name: 'Sprint 4', points: 61 },
+  { name: 'Sprint 5', points: 59 },
+  { name: 'Sprint 6', points: 68 },
+];
+
+const BURNDOWN_DATA = [
+  { day: 'Day 1', remaining: 100, ideal: 100 },
+  { day: 'Day 2', remaining: 90, ideal: 90 },
+  { day: 'Day 3', remaining: 85, ideal: 80 },
+  { day: 'Day 4', remaining: 70, ideal: 70 },
+  { day: 'Day 5', remaining: 65, ideal: 60 },
+  { day: 'Day 6', remaining: 50, ideal: 50 },
+  { day: 'Day 7', remaining: 45, ideal: 40 },
+  { day: 'Day 8', remaining: 30, ideal: 30 },
+  { day: 'Day 9', remaining: 15, ideal: 20 },
+  { day: 'Day 10', remaining: 5, ideal: 10 },
+];
+
+const ISSUE_STATUS_DATA = [
+  { name: 'To Do', value: 15, color: '#facc15' },
+  { name: 'In Progress', value: 25, color: '#3b82f6' },
+  { name: 'Review', value: 10, color: '#a855f7' },
+  { name: 'Done', value: 50, color: '#22c55e' },
+];
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -294,6 +337,101 @@ const OverviewTab = ({ project, activeSprint }) => (
         </CardContent>
       </Card>
     </div>
+
+    {/* Analytics Section Integrated */}
+    <div className="lg:col-span-3 space-y-4 mt-8">
+      <h3 className="text-xl font-semibold flex items-center gap-2 mb-4">
+        <TrendingUp className="h-5 w-5 text-primary" /> Project Analytics
+      </h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl ring-1 ring-white/10">
+          <CardHeader>
+             <CardTitle className="text-lg flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Velocity Chart
+             </CardTitle>
+             <CardDescription>Story points completed across sprints</CardDescription>
+          </CardHeader>
+          <CardContent className="h-72 w-full mt-4">
+             <ResponsiveContainer width="100%" height="100%">
+               <BarChart data={VELOCITY_DATA} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
+                 <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                 <RechartsTooltip 
+                   contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))', color: 'hsl(var(--foreground))' }}
+                   itemStyle={{ color: 'hsl(var(--foreground))' }}
+                 />
+                 <Bar dataKey="points" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={40} />
+               </BarChart>
+             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl ring-1 ring-white/10">
+          <CardHeader>
+             <CardTitle className="text-lg flex items-center gap-2">
+                <Activity className="h-5 w-5 text-primary" />
+                Burndown Chart
+             </CardTitle>
+             <CardDescription>Remaining effort in active sprint</CardDescription>
+          </CardHeader>
+          <CardContent className="h-72 w-full mt-4">
+             <ResponsiveContainer width="100%" height="100%">
+               <LineChart data={BURNDOWN_DATA} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
+                 <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                 <RechartsTooltip 
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))', color: 'hsl(var(--foreground))' }}
+                    itemStyle={{ color: 'hsl(var(--foreground))' }}
+                 />
+                 <Legend verticalAlign="top" height={36} iconType="circle" />
+                 <Line type="monotone" name="Actual Remaining" dataKey="remaining" stroke="hsl(var(--destructive))" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                 <Line type="monotone" name="Ideal Burn" dataKey="ideal" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+               </LineChart>
+             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+         <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl ring-1 ring-white/10 lg:col-span-2">
+          <CardHeader>
+             <CardTitle className="text-lg flex items-center gap-2">
+                <Target className="h-5 w-5 text-primary" />
+                Issue Breakdown
+             </CardTitle>
+             <CardDescription>Current status of all project issues</CardDescription>
+          </CardHeader>
+          <CardContent className="h-80 flex items-center justify-center">
+             <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={ISSUE_STATUS_DATA}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={80}
+                    outerRadius={120}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                    fill="hsl(var(--foreground))"
+                  >
+                    {ISSUE_STATUS_DATA.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip 
+                     contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))', color: 'hsl(var(--foreground))' }}
+                     itemStyle={{ color: 'hsl(var(--foreground))' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                </PieChart>
+             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   </div>
 )
 
@@ -524,100 +662,107 @@ const EpicsTab = () => (
   </Card>
 )
 
-const ArchitectureTab = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <Card className="shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Box className="h-5 w-5 text-primary" />
-          Tech Stack
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-2">
-          {[
-            "React 19",
-            "Vite",
-            "Tailwind CSS v4",
-            "Redux Toolkit",
-            "TanStack Query",
-            "shadcn/ui",
-          ].map((tech) => (
-            <Badge key={tech} variant="secondary">
-              {tech}
-            </Badge>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+const NotesTab = ({ projectId }) => {
+  const SAMPLE_NOTES = [
+    {
+      id: 1,
+      title: "Database Schema Design",
+      category: "architecture",
+      createdAt: "2 days ago",
+      content:
+        "Updated schema for user management with new fields for compliance tracking and audit logs.",
+    },
+    {
+      id: 2,
+      title: "API Integration Guide",
+      category: "guide",
+      createdAt: "5 days ago",
+      content:
+        "Step-by-step guide for integrating third-party APIs with examples and error handling strategies.",
+    },
+    {
+      id: 3,
+      title: "Frontend Architecture Decision",
+      category: "documentation",
+      createdAt: "1 week ago",
+      content:
+        "Decided to adopt the Container/Presenter pattern for all feature components to improve testability.",
+    },
+  ]
 
-    <Card className="shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
-          <GitMerge className="h-5 w-5 text-primary" />
-          Key Decisions (ADRs)
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ul className="space-y-3 text-sm">
-          <li className="flex items-start gap-2">
-            <FileText className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-            <div>
-              <p className="font-medium">Use TanStack Query for Server State</p>
-              <p className="text-xs text-muted-foreground">
-                Decided to separate server state from Redux to improve caching
-                and performance.
-              </p>
-            </div>
-          </li>
-          <li className="flex items-start gap-2">
-            <FileText className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-            <div>
-              <p className="font-medium">Adopt shadcn/ui for Components</p>
-              <p className="text-xs text-muted-foreground">
-                Provides accessible, customizable components without the bloat
-                of a full library.
-              </p>
-            </div>
-          </li>
-        </ul>
-      </CardContent>
-    </Card>
-
-    <Card className="shadow-sm md:col-span-2">
-      <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-primary" />
-          Architectural Notes
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="prose prose-sm dark:prose-invert max-w-none">
-          <p>The frontend follows a 3-tier data flow architecture:</p>
-          <ul>
-            <li>
-              <strong>API Layer:</strong> Axios instances with interceptors for
-              auth and error handling.
-            </li>
-            <li>
-              <strong>Query Layer:</strong> Custom hooks wrapping TanStack Query
-              for data fetching and caching.
-            </li>
-            <li>
-              <strong>Component Layer:</strong> Container/Presenter pattern
-              separating logic from UI.
-            </li>
-          </ul>
-          <p>
-            State management is split between Redux (for global UI state like
-            themes, sidebar toggle) and TanStack Query (for asynchronous server
-            data).
-          </p>
+  return (
+    <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl supports-[backdrop-filter]:bg-background/20 ring-1 ring-white/10">
+      <CardHeader className="flex flex-row items-center justify-between pb-4">
+        <div>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            Project Notes
+          </CardTitle>
+          <CardDescription className="mt-1">
+            Create and manage project documentation and notes
+          </CardDescription>
         </div>
+        <Button size="sm" asChild>
+          <Link to={`/projects/${projectId}/notes/new`}>
+             <FileText className="h-4 w-4 mr-2" />
+             Create Note
+          </Link>
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {SAMPLE_NOTES.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed rounded-lg bg-muted/30">
+            <FileText className="h-10 w-10 text-muted-foreground mb-4 opacity-50" />
+            <h3 className="text-lg font-medium">No notes yet</h3>
+            <p className="text-sm text-muted-foreground max-w-sm mt-1 mb-4">
+              Start documenting your project by creating your first note.
+            </p>
+            <Button asChild>
+               <Link to={`/projects/${projectId}/notes/new`}>Create First Note</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {SAMPLE_NOTES.map((note) => (
+              <Card
+                key={note.id}
+                className="shadow-sm border hover:shadow-md transition-shadow cursor-pointer group bg-card"
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-sm font-semibold leading-tight pr-2 line-clamp-2 group-hover:text-primary transition-colors">
+                      {note.title}
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 -mt-1 -mr-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive transition-colors" />
+                    </Button>
+                  </div>
+                  <CardDescription className="text-xs flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {note.createdAt}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                    {note.content}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
-  </div>
-)
+  )
+}
+
+NotesTab.propTypes = {
+  projectId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+}
 
 /**
  * ProjectDetailsUI - Displays detailed information about a project and its sprints.
@@ -673,12 +818,12 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="sprints">Sprints</TabsTrigger>
-          <TabsTrigger value="epics">Epics</TabsTrigger>
-          <TabsTrigger value="planning">Plans & Backlog</TabsTrigger>
-          <TabsTrigger value="architecture">Architecture</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-5 mb-6 bg-muted/50 p-1 backdrop-blur-md rounded-xl">
+          <TabsTrigger value="overview" className="rounded-lg">Overview</TabsTrigger>
+          <TabsTrigger value="sprints" className="rounded-lg">Sprints</TabsTrigger>
+          <TabsTrigger value="epics" className="rounded-lg">Epics</TabsTrigger>
+          <TabsTrigger value="planning" className="rounded-lg">Plans & Backlog</TabsTrigger>
+          <TabsTrigger value="notes" className="rounded-lg">Notes</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -697,8 +842,8 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
           <PlanningTab />
         </TabsContent>
 
-        <TabsContent value="architecture" className="space-y-6">
-          <ArchitectureTab />
+        <TabsContent value="notes" className="space-y-6">
+          <NotesTab projectId={project.id} />
         </TabsContent>
       </Tabs>
     </div>

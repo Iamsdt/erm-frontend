@@ -33,6 +33,7 @@ const routes = {
     SPRINT: "/projects/:projectId/sprints/:sprintId",
     REPORTS: "/projects/reports",
     SETTINGS: "/projects/:projectId/settings",
+    NOTE_CREATE: "/projects/:projectId/notes/new",
   },
 }
 

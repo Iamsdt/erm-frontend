@@ -39,6 +39,7 @@ const Projects = lazy(() => import("@pages/projects"))
 const ProjectDetails = lazy(() => import("@pages/projects/project-details"))
 const SprintBoard = lazy(() => import("@pages/sprint-board"))
 const ProjectSettings = lazy(() => import("@pages/projects/project-settings"))
+const CreateNotePage = lazy(() => import("@pages/projects/notes/create-note.page"))
 
 // Daily Update pages
 const DailyStandupPage = lazy(() => import("@pages/daily-update/standup"))
@@ -155,6 +156,10 @@ const mainRoutes = [
   {
     path: ct.route.project.SETTINGS,
     element: <ProjectSettings />,
+  },
+  {
+    path: ct.route.project.NOTE_CREATE,
+    element: <CreateNotePage />,
   },
 
   // Daily Updates routes
