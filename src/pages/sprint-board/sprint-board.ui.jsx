@@ -464,7 +464,9 @@ const MOCK_STANDUP_DATES = [
 const StandupTab = ({ sprintId }) => {
   const [selectedDateId, setSelectedDateId] = useState(MOCK_STANDUP_DATES[0].id)
 
-  const selectedDateData = MOCK_STANDUP_DATES.find((d) => d.id === selectedDateId)
+  const selectedDateData = MOCK_STANDUP_DATES.find(
+    (d) => d.id === selectedDateId
+  )
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -545,7 +547,9 @@ const StandupTab = ({ sprintId }) => {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="font-medium text-sm">{update.name}</span>
+                        <span className="font-medium text-sm">
+                          {update.name}
+                        </span>
                         <span className="text-xs text-muted-foreground shrink-0">
                           {update.time}
                         </span>

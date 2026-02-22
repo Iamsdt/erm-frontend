@@ -643,7 +643,10 @@ const PlanningTab = () => {
       status: "To Do",
       startDate: "2025-02-20",
       endDate: "2025-03-10",
-      assignee: { name: "Sarah Smith", avatar: "https://i.pravatar.cc/40?img=2" },
+      assignee: {
+        name: "Sarah Smith",
+        avatar: "https://i.pravatar.cc/40?img=2",
+      },
     },
     {
       id: "US-103",
@@ -655,7 +658,10 @@ const PlanningTab = () => {
       status: "In Progress",
       startDate: "2025-02-10",
       endDate: "2025-03-15",
-      assignee: { name: "Mike Johnson", avatar: "https://i.pravatar.cc/40?img=3" },
+      assignee: {
+        name: "Mike Johnson",
+        avatar: "https://i.pravatar.cc/40?img=3",
+      },
     },
     {
       id: "US-104",
@@ -779,7 +785,8 @@ const PlanningTab = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="text-xs text-muted-foreground">
-                      {story.startDate && `${new Date(story.startDate).toLocaleDateString()}`}
+                      {story.startDate &&
+                        `${new Date(story.startDate).toLocaleDateString()}`}
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -792,7 +799,9 @@ const PlanningTab = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditIssue(story)}>
+                        <DropdownMenuItem
+                          onClick={() => handleEditIssue(story)}
+                        >
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>

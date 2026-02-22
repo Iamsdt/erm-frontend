@@ -17,7 +17,6 @@ const EmployeeDashboard = lazy(() => import("@pages/leave-employee"))
 const RequestLeavePage = lazy(() => import("@pages/leave-employee/request"))
 
 // Attendance pages
-const AttendanceClock = lazy(() => import("@pages/attendance/employee"))
 const AttendanceHistory = lazy(
   () => import("@pages/attendance/employee/history")
 )
@@ -44,8 +43,9 @@ const CreateNotePage = lazy(
 )
 
 // Daily Update pages
-const DailyStandupPage = lazy(() => import("@pages/daily-update/standup"))
-const CreateStandupPage = lazy(() => import("@pages/daily-update/create-standup"))
+const CreateStandupPage = lazy(
+  () => import("@pages/daily-update/create-standup")
+)
 const TeamUpdatesPage = lazy(() => import("@pages/daily-update/team"))
 const ProgressLogPage = lazy(() => import("@pages/daily-update/progress"))
 
@@ -166,10 +166,6 @@ const mainRoutes = [
   },
 
   // Daily Updates routes
-  {
-    path: "/daily-update/standup",
-    element: <DailyStandupPage />,
-  },
   {
     path: "/daily-update/standup/new",
     element: <CreateStandupPage />,

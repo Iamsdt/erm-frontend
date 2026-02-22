@@ -76,7 +76,9 @@ export const CreateIssueModal = ({
           <SheetHeader className="pb-4 border-b">
             <SheetTitle className="flex items-center gap-2">
               <IssueTypeIcon type={issueType} /> Create{" "}
-              {parentIssueId ? "Subtask" : issueType.charAt(0).toUpperCase() + issueType.slice(1)}
+              {parentIssueId
+                ? "Subtask"
+                : issueType.charAt(0).toUpperCase() + issueType.slice(1)}
             </SheetTitle>
             <SheetDescription>
               {parentIssueId
@@ -159,11 +161,7 @@ export const CreateIssueModal = ({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="endDate">End Date / Deadline</Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  placeholder="Select end date"
-                />
+                <Input id="endDate" type="date" placeholder="Select end date" />
               </div>
             </div>
 

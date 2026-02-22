@@ -1,10 +1,4 @@
-import {
-  Activity,
-  CheckSquare,
-  Plus,
-  CheckCircle2,
-  Circle,
-} from "lucide-react"
+import { Activity, CheckSquare, Plus, CheckCircle2, Circle } from "lucide-react"
 import { useState } from "react"
 import PropTypes from "prop-types"
 
