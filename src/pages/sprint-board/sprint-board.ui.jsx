@@ -279,11 +279,16 @@ KanbanColumn.defaultProps = {
 /**
  * BoardFilters - Filter bar for type, priority, and assignee.
  */
-const BoardFilters = ({ filters, onChange, projectMembers, tasks }) => {
+const BoardFilters = ({
+  filters,
+  onChange,
+  projectMembers,
+  tasks = [],
+}) => {
   const hasActiveFilters =
     filters.type !== "all" || filters.priority !== "all" || filters.assignee !== "all"
 
-  const handleClear = () => onChange({ type: "all", priority: "all", assignee: "all" })
+  const handleClear = () => onChange?.({ type: "all", priority: "all", assignee: "all" })
 
   const seen = new Set()
   const assignees = []
@@ -377,7 +382,7 @@ BoardFilters.propTypes = {
 
 BoardFilters.defaultProps = {
   projectMembers: undefined,
-  tasks: undefined,
+  tasks: [],
 }
 
 // ---------------------------------------------------------------------------
@@ -789,10 +794,10 @@ const SprintBoardUI = ({
             <div className="mb-6">
               <BoardFilters
                 filters={filters}
-                onFilterChange={(key, value) => {
+                onChange={(key, value) => {
                   setFilters((previous) => ({ ...previous, [key]: value }))
                 }}
-                allTasks={tasks}
+                tasks={tasks}
                 projectMembers={project?.members || []}
               />
             </div>
@@ -920,4 +925,5 @@ SprintBoardUI.defaultProps = {
   isSavingTask: false,
 }
 
+export { BoardFilters }
 export default SprintBoardUI
