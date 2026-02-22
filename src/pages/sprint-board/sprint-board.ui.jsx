@@ -9,7 +9,6 @@ import {
   CircleDashed,
   Filter,
   X,
-  Send,
   ChevronRight,
   CalendarDays,
   Users,
@@ -392,62 +391,89 @@ BoardFilters.defaultProps = {
 }
 
 // ---------------------------------------------------------------------------
-// DailyUpdatesTab
+// StandupTab
 // ---------------------------------------------------------------------------
 
-const MOCK_TEAM_UPDATES = [
+const MOCK_STANDUP_DATES = [
   {
-    id: 1,
-    name: "Alice Smith",
-    avatar: "https://i.pravatar.cc/150?u=1",
-    today: "Completed UI component library setup and theme design review.",
-    blockers: "None",
-    time: "2 hours ago",
+    id: "2026-02-23",
+    date: "2026-02-23",
+    label: "Today",
+    updates: [
+      {
+        id: 1,
+        name: "Alice Smith",
+        avatar: "https://i.pravatar.cc/150?u=1",
+        today: "Completed UI component library setup and theme design review.",
+        blockers: "None",
+        time: "2 hours ago",
+      },
+      {
+        id: 2,
+        name: "Bob Jones",
+        avatar: "https://i.pravatar.cc/150?u=2",
+        today: "Implemented API authentication and token refresh flow.",
+        blockers: "Waiting for design specs for the mobile screen",
+        time: "1 hour ago",
+      },
+    ],
   },
   {
-    id: 2,
-    name: "Bob Jones",
-    avatar: "https://i.pravatar.cc/150?u=2",
-    today: "Implemented API authentication and token refresh flow.",
-    blockers: "Waiting for design specs for the mobile screen",
-    time: "1 hour ago",
+    id: "2026-02-22",
+    date: "2026-02-22",
+    label: "Yesterday",
+    updates: [
+      {
+        id: 3,
+        name: "Alice Smith",
+        avatar: "https://i.pravatar.cc/150?u=1",
+        today: "Started working on the UI component library.",
+        blockers: "None",
+        time: "1 day ago",
+      },
+      {
+        id: 4,
+        name: "Charlie Brown",
+        avatar: "https://i.pravatar.cc/150?u=3",
+        today: "Fixed the bug in the user profile page.",
+        blockers: "None",
+        time: "1 day ago",
+      },
+    ],
+  },
+  {
+    id: "2026-02-21",
+    date: "2026-02-21",
+    label: "Feb 21, 2026",
+    updates: [
+      {
+        id: 5,
+        name: "Bob Jones",
+        avatar: "https://i.pravatar.cc/150?u=2",
+        today: "Investigated the performance issue in the dashboard.",
+        blockers: "Need access to production logs",
+        time: "2 days ago",
+      },
+    ],
   },
 ]
 
 /**
- * DailyUpdatesTab - Embedded standup and team updates view for the sprint.
+ * StandupTab - Embedded standup and team updates view for the sprint.
  */
-const DailyUpdatesTab = ({ sprintId }) => {
-  const [standup, setStandup] = useState("")
-  const [submitted, setSubmitted] = useState(false)
+const StandupTab = ({ sprintId }) => {
+  const [selectedDateId, setSelectedDateId] = useState(MOCK_STANDUP_DATES[0].id)
 
-  const dateLabel = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
-
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    if (!standup.trim()) {
-      return
-    }
-    setSubmitted(true)
-    setTimeout(() => {
-      setStandup("")
-      setSubmitted(false)
-    }, 2500)
-  }
+  const selectedDateData = MOCK_STANDUP_DATES.find((d) => d.id === selectedDateId)
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-xl font-bold tracking-tight">Daily Updates</h2>
+          <h2 className="text-xl font-bold tracking-tight">Standup Updates</h2>
           <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
-            <CalendarDays className="h-4 w-4" />
-            {dateLabel}
+            <Users className="h-4 w-4" />
+            Team daily progress
             {sprintId && (
               <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                 Sprint {sprintId}
@@ -457,101 +483,101 @@ const DailyUpdatesTab = ({ sprintId }) => {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <Card className="lg:col-span-2">
+      <div className="grid gap-6 lg:grid-cols-4">
+        {/* Left Side: Dates List */}
+        <Card className="lg:col-span-1 h-fit">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Send className="h-4 w-4 text-primary" />
-              Post Your Standup
+              <CalendarDays className="h-4 w-4 text-primary" />
+              Dates
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="standup-input"
-                  className="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+          <CardContent className="p-2">
+            <div className="space-y-1">
+              {MOCK_STANDUP_DATES.map((dateItem) => (
+                <button
+                  key={dateItem.id}
+                  onClick={() => setSelectedDateId(dateItem.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
+                    selectedDateId === dateItem.id
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
                 >
-                  What did you accomplish?
-                </label>
-                <Textarea
-                  id="standup-input"
-                  placeholder="Share your blockers, progress, and what you are working on today..."
-                  value={standup}
-                  onChange={(event) => setStandup(event.target.value)}
-                  rows={5}
-                  className="resize-none text-sm"
-                />
-              </div>
-              {submitted ? (
-                <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 rounded-lg px-3 py-2">
-                  <CheckCircle2 className="h-4 w-4 shrink-0" />
-                  Update posted successfully!
-                </div>
-              ) : (
-                <Button
-                  type="submit"
-                  className="w-full gap-2"
-                  disabled={!standup.trim()}
-                >
-                  <Send className="h-4 w-4" />
-                  Post Update
-                </Button>
-              )}
-            </form>
+                  <span>{dateItem.label}</span>
+                  <Badge
+                    variant="secondary"
+                    className={`text-[10px] px-1.5 py-0 ${
+                      selectedDateId === dateItem.id
+                        ? "bg-primary/20 text-primary"
+                        : "bg-muted-foreground/10 text-muted-foreground"
+                    }`}
+                  >
+                    {dateItem.updates.length}
+                  </Badge>
+                </button>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
+        {/* Right Side: Updates List */}
         <Card className="lg:col-span-3">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Users className="h-4 w-4 text-primary" />
-              Team Updates
+              Updates for {selectedDateData?.label}
               <Badge variant="secondary" className="ml-auto text-xs">
-                {MOCK_TEAM_UPDATES.length} updates
+                {selectedDateData?.updates.length || 0} updates
               </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {MOCK_TEAM_UPDATES.map((update, _index) => (
-              <div key={update.id}>
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-8 w-8 shrink-0 mt-0.5">
-                    <AvatarImage src={update.avatar} alt={update.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                      {update.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="font-medium text-sm">{update.name}</span>
-                      <span className="text-xs text-muted-foreground shrink-0">
-                        {update.time}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {update.today}
-                    </p>
-                    {update.blockers && update.blockers !== "None" && (
-                      <div className="mt-1.5 flex items-start gap-1.5">
-                        <Badge
-                          variant="outline"
-                          className="text-[10px] px-1.5 py-0 border-orange-300 text-orange-700 bg-orange-50 shrink-0"
-                        >
-                          Blocker
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {update.blockers}
+            {selectedDateData?.updates.length > 0 ? (
+              selectedDateData.updates.map((update, _index) => (
+                <div key={update.id}>
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-8 w-8 shrink-0 mt-0.5">
+                      <AvatarImage src={update.avatar} alt={update.name} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                        {update.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="font-medium text-sm">{update.name}</span>
+                        <span className="text-xs text-muted-foreground shrink-0">
+                          {update.time}
                         </span>
                       </div>
-                    )}
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {update.today}
+                      </p>
+                      {update.blockers && update.blockers !== "None" && (
+                        <div className="mt-1.5 flex items-start gap-1.5">
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-1.5 py-0 border-orange-300 text-orange-700 bg-orange-50 shrink-0"
+                          >
+                            Blocker
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {update.blockers}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
+                  {_index < selectedDateData.updates.length - 1 && (
+                    <Separator className="mt-4" />
+                  )}
                 </div>
-                {_index < MOCK_TEAM_UPDATES.length - 1 && (
-                  <Separator className="mt-4" />
-                )}
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                No updates for this date.
               </div>
-            ))}
+            )}
           </CardContent>
         </Card>
       </div>
@@ -559,11 +585,11 @@ const DailyUpdatesTab = ({ sprintId }) => {
   )
 }
 
-DailyUpdatesTab.propTypes = {
+StandupTab.propTypes = {
   sprintId: PropTypes.string,
 }
 
-DailyUpdatesTab.defaultProps = {
+StandupTab.defaultProps = {
   sprintId: undefined,
 }
 
@@ -773,11 +799,11 @@ const SprintBoardUI = ({
               Board
             </TabsTrigger>
             <TabsTrigger
-              value="daily-updates"
+              value="standup"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-2.5 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all"
             >
               <CalendarDays className="h-4 w-4 mr-2" />
-              Daily Updates
+              Standup
             </TabsTrigger>
             <TabsTrigger
               value="insights"
@@ -835,10 +861,10 @@ const SprintBoardUI = ({
           </div>
         )}
 
-        {/* Daily Updates Tab */}
-        {activeTab === "daily-updates" && (
+        {/* Standup Tab */}
+        {activeTab === "standup" && (
           <div className="h-full p-6 overflow-y-auto">
-            <DailyUpdatesTab projectMembers={project?.members || []} />
+            <StandupTab projectMembers={project?.members || []} />
           </div>
         )}
 

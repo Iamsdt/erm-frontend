@@ -45,6 +45,7 @@ const CreateNotePage = lazy(
 
 // Daily Update pages
 const DailyStandupPage = lazy(() => import("@pages/daily-update/standup"))
+const CreateStandupPage = lazy(() => import("@pages/daily-update/create-standup"))
 const TeamUpdatesPage = lazy(() => import("@pages/daily-update/team"))
 const ProgressLogPage = lazy(() => import("@pages/daily-update/progress"))
 
@@ -168,6 +169,10 @@ const mainRoutes = [
   {
     path: "/daily-update/standup",
     element: <DailyStandupPage />,
+  },
+  {
+    path: "/daily-update/standup/new",
+    element: <CreateStandupPage />,
   },
   {
     path: "/daily-update/team",
