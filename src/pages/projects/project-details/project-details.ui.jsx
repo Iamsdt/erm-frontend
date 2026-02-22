@@ -15,8 +15,11 @@ import {
   Settings,
   Layers,
   Trash2,
+  Edit,
+  MoreVertical,
 } from "lucide-react"
 import PropTypes from "prop-types"
+import { useState } from "react"
 import { Link } from "react-router"
 import {
   LineChart,
@@ -31,37 +34,37 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  Legend
-} from 'recharts';
+  Legend,
+} from "recharts"
 
 const VELOCITY_DATA = [
-  { name: 'Sprint 1', points: 45 },
-  { name: 'Sprint 2', points: 52 },
-  { name: 'Sprint 3', points: 48 },
-  { name: 'Sprint 4', points: 61 },
-  { name: 'Sprint 5', points: 59 },
-  { name: 'Sprint 6', points: 68 },
-];
+  { name: "Sprint 1", points: 45 },
+  { name: "Sprint 2", points: 52 },
+  { name: "Sprint 3", points: 48 },
+  { name: "Sprint 4", points: 61 },
+  { name: "Sprint 5", points: 59 },
+  { name: "Sprint 6", points: 68 },
+]
 
 const BURNDOWN_DATA = [
-  { day: 'Day 1', remaining: 100, ideal: 100 },
-  { day: 'Day 2', remaining: 90, ideal: 90 },
-  { day: 'Day 3', remaining: 85, ideal: 80 },
-  { day: 'Day 4', remaining: 70, ideal: 70 },
-  { day: 'Day 5', remaining: 65, ideal: 60 },
-  { day: 'Day 6', remaining: 50, ideal: 50 },
-  { day: 'Day 7', remaining: 45, ideal: 40 },
-  { day: 'Day 8', remaining: 30, ideal: 30 },
-  { day: 'Day 9', remaining: 15, ideal: 20 },
-  { day: 'Day 10', remaining: 5, ideal: 10 },
-];
+  { day: "Day 1", remaining: 100, ideal: 100 },
+  { day: "Day 2", remaining: 90, ideal: 90 },
+  { day: "Day 3", remaining: 85, ideal: 80 },
+  { day: "Day 4", remaining: 70, ideal: 70 },
+  { day: "Day 5", remaining: 65, ideal: 60 },
+  { day: "Day 6", remaining: 50, ideal: 50 },
+  { day: "Day 7", remaining: 45, ideal: 40 },
+  { day: "Day 8", remaining: 30, ideal: 30 },
+  { day: "Day 9", remaining: 15, ideal: 20 },
+  { day: "Day 10", remaining: 5, ideal: 10 },
+]
 
 const ISSUE_STATUS_DATA = [
-  { name: 'To Do', value: 15, color: '#facc15' },
-  { name: 'In Progress', value: 25, color: '#3b82f6' },
-  { name: 'Review', value: 10, color: '#a855f7' },
-  { name: 'Done', value: 50, color: '#22c55e' },
-];
+  { name: "To Do", value: 15, color: "#facc15" },
+  { name: "In Progress", value: 25, color: "#3b82f6" },
+  { name: "Review", value: 10, color: "#a855f7" },
+  { name: "Done", value: 50, color: "#22c55e" },
+]
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -80,6 +83,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreateIssueModal } from "../components/create-issue-modal"
 import { CreateSprintModal } from "../components/create-sprint-modal"
 import { EditProjectSidebar } from "../components/edit-project-sidebar"
+import { EpicDetailsSidebar } from "../components/epic-details-sidebar"
+import { IssueDetailsSidebar } from "../components/issue-details-sidebar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 
 const getStatusColor = (status) => {
   switch (status?.toLowerCase()) {
@@ -347,88 +359,166 @@ const OverviewTab = ({ project, activeSprint }) => (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl ring-1 ring-white/10">
           <CardHeader>
-             <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Velocity Chart
-             </CardTitle>
-             <CardDescription>Story points completed across sprints</CardDescription>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              Velocity Chart
+            </CardTitle>
+            <CardDescription>
+              Story points completed across sprints
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-72 w-full mt-4">
-             <ResponsiveContainer width="100%" height="100%">
-               <BarChart data={VELOCITY_DATA} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
-                 <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                 <RechartsTooltip 
-                   contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))', color: 'hsl(var(--foreground))' }}
-                   itemStyle={{ color: 'hsl(var(--foreground))' }}
-                 />
-                 <Bar dataKey="points" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={40} />
-               </BarChart>
-             </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        
-        <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl ring-1 ring-white/10">
-          <CardHeader>
-             <CardTitle className="text-lg flex items-center gap-2">
-                <Activity className="h-5 w-5 text-primary" />
-                Burndown Chart
-             </CardTitle>
-             <CardDescription>Remaining effort in active sprint</CardDescription>
-          </CardHeader>
-          <CardContent className="h-72 w-full mt-4">
-             <ResponsiveContainer width="100%" height="100%">
-               <LineChart data={BURNDOWN_DATA} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
-                 <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                 <RechartsTooltip 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))', color: 'hsl(var(--foreground))' }}
-                    itemStyle={{ color: 'hsl(var(--foreground))' }}
-                 />
-                 <Legend verticalAlign="top" height={36} iconType="circle" />
-                 <Line type="monotone" name="Actual Remaining" dataKey="remaining" stroke="hsl(var(--destructive))" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                 <Line type="monotone" name="Ideal Burn" dataKey="ideal" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" dot={false} />
-               </LineChart>
-             </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={VELOCITY_DATA}
+                margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="hsl(var(--muted-foreground) / 0.2)"
+                />
+                <XAxis
+                  dataKey="name"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <RechartsTooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    borderRadius: "8px",
+                    border: "1px solid hsl(var(--border))",
+                    color: "hsl(var(--foreground))",
+                  }}
+                  itemStyle={{ color: "hsl(var(--foreground))" }}
+                />
+                <Bar
+                  dataKey="points"
+                  fill="hsl(var(--primary))"
+                  radius={[4, 4, 0, 0]}
+                  barSize={40}
+                />
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-         <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl ring-1 ring-white/10 lg:col-span-2">
+        <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl ring-1 ring-white/10">
           <CardHeader>
-             <CardTitle className="text-lg flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                Issue Breakdown
-             </CardTitle>
-             <CardDescription>Current status of all project issues</CardDescription>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Activity className="h-5 w-5 text-primary" />
+              Burndown Chart
+            </CardTitle>
+            <CardDescription>Remaining effort in active sprint</CardDescription>
+          </CardHeader>
+          <CardContent className="h-72 w-full mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={BURNDOWN_DATA}
+                margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="hsl(var(--muted-foreground) / 0.2)"
+                />
+                <XAxis
+                  dataKey="day"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <RechartsTooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    borderRadius: "8px",
+                    border: "1px solid hsl(var(--border))",
+                    color: "hsl(var(--foreground))",
+                  }}
+                  itemStyle={{ color: "hsl(var(--foreground))" }}
+                />
+                <Legend verticalAlign="top" height={36} iconType="circle" />
+                <Line
+                  type="monotone"
+                  name="Actual Remaining"
+                  dataKey="remaining"
+                  stroke="hsl(var(--destructive))"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type="monotone"
+                  name="Ideal Burn"
+                  dataKey="ideal"
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-0 bg-background/50 backdrop-blur-xl ring-1 ring-white/10 lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              Issue Breakdown
+            </CardTitle>
+            <CardDescription>
+              Current status of all project issues
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-80 flex items-center justify-center">
-             <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={ISSUE_STATUS_DATA}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={80}
-                    outerRadius={120}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                    fill="hsl(var(--foreground))"
-                  >
-                    {ISSUE_STATUS_DATA.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip 
-                     contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '8px', border: '1px solid hsl(var(--border))', color: 'hsl(var(--foreground))' }}
-                     itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                </PieChart>
-             </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={ISSUE_STATUS_DATA}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={80}
+                  outerRadius={120}
+                  paddingAngle={5}
+                  dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
+                  labelLine={false}
+                  fill="hsl(var(--foreground))"
+                >
+                  {ISSUE_STATUS_DATA.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <RechartsTooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    borderRadius: "8px",
+                    border: "1px solid hsl(var(--border))",
+                    color: "hsl(var(--foreground))",
+                  }}
+                  itemStyle={{ color: "hsl(var(--foreground))" }}
+                />
+                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
@@ -524,144 +614,355 @@ SprintsTab.propTypes = {
   sprints: PropTypes.array.isRequired,
 }
 
-const PlanningTab = () => (
-  <Card className="shadow-sm">
-    <CardHeader className="flex flex-row items-center justify-between">
-      <CardTitle className="text-lg flex items-center gap-2">
-        <ListTodo className="h-5 w-5 text-primary" />
-        Plans & Upcoming User Stories
-      </CardTitle>
-      <CreateIssueModal triggerText="Add Issue" />
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-4">
-        {[
-          {
-            id: "US-101",
-            title: "Implement OAuth2 Authentication",
-            epic: "Security",
-            points: 8,
-            priority: "High",
-          },
-          {
-            id: "US-102",
-            title: "Design new Dashboard Layout",
-            epic: "UI/UX",
-            points: 5,
-            priority: "Medium",
-          },
-          {
-            id: "US-103",
-            title: "Setup CI/CD Pipeline for Staging",
-            epic: "DevOps",
-            points: 13,
-            priority: "High",
-          },
-          {
-            id: "US-104",
-            title: "User Profile Settings Page",
-            epic: "Features",
-            points: 3,
-            priority: "Low",
-          },
-        ].map((story) => (
-          <div
-            key={story.id}
-            className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center gap-3">
-              <Badge variant="outline" className="text-xs font-mono">
-                {story.id}
-              </Badge>
-              <div>
-                <p className="text-sm font-medium">{story.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Epic: {story.epic}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="text-xs">
-                {story.points} pts
-              </Badge>
-              <Badge
-                variant={story.priority === "High" ? "destructive" : "outline"}
-                className="text-xs"
-              >
-                {story.priority}
-              </Badge>
-            </div>
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-)
+const PlanningTab = () => {
+  const [selectedIssue, setSelectedIssue] = useState(null)
+  const [showIssueDetails, setShowIssueDetails] = useState(false)
+  const [showCreateIssueModal, setShowCreateIssueModal] = useState(false)
+  const [parentIssueIdForSubtask, setParentIssueIdForSubtask] = useState(null)
 
-const EpicsTab = () => (
-  <Card className="shadow-sm">
-    <CardHeader className="flex flex-row items-center justify-between">
-      <CardTitle className="text-lg flex items-center gap-2">
-        <Layers className="h-5 w-5 text-primary" />
-        Project Epics
-      </CardTitle>
-      <CreateIssueModal triggerText="Create Epic" />
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-4">
-        {[
-          {
-            id: "EPIC-1",
-            title: "Security Improvements",
-            status: "In Progress",
-            progress: 65,
-          },
-          {
-            id: "EPIC-2",
-            title: "UI/UX Overhaul",
-            status: "To Do",
-            progress: 0,
-          },
-          {
-            id: "EPIC-3",
-            title: "Performance Optimization",
-            status: "Done",
-            progress: 100,
-          },
-        ].map((epic) => (
-          <div
-            key={epic.id}
-            className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Layers className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="font-medium">{epic.title}</p>
-                  <Badge variant="outline" className="text-xs font-mono">
-                    {epic.id}
+  const ISSUES_DATA = [
+    {
+      id: "US-101",
+      title: "Implement OAuth2 Authentication",
+      epic: "Security",
+      points: 8,
+      priority: "High",
+      description: "Implement OAuth2 authentication for secure user login.",
+      status: "In Progress",
+      startDate: "2025-02-15",
+      endDate: "2025-03-05",
+      assignee: { name: "John Doe", avatar: "https://i.pravatar.cc/40?img=1" },
+    },
+    {
+      id: "US-102",
+      title: "Design new Dashboard Layout",
+      epic: "UI/UX",
+      points: 5,
+      priority: "Medium",
+      description: "Create a modern dashboard layout with improved UX.",
+      status: "To Do",
+      startDate: "2025-02-20",
+      endDate: "2025-03-10",
+      assignee: { name: "Sarah Smith", avatar: "https://i.pravatar.cc/40?img=2" },
+    },
+    {
+      id: "US-103",
+      title: "Setup CI/CD Pipeline for Staging",
+      epic: "DevOps",
+      points: 13,
+      priority: "High",
+      description: "Setup automated CI/CD pipeline for staging environment.",
+      status: "In Progress",
+      startDate: "2025-02-10",
+      endDate: "2025-03-15",
+      assignee: { name: "Mike Johnson", avatar: "https://i.pravatar.cc/40?img=3" },
+    },
+    {
+      id: "US-104",
+      title: "User Profile Settings Page",
+      epic: "Features",
+      points: 3,
+      priority: "Low",
+      description: "Create user profile settings page with basic options.",
+      status: "To Do",
+      startDate: "2025-03-01",
+      endDate: "2025-03-20",
+      assignee: null,
+    },
+  ]
+
+  const handleIssueSelect = (issue) => {
+    setSelectedIssue(issue)
+    setShowIssueDetails(true)
+  }
+
+  const handleEditIssue = (issue) => {
+    console.log("Edit issue:", issue)
+    // TODO: Open edit issue modal/sidebar
+  }
+
+  const handleDeleteIssue = (issueId) => {
+    console.log("Delete issue:", issueId)
+    // TODO: Delete issue
+  }
+
+  const handleCreateSubtask = (parentIssueId) => {
+    setParentIssueIdForSubtask(parentIssueId)
+    setShowCreateIssueModal(true)
+  }
+
+  return (
+    <>
+      <Card className="shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <ListTodo className="h-5 w-5 text-primary" />
+            Plans & Upcoming User Stories
+          </CardTitle>
+          <CreateIssueModal
+            triggerText="Add Issue"
+            parentIssueId={parentIssueIdForSubtask}
+            open={showCreateIssueModal}
+            onOpenChange={(newOpen) => {
+              setShowCreateIssueModal(newOpen)
+              if (!newOpen) setParentIssueIdForSubtask(null)
+            }}
+          />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {ISSUES_DATA.map((story) => (
+              <div
+                key={story.id}
+                className="flex flex-col p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors group gap-2"
+              >
+                <div
+                  className="flex items-center justify-between cursor-pointer"
+                  onClick={() => handleIssueSelect(story)}
+                >
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-mono shrink-0"
+                    >
+                      {story.id}
+                    </Badge>
+                    <p className="text-sm font-medium truncate">
+                      {story.title}
+                    </p>
+                  </div>
+                  <Badge
+                    variant={
+                      story.priority === "High" ? "destructive" : "outline"
+                    }
+                    className="text-xs shrink-0 ml-2"
+                  >
+                    {story.priority}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Status: {epic.status}
-                </p>
+
+                <div className="flex flex-wrap gap-2 items-center ml-0">
+                  <Badge variant="secondary" className="text-xs">
+                    {story.points} pts
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {story.status}
+                  </Badge>
+                  <p className="text-xs text-muted-foreground">
+                    Epic: {story.epic}
+                  </p>
+                  {story.endDate && (
+                    <p className="text-xs text-orange-600 font-medium">
+                      Due: {new Date(story.endDate).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {story.assignee ? (
+                      <div className="flex items-center gap-1">
+                        <img
+                          src={story.assignee.avatar}
+                          alt={story.assignee.name}
+                          className="w-5 h-5 rounded-full"
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {story.assignee.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground italic">
+                        Unassigned
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs text-muted-foreground">
+                      {story.startDate && `${new Date(story.startDate).toLocaleDateString()}`}
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <MoreVertical className="h-3.5 w-3.5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEditIssue(story)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteIssue(story.id)}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="w-32">
-              <div className="flex justify-between text-xs mb-1">
-                <span>Progress</span>
-                <span className="font-medium">{epic.progress}%</span>
-              </div>
-              <Progress value={epic.progress} className="h-1.5" />
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-)
+        </CardContent>
+      </Card>
+
+      {/* Issue Details Sidebar */}
+      <IssueDetailsSidebar
+        issue={selectedIssue}
+        open={showIssueDetails}
+        onOpenChange={setShowIssueDetails}
+        onEdit={handleEditIssue}
+        onDelete={handleDeleteIssue}
+        onCreateSubtask={handleCreateSubtask}
+      />
+    </>
+  )
+}
+
+const EpicsTab = () => {
+  const [selectedEpic, setSelectedEpic] = useState(null)
+  const [showEpicDetails, setShowEpicDetails] = useState(false)
+
+  const EPICS_DATA = [
+    {
+      id: "EPIC-1",
+      title: "Security Improvements",
+      status: "In Progress",
+      progress: 65,
+      description:
+        "Implementing OAuth2 authentication, encryption, and security best practices.",
+    },
+    {
+      id: "EPIC-2",
+      title: "UI/UX Overhaul",
+      status: "To Do",
+      progress: 0,
+      description:
+        "Redesign the user interface with improved user experience and modern design patterns.",
+    },
+    {
+      id: "EPIC-3",
+      title: "Performance Optimization",
+      status: "Done",
+      progress: 100,
+      description:
+        "Optimize database queries, reduce bundle size, and improve overall application performance.",
+    },
+  ]
+
+  const handleEpicSelect = (epic) => {
+    setSelectedEpic(epic)
+    setShowEpicDetails(true)
+  }
+
+  const handleEditEpic = (epic) => {
+    console.log("Edit epic:", epic)
+    // TODO: Open edit epic modal/sidebar
+  }
+
+  const handleDeleteEpic = (epicId) => {
+    console.log("Delete epic:", epicId)
+    // TODO: Delete epic
+  }
+
+  return (
+    <>
+      <Card className="shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Layers className="h-5 w-5 text-primary" />
+            Project Epics
+          </CardTitle>
+          <CreateIssueModal triggerText="Create Epic" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {EPICS_DATA.map((epic) => (
+              <div
+                key={epic.id}
+                className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"
+              >
+                <div
+                  className="flex items-center gap-4 flex-1 cursor-pointer"
+                  onClick={() => handleEpicSelect(epic)}
+                >
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Layers className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium truncate">{epic.title}</p>
+                      <Badge
+                        variant="outline"
+                        className="text-xs font-mono shrink-0"
+                      >
+                        {epic.id}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Status: {epic.status}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0 ml-4">
+                  <div className="w-32">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span>Progress</span>
+                      <span className="font-medium">{epic.progress}%</span>
+                    </div>
+                    <Progress value={epic.progress} className="h-1.5" />
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEditEpic(epic)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteEpic(epic.id)}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Epic Details Sidebar */}
+      <EpicDetailsSidebar
+        epic={selectedEpic}
+        open={showEpicDetails}
+        onOpenChange={setShowEpicDetails}
+        onEdit={handleEditEpic}
+        onDelete={handleDeleteEpic}
+      />
+    </>
+  )
+}
 
 const NotesTab = ({ projectId }) => {
   const SAMPLE_NOTES = [
@@ -705,8 +1006,8 @@ const NotesTab = ({ projectId }) => {
         </div>
         <Button size="sm" asChild>
           <Link to={`/projects/${projectId}/notes/new`}>
-             <FileText className="h-4 w-4 mr-2" />
-             Create Note
+            <FileText className="h-4 w-4 mr-2" />
+            Create Note
           </Link>
         </Button>
       </CardHeader>
@@ -719,7 +1020,9 @@ const NotesTab = ({ projectId }) => {
               Start documenting your project by creating your first note.
             </p>
             <Button asChild>
-               <Link to={`/projects/${projectId}/notes/new`}>Create First Note</Link>
+              <Link to={`/projects/${projectId}/notes/new`}>
+                Create First Note
+              </Link>
             </Button>
           </div>
         ) : (
@@ -762,7 +1065,8 @@ const NotesTab = ({ projectId }) => {
 }
 
 NotesTab.propTypes = {
-  projectId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  projectId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
 }
 
 /**
@@ -820,11 +1124,21 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-5 mb-6 bg-muted/50 p-1 backdrop-blur-md rounded-xl">
-          <TabsTrigger value="overview" className="rounded-lg">Overview</TabsTrigger>
-          <TabsTrigger value="sprints" className="rounded-lg">Sprints</TabsTrigger>
-          <TabsTrigger value="epics" className="rounded-lg">Epics</TabsTrigger>
-          <TabsTrigger value="planning" className="rounded-lg">Plans & Backlog</TabsTrigger>
-          <TabsTrigger value="notes" className="rounded-lg">Notes</TabsTrigger>
+          <TabsTrigger value="overview" className="rounded-lg">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="sprints" className="rounded-lg">
+            Sprints
+          </TabsTrigger>
+          <TabsTrigger value="epics" className="rounded-lg">
+            Epics
+          </TabsTrigger>
+          <TabsTrigger value="planning" className="rounded-lg">
+            Plans & Backlog
+          </TabsTrigger>
+          <TabsTrigger value="notes" className="rounded-lg">
+            Notes
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">

@@ -3,8 +3,8 @@ import { BlockNoteView } from "@blocknote/mantine"
 import "@blocknote/core/fonts/inter.css"
 import "@blocknote/mantine/style.css"
 
-import PropTypes from 'prop-types'
-import { cn } from '@/lib/utils'
+import PropTypes from "prop-types"
+import { cn } from "@/lib/utils"
 
 export const NotionEditor = ({
   value,

@@ -25,11 +25,7 @@ describe("BoardFilters component", () => {
       { id: "3", assignee: { id: 10, name: "Alice" } },
     ]
     render(
-      <BoardFilters
-        filters={defaultFilters}
-        onChange={vi.fn()}
-        tasks={tasks}
-      />
+      <BoardFilters filters={defaultFilters} onChange={vi.fn()} tasks={tasks} />
     )
 
     // open assignee select menu

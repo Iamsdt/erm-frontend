@@ -134,11 +134,16 @@ export const EditProjectSidebar = ({
                 {/* Ongoing Project Toggle */}
                 <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/40">
                   <div className="space-y-0.5">
-                    <Label htmlFor="edit-ongoing" className="text-sm font-medium cursor-pointer">
+                    <Label
+                      htmlFor="edit-ongoing"
+                      className="text-sm font-medium cursor-pointer"
+                    >
                       Ongoing Project
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      {isOngoing ? "No end date - never-ending project" : "Project has a target date"}
+                      {isOngoing
+                        ? "No end date - never-ending project"
+                        : "Project has a target date"}
                     </p>
                   </div>
                   <Switch
@@ -224,11 +229,7 @@ export const EditProjectSidebar = ({
             >
               Cancel
             </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-            >
+            <Button type="button" variant="destructive" onClick={handleDelete}>
               Delete Project
             </Button>
           </DialogFooter>

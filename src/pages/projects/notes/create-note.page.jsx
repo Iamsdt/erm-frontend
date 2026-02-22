@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator"
 const CreateNotePage = () => {
   const { projectId } = useParams()
   const navigate = useNavigate()
-  
+
   const [title, setTitle] = useState("")
   const [content, setContent] = useState()
   const [coverImage, setCoverImage] = useState("")
@@ -26,19 +26,36 @@ const CreateNotePage = () => {
       {/* Top Navigation */}
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full hover:bg-muted">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="rounded-full hover:bg-muted"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <span className="hover:underline cursor-pointer" onClick={() => navigate('/projects')}>Projects</span>
+            <span
+              className="hover:underline cursor-pointer"
+              onClick={() => navigate("/projects")}
+            >
+              Projects
+            </span>
             <span>/</span>
-            <span className="hover:underline cursor-pointer" onClick={() => navigate(`/projects/${projectId}`)}>PRJ-{projectId}</span>
+            <span
+              className="hover:underline cursor-pointer"
+              onClick={() => navigate(`/projects/${projectId}`)}
+            >
+              PRJ-{projectId}
+            </span>
             <span>/</span>
             <span className="text-foreground">New Note</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" className="text-muted-foreground">Share</Button>
+          <Button variant="ghost" className="text-muted-foreground">
+            Share
+          </Button>
           <Button onClick={handleSave} className="gap-2 rounded-full px-6">
             <Save className="h-4 w-4" /> Publish
           </Button>
@@ -48,19 +65,39 @@ const CreateNotePage = () => {
       {/* Main Content Area */}
       <main className="flex-1 flex justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl w-full space-y-8">
-          
           {/* Cover Image Placeholder Space */}
           {coverImage ? (
             <div className="w-full h-64 rounded-xl overflow-hidden mb-8 group relative bg-muted">
-               <img src={coverImage} alt="Cover" className="w-full h-full object-cover" />
-               <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => setCoverImage("")}>Remove Cover</Button>
-                  <Button variant="secondary" size="sm">Change Cover</Button>
-               </div>
+              <img
+                src={coverImage}
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setCoverImage("")}
+                >
+                  Remove Cover
+                </Button>
+                <Button variant="secondary" size="sm">
+                  Change Cover
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="group flex gap-3 text-muted-foreground mb-4 opacity-60 hover:opacity-100 transition-opacity">
-              <Button variant="ghost" size="sm" className="h-8 gap-1" onClick={() => setCoverImage("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop")}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1"
+                onClick={() =>
+                  setCoverImage(
+                    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
+                  )
+                }
+              >
                 <Image className="h-4 w-4" /> Add cover
               </Button>
               <Button variant="ghost" size="sm" className="h-8 gap-1">
@@ -82,19 +119,19 @@ const CreateNotePage = () => {
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
-          
+
           <Separator className="my-8 opacity-50" />
 
           {/* Block Editor */}
           <div className="prose prose-lg dark:prose-invert max-w-none">
-             <NotionEditor 
-               value={content} 
-               onChange={setContent} 
-               placeholder="Press '/' for commands..." 
-               minHeight={400} 
-             />
+            <NotionEditor
+              value={content}
+              onChange={setContent}
+              placeholder="Press '/' for commands..."
+              minHeight={600}
+            />
           </div>
-          
+
           {/* Bottom spacer for comfortable scrolling */}
           <div className="h-64"></div>
         </div>

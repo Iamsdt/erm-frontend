@@ -20,7 +20,6 @@ import { Link } from "react-router"
 
 import AIInsightsPanel from "@/components/ai-insights-panel"
 import AnalyticsDashboard from "@/components/analytics-dashboard"
-import TaskModal from "@/components/task-modal"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -37,7 +36,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 
-import { CreateIssueSidebar } from "../projects/components/create-issue-sidebar"
+import { CreateIssueModal } from "../projects/components/create-issue-modal"
+import { IssueDetailsSidebar } from "../projects/components/issue-details-sidebar"
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -104,7 +104,24 @@ const TaskCard = ({ task, onClick, parentTitle }) => {
               {task.type}
             </Badge>
           ) : null}
+          {task.points && (
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+              {task.points} pts
+            </Badge>
+          )}
+          {task.endDate && (
+            <Badge
+              variant="outline"
+              className="text-[10px] px-1.5 py-0 text-orange-600 border-orange-200 bg-orange-50"
+            >
+              Due: {new Date(task.endDate).toLocaleDateString()}
+            </Badge>
+          )}
         </div>
+
+        {task.epic && (
+          <p className="text-xs text-muted-foreground">Epic: {task.epic}</p>
+        )}
 
         <div className="flex items-center justify-between pt-2 border-t border-border/50 mt-2">
           <div className="flex items-center gap-2">
@@ -170,7 +187,14 @@ TaskCard.defaultProps = {
 /**
  * KanbanColumn - Reusable kanban column with drop support.
  */
-const KanbanColumn = ({ title, tasks, allTasks, columnId, onTaskClick, projectMembers }) => {
+const KanbanColumn = ({
+  title,
+  tasks,
+  allTasks,
+  columnId,
+  onTaskClick,
+  projectMembers,
+}) => {
   return (
     <Droppable droppableId={columnId}>
       {(provided, snapshot) => (
@@ -191,15 +215,6 @@ const KanbanColumn = ({ title, tasks, allTasks, columnId, onTaskClick, projectMe
                 {tasks.length}
               </Badge>
             </div>
-            <CreateIssueSidebar
-              triggerText=""
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 text-muted-foreground hover:text-foreground"
-              defaultStatus={columnId}
-              tasks={allTasks}
-              projectMembers={projectMembers}
-            />
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto py-1 custom-scrollbar">
@@ -242,16 +257,6 @@ const KanbanColumn = ({ title, tasks, allTasks, columnId, onTaskClick, projectMe
             )}
             {provided.placeholder}
           </div>
-
-          <CreateIssueSidebar
-            triggerText="Add Task"
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-background/80 border border-transparent hover:border-border/50"
-            defaultStatus={columnId}
-            tasks={allTasks}
-            projectMembers={projectMembers}
-          />
         </div>
       )}
     </Droppable>
@@ -279,16 +284,14 @@ KanbanColumn.defaultProps = {
 /**
  * BoardFilters - Filter bar for type, priority, and assignee.
  */
-const BoardFilters = ({
-  filters,
-  onChange,
-  projectMembers,
-  tasks = [],
-}) => {
+const BoardFilters = ({ filters, onChange, projectMembers, tasks = [] }) => {
   const hasActiveFilters =
-    filters.type !== "all" || filters.priority !== "all" || filters.assignee !== "all"
+    filters.type !== "all" ||
+    filters.priority !== "all" ||
+    filters.assignee !== "all"
 
-  const handleClear = () => onChange?.({ type: "all", priority: "all", assignee: "all" })
+  const handleClear = () =>
+    onChange?.({ type: "all", priority: "all", assignee: "all" })
 
   const seen = new Set()
   const assignees = []
@@ -310,7 +313,10 @@ const BoardFilters = ({
         <span className="font-medium text-xs">Filters:</span>
       </div>
 
-      <Select value={filters.type} onValueChange={(v) => onChange({ ...filters, type: v })}>
+      <Select
+        value={filters.type}
+        onValueChange={(v) => onChange({ ...filters, type: v })}
+      >
         <SelectTrigger className="h-7 text-xs px-2 w-auto min-w-[90px] bg-background">
           <SelectValue placeholder="Type" />
         </SelectTrigger>
@@ -596,6 +602,8 @@ const SprintBoardUI = ({
 }) => {
   const [activeTab, setActiveTab] = useState("kanban")
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const [showCreateIssueModal, setShowCreateIssueModal] = useState(false)
+  const [parentIssueIdForSubtask, setParentIssueIdForSubtask] = useState(null)
 
   if (isLoading) {
     return (
@@ -688,6 +696,11 @@ const SprintBoardUI = ({
     }
   }
 
+  const handleCreateSubtask = (parentIssueId) => {
+    setParentIssueIdForSubtask(parentIssueId)
+    setShowCreateIssueModal(true)
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
       {/* Header Area */}
@@ -741,12 +754,10 @@ const SprintBoardUI = ({
                 </div>
               )}
             </div>
-            <CreateIssueSidebar
+            <CreateIssueModal
               triggerText="Create Issue"
               variant="default"
               size="default"
-              tasks={tasks}
-              projectMembers={project.members || []}
             />
           </div>
         </div>
@@ -876,16 +887,22 @@ const SprintBoardUI = ({
         )}
       </div>
 
-      {/* Task Modal */}
-      <TaskModal
-        isOpen={!!selectedTask}
-        task={selectedTask}
-        projectId={project?.id}
-        sprintId={sprintId}
-        onClose={() => onSelectTask?.(null)}
-        onSave={onSaveTask}
-        isLoading={isSavingTask}
-        projectMembers={project?.members || []}
+      {/* Issue Details Sidebar */}
+      <IssueDetailsSidebar
+        issue={selectedTask}
+        open={!!selectedTask}
+        onOpenChange={(open) => {
+          if (!open) onSelectTask?.(null)
+        }}
+        onEdit={(issue) => {
+          console.log("Edit issue:", issue)
+          // TODO: Open edit issue modal/sidebar
+        }}
+        onDelete={(issueId) => {
+          console.log("Delete issue:", issueId)
+          // TODO: Delete issue
+        }}
+        onCreateSubtask={handleCreateSubtask}
       />
     </div>
   )

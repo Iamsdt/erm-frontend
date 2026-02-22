@@ -47,18 +47,25 @@ export const CreateIssueModal = ({
   variant = "outline",
   size = "sm",
   className = "",
+  parentIssueId = undefined,
+  open = undefined,
+  onOpenChange = undefined,
 }) => {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : internalOpen
+  const setIsOpen = isControlled ? onOpenChange : setInternalOpen
+
   const [issueType, setIssueType] = useState("story")
 
   const handleSubmit = (e) => {
     e.preventDefault()
     // Handle form submission
-    setOpen(false)
+    setIsOpen(false)
   }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button variant={variant} size={size} className={`gap-2 ${className}`}>
           <Plus className="h-4 w-4" /> {triggerText}
@@ -68,10 +75,13 @@ export const CreateIssueModal = ({
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <SheetHeader className="pb-4 border-b">
             <SheetTitle className="flex items-center gap-2">
-              <IssueTypeIcon type={issueType} /> Create {issueType.charAt(0).toUpperCase() + issueType.slice(1)}
+              <IssueTypeIcon type={issueType} /> Create{" "}
+              {parentIssueId ? "Subtask" : issueType.charAt(0).toUpperCase() + issueType.slice(1)}
             </SheetTitle>
             <SheetDescription>
-              Add a new {issueType} to your project backlog or active sprint.
+              {parentIssueId
+                ? "Create a subtask for the selected issue."
+                : `Add a new ${issueType} to your project backlog or active sprint.`}
             </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto py-4 space-y-5 pr-2">
@@ -84,16 +94,24 @@ export const CreateIssueModal = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="epic">
-                      <div className="flex items-center gap-2"><IssueTypeIcon type="epic" /> Epic</div>
+                      <div className="flex items-center gap-2">
+                        <IssueTypeIcon type="epic" /> Epic
+                      </div>
                     </SelectItem>
                     <SelectItem value="story">
-                      <div className="flex items-center gap-2"><IssueTypeIcon type="story" /> Story</div>
+                      <div className="flex items-center gap-2">
+                        <IssueTypeIcon type="story" /> Story
+                      </div>
                     </SelectItem>
                     <SelectItem value="task">
-                      <div className="flex items-center gap-2"><IssueTypeIcon type="task" /> Task</div>
+                      <div className="flex items-center gap-2">
+                        <IssueTypeIcon type="task" /> Task
+                      </div>
                     </SelectItem>
                     <SelectItem value="bug">
-                      <div className="flex items-center gap-2"><IssueTypeIcon type="bug" /> Bug</div>
+                      <div className="flex items-center gap-2">
+                        <IssueTypeIcon type="bug" /> Bug
+                      </div>
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -129,6 +147,26 @@ export const CreateIssueModal = ({
               />
             </div>
 
+            {/* Start and End Dates */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Start Date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  placeholder="Select start date"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endDate">End Date / Deadline</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  placeholder="Select end date"
+                />
+              </div>
+            </div>
+
             {/* Dynamic Fields based on Type */}
             {issueType === "epic" && (
               <div className="space-y-2 border-l-4 border-purple-500 pl-4 bg-purple-500/5 p-3 rounded-r-md">
@@ -143,20 +181,25 @@ export const CreateIssueModal = ({
 
             {issueType === "story" && (
               <div className="space-y-4 border-l-4 border-green-500 pl-4 bg-green-500/5 p-3 rounded-r-md">
-                 <div className="space-y-2">
+                <div className="space-y-2">
                   <Label htmlFor="acceptance">Acceptance Criteria</Label>
                   <Textarea
                     id="acceptance"
                     placeholder="- Given... When... Then..."
                     className="min-h-[100px]"
                   />
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="points">Story Points</Label>
-                    <Input id="points" type="number" placeholder="e.g. 5, 8, 13" min="0" />
+                    <Input
+                      id="points"
+                      type="number"
+                      placeholder="e.g. 5, 8, 13"
+                      min="0"
+                    />
                   </div>
-                 </div>
+                </div>
               </div>
             )}
 
@@ -164,27 +207,35 @@ export const CreateIssueModal = ({
               <div className="grid grid-cols-2 gap-4 border-l-4 border-blue-500 pl-4 bg-blue-500/5 p-3 rounded-r-md">
                 <div className="space-y-2">
                   <Label htmlFor="estimate">Original Estimate (h)</Label>
-                  <Input id="estimate" type="number" placeholder="e.g. 4" min="0" />
+                  <Input
+                    id="estimate"
+                    type="number"
+                    placeholder="e.g. 4"
+                    min="0"
+                  />
                 </div>
               </div>
             )}
 
-             {issueType === "bug" && (
+            {issueType === "bug" && (
               <div className="space-y-4 border-l-4 border-red-500 pl-4 bg-red-500/5 p-3 rounded-r-md">
-                 <div className="space-y-2">
+                <div className="space-y-2">
                   <Label htmlFor="reproduction">Steps to Reproduce</Label>
                   <Textarea
                     id="reproduction"
                     placeholder="1. Go to...&#10;2. Click on...&#10;3. See error..."
                     className="min-h-[80px]"
                   />
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="environment">Environment</Label>
-                    <Input id="environment" placeholder="e.g. Production, QA, Chrome" />
+                    <Input
+                      id="environment"
+                      placeholder="e.g. Production, QA, Chrome"
+                    />
                   </div>
-                 </div>
+                </div>
               </div>
             )}
 
@@ -216,21 +267,20 @@ export const CreateIssueModal = ({
                 </Select>
               </div>
             </div>
-            
-             <div className="space-y-2">
-                <Label htmlFor="sprint">Sprint</Label>
-                <Select>
-                  <SelectTrigger id="sprint">
-                    <SelectValue placeholder="Backlog" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="backlog">Backlog</SelectItem>
-                    <SelectItem value="s1">Active Sprint (Sprint 1)</SelectItem>
-                    <SelectItem value="s2">Sprint 2</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
+
+            <div className="space-y-2">
+              <Label htmlFor="sprint">Sprint</Label>
+              <Select>
+                <SelectTrigger id="sprint">
+                  <SelectValue placeholder="Backlog" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="backlog">Backlog</SelectItem>
+                  <SelectItem value="s1">Active Sprint (Sprint 1)</SelectItem>
+                  <SelectItem value="s2">Sprint 2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <SheetFooter className="mt-4 pt-4 border-t shrink-0">
             <Button
@@ -253,6 +303,9 @@ CreateIssueModal.propTypes = {
   variant: PropTypes.string,
   size: PropTypes.string,
   className: PropTypes.string,
+  parentIssueId: PropTypes.string,
+  open: PropTypes.bool,
+  onOpenChange: PropTypes.func,
 }
 
 CreateIssueModal.defaultProps = {
@@ -260,4 +313,7 @@ CreateIssueModal.defaultProps = {
   variant: "outline",
   size: "sm",
   className: "",
+  parentIssueId: undefined,
+  open: undefined,
+  onOpenChange: undefined,
 }

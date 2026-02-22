@@ -74,13 +74,17 @@ export const CreateSprintModal = ({ projectId = null }) => {
 
   const toggleEpic = (epicId) => {
     setSelectedEpics((prev) =>
-      prev.includes(epicId) ? prev.filter((id) => id !== epicId) : [...prev, epicId]
+      prev.includes(epicId)
+        ? prev.filter((id) => id !== epicId)
+        : [...prev, epicId]
     )
   }
 
   const toggleTask = (taskId) => {
     setSelectedTasks((prev) =>
-      prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
+      prev.includes(taskId)
+        ? prev.filter((id) => id !== taskId)
+        : [...prev, taskId]
     )
   }
 
@@ -107,12 +111,16 @@ export const CreateSprintModal = ({ projectId = null }) => {
           <Plus className="h-4 w-4" /> Create Sprint
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-2xl flex flex-col p-0">
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-2xl flex flex-col p-0"
+      >
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <SheetHeader className="px-6 py-4 border-b sticky top-0">
             <SheetTitle>Create Sprint</SheetTitle>
             <SheetDescription>
-              Plan a new sprint for your project. Set a goal, timeline, and add epics and tasks.
+              Plan a new sprint for your project. Set a goal, timeline, and add
+              epics and tasks.
             </SheetDescription>
           </SheetHeader>
 
@@ -147,7 +155,9 @@ export const CreateSprintModal = ({ projectId = null }) => {
                     id="startDate"
                     type="date"
                     value={formData.startDate}
-                    onChange={(e) => handleFormChange("startDate", e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange("startDate", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -157,7 +167,9 @@ export const CreateSprintModal = ({ projectId = null }) => {
                     id="endDate"
                     type="date"
                     value={formData.endDate}
-                    onChange={(e) => handleFormChange("endDate", e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange("endDate", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -197,7 +209,10 @@ export const CreateSprintModal = ({ projectId = null }) => {
                         >
                           {epic.title}
                         </Label>
-                        <Badge variant="secondary" className="text-xs ml-0 mt-1">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs ml-0 mt-1"
+                        >
                           {epic.status}
                         </Badge>
                       </div>
@@ -247,7 +262,11 @@ export const CreateSprintModal = ({ projectId = null }) => {
                             {task.points} pts
                           </Badge>
                           <Badge
-                            variant={task.priority === "High" ? "destructive" : "outline"}
+                            variant={
+                              task.priority === "High"
+                                ? "destructive"
+                                : "outline"
+                            }
                             className="text-xs"
                           >
                             {task.priority}

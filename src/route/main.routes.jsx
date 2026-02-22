@@ -39,7 +39,9 @@ const Projects = lazy(() => import("@pages/projects"))
 const ProjectDetails = lazy(() => import("@pages/projects/project-details"))
 const SprintBoard = lazy(() => import("@pages/sprint-board"))
 const ProjectSettings = lazy(() => import("@pages/projects/project-settings"))
-const CreateNotePage = lazy(() => import("@pages/projects/notes/create-note.page"))
+const CreateNotePage = lazy(
+  () => import("@pages/projects/notes/create-note.page")
+)
 
 // Daily Update pages
 const DailyStandupPage = lazy(() => import("@pages/daily-update/standup"))

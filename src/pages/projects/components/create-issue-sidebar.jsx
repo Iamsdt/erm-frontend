@@ -256,7 +256,9 @@ export const CreateIssueSidebar = ({
                 id="issue-description"
                 placeholder="Add more details, acceptance criteria, or context..."
                 value={formData.description}
-                onChange={(event) => handleChange("description", event.target.value)}
+                onChange={(event) =>
+                  handleChange("description", event.target.value)
+                }
                 className="min-h-[120px] resize-none"
               />
             </div>
