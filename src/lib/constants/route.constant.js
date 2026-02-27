@@ -35,6 +35,18 @@ const routes = {
     SETTINGS: "/projects/:projectId/settings",
     NOTE_CREATE: "/projects/:projectId/notes/new",
   },
+  profile: {
+    MY_PROFILE: "/profile",
+  },
+  settings: {
+    INDEX: "/settings",
+  },
+  policy: {
+    INDEX: "/policy",
+  },
+  rewards: {
+    INDEX: "/rewards",
+  },
 }
 
 export default routes

@@ -54,6 +54,14 @@ const AIInsightsPage = lazy(() => import("@pages/ai/insights"))
 const AIRecommendationsPage = lazy(() => import("@pages/ai/recommendations"))
 const AIAnalyticsPage = lazy(() => import("@pages/ai/analytics"))
 
+// Notifications
+const NotificationsPage = lazy(() => import("@pages/notifications"))
+
+// Profile, Policy, Rewards
+const ProfilePage = lazy(() => import("@pages/profile"))
+const PolicyPage = lazy(() => import("@pages/policy"))
+const RewardsPage = lazy(() => import("@pages/rewards"))
+
 const leaveGuard = (element, allowedRoles) => (
   <LeaveRoleGuard allowedRoles={allowedRoles}>{element}</LeaveRoleGuard>
 )
@@ -191,6 +199,30 @@ const mainRoutes = [
   {
     path: "/ai/analytics",
     element: <AIAnalyticsPage />,
+  },
+
+  // Notifications
+  {
+    path: "/notifications",
+    element: <NotificationsPage />,
+  },
+
+  // Profile & Settings (merged)
+  {
+    path: ct.route.profile.MY_PROFILE,
+    element: <ProfilePage />,
+  },
+
+  // Policy Management (admin)
+  {
+    path: ct.route.policy.INDEX,
+    element: empGuard(<PolicyPage />),
+  },
+
+  // Rewards
+  {
+    path: ct.route.rewards.INDEX,
+    element: <RewardsPage />,
   },
 ]
 

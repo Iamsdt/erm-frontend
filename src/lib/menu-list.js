@@ -1,13 +1,12 @@
 import {
-  Users,
-  Settings,
   SquarePen,
   LayoutGrid,
   Clock,
   ClipboardList,
   FolderOpen,
+  Award,
+  FileText,
 } from "lucide-react"
-import { useSelector } from "react-redux"
 
 import ct from "@constants/"
 
@@ -127,25 +126,25 @@ const getAttendanceAdminMenuGroup = (pathname) => ({
 })
 
 /**
- * Returns the settings menu group configuration.
+ * Returns the rewards menu group for admin users.
  * @param {string} pathname - The current pathname.
- * @returns {object} The settings menu group object.
+ * @returns {object} The rewards menu group object.
  */
-const getSettingsMenuGroup = (pathname) => ({
-  groupLabel: "Settings",
+const getRewardsMenuGroup = (pathname) => ({
+  groupLabel: "Recognition",
   menus: [
     {
-      href: "/users",
-      label: "Users",
-      active: pathname.includes("/users"),
-      icon: Users,
+      href: ct.route.rewards.INDEX,
+      label: "Rewards",
+      active: pathname.startsWith(ct.route.rewards.INDEX),
+      icon: Award,
       submenus: [],
     },
     {
-      href: "/account",
-      label: "Account",
-      active: pathname.includes("/account"),
-      icon: Settings,
+      href: ct.route.policy.INDEX,
+      label: "Policies",
+      active: pathname.startsWith(ct.route.policy.INDEX),
+      icon: FileText,
       submenus: [],
     },
   ],
@@ -180,7 +179,7 @@ export const getMenuList = (pathname) => [
   getAttendanceMenuGroup(pathname),
   getAttendanceAdminMenuGroup(pathname),
   getProjectMenuGroup(pathname),
-  getSettingsMenuGroup(pathname),
+  getRewardsMenuGroup(pathname),
 ]
 
 /**

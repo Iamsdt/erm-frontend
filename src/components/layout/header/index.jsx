@@ -8,6 +8,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import ct from "@constants/"
 
 import LanguageNav from "./language-nav"
+import NotificationNav from "./notification-nav"
 import UserNav from "./user-nav"
 
 const Navbar = () => {
@@ -54,6 +55,7 @@ const Navbar = () => {
               Clock IN
             </Link>
           </Button>
+          <NotificationNav />
           <LanguageNav />
           <ModeToggle />
           <UserNav />

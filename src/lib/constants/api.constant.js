@@ -50,5 +50,27 @@ const apiConstant = {
     tasks: (projectId, sprintId) =>
       `projects/${projectId}/sprints/${sprintId}/tasks/`,
   },
+  profile: {
+    me: "profile/me/",
+    update: "profile/me/",
+    changePassword: "profile/change-password/",
+  },
+  settings: {
+    get: "settings/",
+    update: "settings/",
+  },
+  policy: {
+    list: "policies/",
+    create: "policies/",
+    detail: "policies", // append /{id}/
+    update: "policies", // append /{id}/
+    delete: "policies", // append /{id}/
+  },
+  rewards: {
+    list: "rewards/",
+    create: "rewards/",
+    detail: "rewards", // append /{id}/
+    myRewards: "rewards/my/",
+  },
 }
 export default apiConstant
