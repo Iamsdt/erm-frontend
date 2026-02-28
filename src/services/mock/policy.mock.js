@@ -9,6 +9,8 @@ let policies = [
         content:
             "Employees may work remotely up to 3 days per week with manager approval. All remote work must comply with data security standards.",
         category: "hr",
+        shareScope: "team",
+        specificAccess: "",
         effectiveDate: "2024-01-01",
         createdAt: "2023-12-15T10:00:00Z",
         updatedAt: "2024-01-01T08:00:00Z",
@@ -19,6 +21,8 @@ let policies = [
         content:
             "All employees are expected to maintain a professional and respectful workplace. Harassment and discrimination of any kind are not tolerated.",
         category: "general",
+        shareScope: "public",
+        specificAccess: "",
         effectiveDate: "2023-03-01",
         createdAt: "2023-02-10T09:00:00Z",
         updatedAt: "2023-03-01T08:00:00Z",
@@ -29,6 +33,8 @@ let policies = [
         content:
             "Full-time employees are entitled to 20 days of annual leave per year. Leave must be requested at least 5 working days in advance.",
         category: "leave",
+        shareScope: "team",
+        specificAccess: "",
         effectiveDate: "2024-01-01",
         createdAt: "2023-11-20T11:00:00Z",
         updatedAt: "2024-01-01T08:00:00Z",
@@ -39,6 +45,8 @@ let policies = [
         content:
             "All company data must be handled securely. Employees must use strong passwords, enable 2FA, and not share credentials. Security incidents must be reported immediately.",
         category: "security",
+        shareScope: "specific",
+        specificAccess: "security-team@company.com",
         effectiveDate: "2023-06-01",
         createdAt: "2023-05-01T10:00:00Z",
         updatedAt: "2023-06-01T08:00:00Z",
@@ -73,6 +81,9 @@ const policyHandlers = [
             title: body.title ?? "",
             content: body.content ?? "",
             category: body.category ?? "general",
+            shareScope: body.shareScope ?? "team",
+            specificAccess:
+                body.shareScope === "specific" ? (body.specificAccess ?? "") : "",
             effectiveDate: body.effectiveDate ?? now.split("T")[0],
             createdAt: now,
             updatedAt: now,

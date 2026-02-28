@@ -56,6 +56,18 @@ const CATEGORY_META = {
   general: { label: "General", variant: "outline", icon: FileText },
 }
 
+const SHARE_SCOPES = [
+  { value: "team", label: "Team" },
+  { value: "public", label: "Public" },
+  { value: "specific", label: "Specific" },
+]
+
+const SHARE_SCOPE_LABELS = {
+  team: "Team",
+  public: "Public",
+  specific: "Specific",
+}
+
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 const PolicyCardSkeleton = () => (
@@ -82,6 +94,8 @@ const PolicyForm = ({ initial, onSubmit, onClose, isLoading, title }) => {
     content: initial?.content ?? "",
     category: initial?.category ?? "general",
     effectiveDate: initial?.effectiveDate ?? "",
+    shareScope: initial?.shareScope ?? "team",
+    specificAccess: initial?.specificAccess ?? "",
   })
 
   const handleChange = (event) => {
@@ -93,7 +107,10 @@ const PolicyForm = ({ initial, onSubmit, onClose, isLoading, title }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    onSubmit(form)
+    onSubmit({
+      ...form,
+      specificAccess: form.shareScope === "specific" ? form.specificAccess : "",
+    })
   }
 
   return (
@@ -144,6 +161,41 @@ const PolicyForm = ({ initial, onSubmit, onClose, isLoading, title }) => {
               onChange={handleChange}
             />
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="p-share-scope">Share Setting</Label>
+            <Select
+              value={form.shareScope}
+              onValueChange={(value) =>
+                setForm((previous) => ({ ...previous, shareScope: value }))
+              }
+            >
+              <SelectTrigger id="p-share-scope">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SHARE_SCOPES.map((scope) => (
+                  <SelectItem key={scope.value} value={scope.value}>
+                    {scope.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {form.shareScope === "specific" && (
+            <div className="space-y-1.5">
+              <Label htmlFor="p-specific-access">
+                Specific Access (emails or usernames)
+              </Label>
+              <Input
+                id="p-specific-access"
+                name="specificAccess"
+                value={form.specificAccess}
+                onChange={handleChange}
+                placeholder="e.g. alex@company.com, priya@company.com"
+                required
+              />
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label htmlFor="p-content">Content</Label>
             <Textarea
@@ -231,6 +283,7 @@ const PolicyCard = ({ policy, onEdit, onDelete, isDeleting }) => {
         day: "numeric",
       })
     : null
+  const shareScopeLabel = SHARE_SCOPE_LABELS[policy.shareScope] ?? "Team"
 
   return (
     <>
@@ -252,11 +305,16 @@ const PolicyCard = ({ policy, onEdit, onDelete, isDeleting }) => {
           </p>
         </CardContent>
         <CardFooter className="flex items-center justify-between pt-2">
-          <p className="text-xs text-muted-foreground">
-            {effectiveDate
-              ? `Effective: ${effectiveDate}`
-              : "No effective date"}
-          </p>
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">
+              {effectiveDate
+                ? `Effective: ${effectiveDate}`
+                : "No effective date"}
+            </p>
+            <Badge variant="outline" className="text-[10px] h-5">
+              Share: {shareScopeLabel}
+            </Badge>
+          </div>
           <div className="flex gap-1">
             <Button
               variant="ghost"

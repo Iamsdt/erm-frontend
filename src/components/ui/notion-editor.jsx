@@ -4,6 +4,7 @@ import "@blocknote/core/fonts/inter.css"
 import "@blocknote/mantine/style.css"
 
 import PropTypes from "prop-types"
+import { useTheme } from "@context/theme-provider"
 import { cn } from "@/lib/utils"
 
 export const NotionEditor = ({
@@ -13,6 +14,15 @@ export const NotionEditor = ({
   className,
   minHeight,
 }) => {
+  const { theme } = useTheme()
+
+  const resolvedTheme =
+    theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : theme
+
   // Creates a new editor instance.
   // We use initialContent if a value exists, otherwise it starts empty.
   const editor = useCreateBlockNote({
@@ -33,7 +43,7 @@ export const NotionEditor = ({
           // Pass the array of top-level blocks to the parent
           onChange?.(editor.document)
         }}
-        theme="system"
+        theme={resolvedTheme}
       />
     </div>
   )

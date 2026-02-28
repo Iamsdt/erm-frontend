@@ -4,7 +4,15 @@ import { useNavigate, useParams } from "react-router"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { NotionEditor } from "@/components/ui/notion-editor"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 
 const CreateNotePage = () => {
@@ -14,10 +22,18 @@ const CreateNotePage = () => {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState()
   const [coverImage, setCoverImage] = useState("")
+  const [shareScope, setShareScope] = useState("team")
+  const [specificAccess, setSpecificAccess] = useState("")
 
   const handleSave = () => {
     // Save logic here
-    console.log("Saving note:", { title, content, coverImage })
+    console.log("Saving note:", {
+      title,
+      content,
+      coverImage,
+      shareScope,
+      specificAccess: shareScope === "specific" ? specificAccess : "",
+    })
     navigate(`/projects/${projectId}`)
   }
 
@@ -53,9 +69,19 @@ const CreateNotePage = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" className="text-muted-foreground">
-            Share
-          </Button>
+          <Select value={shareScope} onValueChange={setShareScope}>
+            <SelectTrigger
+              className="w-35 h-9"
+              aria-label="Share setting"
+            >
+              <SelectValue placeholder="Share setting" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="team">Team</SelectItem>
+              <SelectItem value="public">Public</SelectItem>
+              <SelectItem value="specific">Specific</SelectItem>
+            </SelectContent>
+          </Select>
           <Button onClick={handleSave} className="gap-2 rounded-full px-6">
             <Save className="h-4 w-4" /> Publish
           </Button>
@@ -65,6 +91,20 @@ const CreateNotePage = () => {
       {/* Main Content Area */}
       <main className="flex-1 flex justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl w-full space-y-8">
+          {shareScope === "specific" && (
+            <div className="space-y-2 rounded-lg border bg-card p-4">
+              <Label htmlFor="note-specific-access">
+                Specific Access (emails or usernames)
+              </Label>
+              <Input
+                id="note-specific-access"
+                value={specificAccess}
+                onChange={(event) => setSpecificAccess(event.target.value)}
+                placeholder="e.g. alex@company.com, priya@company.com"
+              />
+            </div>
+          )}
+
           {/* Cover Image Placeholder Space */}
           {coverImage ? (
             <div className="w-full h-64 rounded-xl overflow-hidden mb-8 group relative bg-muted">
@@ -113,6 +153,7 @@ const CreateNotePage = () => {
           <div className="mb-8">
             <input
               type="text"
+              name="title"
               placeholder="Untitled Document"
               className="w-full text-5xl font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground/30 resize-none overflow-hidden"
               value={title}

@@ -32,6 +32,8 @@ export const getPolicy = async (id, { signal } = {}) => {
  * @param {string} payload.title - Policy title
  * @param {string} payload.content - Policy content / body
  * @param {string} payload.category - Category (hr | security | leave | general)
+ * @param {string} [payload.shareScope] - Share setting (team | public | specific)
+ * @param {string} [payload.specificAccess] - Comma-separated users/emails for specific sharing
  * @param {string} [payload.effectiveDate] - Effective date ISO string
  * @returns {Promise} API response with created policy
  */
