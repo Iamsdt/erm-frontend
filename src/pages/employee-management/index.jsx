@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 
 import { toast } from "@/components/ui/use-toast"
-import { resetPassword } from "@/lib/firebase"
+import useDebounce from "@/hooks/use-debounce"
 import {
   useDeleteEmployee,
   useFetchEmployees,
@@ -9,25 +9,28 @@ import {
 
 import EmployeeListUI from "./employee-list.ui"
 
+import { resetPassword } from "@/lib/firebase"
+
 /**
  * EmployeeList container — fetches the employee list and handles search/delete.
  */
 const EmployeeList = () => {
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search, 300)
 
   const { data, isLoading, isError, error } = useFetchEmployees()
   const { mutate: deleteEmployee } = useDeleteEmployee()
 
   const employees = useMemo(() => {
     const list = data?.employees ?? []
-    if (!search.trim()) return list
-    const lower = search.toLowerCase()
+    if (!debouncedSearch.trim()) return list
+    const lower = debouncedSearch.toLowerCase()
     return list.filter(
       (employee) =>
         employee.name.toLowerCase().includes(lower) ||
         employee.email.toLowerCase().includes(lower)
     )
-  }, [data, search])
+  }, [data, debouncedSearch])
 
   const handleSendInvite = async (email) => {
     try {

@@ -184,7 +184,10 @@ const HistoryUI = ({
             value={year}
             onChange={(event) => onYearChange(Number(event.target.value))}
           >
-            {[2024, 2025, 2026].map((y) => (
+            {Array.from(
+              { length: 3 },
+              (_, index) => new Date().getFullYear() - 2 + index
+            ).map((y) => (
               <option key={y} value={y}>
                 {y}
               </option>

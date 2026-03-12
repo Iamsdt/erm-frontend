@@ -1,11 +1,14 @@
 import { Bell } from "lucide-react"
+import { useSelector } from "react-redux"
 import { Link } from "react-router"
 
 import { Button } from "@/components/ui/button"
+import ct from "@constants/"
 
 const NotificationNav = () => {
-  // In a real app, this would come from a store or API
-  const unreadCount = 2
+  const unreadCount = useSelector(
+    (state) => state[ct.store.APP_STORE].notificationCount
+  )
 
   return (
     <Button variant="ghost" size="icon" asChild className="relative">

@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react"
 import PropTypes from "prop-types"
+import { useState } from "react"
 import { Link } from "react-router-dom"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -23,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import ConfirmDialog from "@/components/ui/confirm-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -176,9 +178,18 @@ EmployeeRow.propTypes = {
  * @param {boolean} props.isLoading - Whether the employee data is currently loading.
  * @param {boolean} props.isError - Whether there was an error loading the employee data.
  * @param {Array} props.employees - The array of employee objects to display.
+ * @param {boolean} props.hasSearch - Whether a search query is currently active.
  * @param {(id: string) => void} props.onDelete - Callback function to call when an employee is deleted, receives the employee ID as an argument.
+ * @param {(email: string) => void} props.onSendInvite - Callback function to send an invite email.
  */
-const EmployeeListContent = ({ isLoading, isError, employees, onDelete, onSendInvite }) => {
+const EmployeeListContent = ({
+  isLoading,
+  isError,
+  employees,
+  hasSearch,
+  onDelete,
+  onSendInvite,
+}) => {
   if (isError) {
     return (
       <p className="px-4 py-6 text-sm text-center text-destructive">
@@ -197,13 +208,18 @@ const EmployeeListContent = ({ isLoading, isError, employees, onDelete, onSendIn
   if (employees?.length === 0) {
     return (
       <p className="px-4 py-10 text-sm text-center text-muted-foreground">
-        No employees found.
+        {hasSearch ? "No employees match your search." : "No employees found."}
       </p>
     )
   }
 
   return employees?.map((emp) => (
-    <EmployeeRow key={emp.id} employee={emp} onDelete={onDelete} onSendInvite={onSendInvite} />
+    <EmployeeRow
+      key={emp.id}
+      employee={emp}
+      onDelete={onDelete}
+      onSendInvite={onSendInvite}
+    />
   ))
 }
 
@@ -211,6 +227,7 @@ EmployeeListContent.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   employees: PropTypes.array.isRequired,
+  hasSearch: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
   onSendInvite: PropTypes.func.isRequired,
 }
@@ -227,6 +244,8 @@ const EmployeeListUI = ({
   onSendInvite,
   onDelete,
 }) => {
+  const [pendingDeleteId, setPendingDeleteId] = useState(null)
+
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
@@ -304,11 +323,22 @@ const EmployeeListUI = ({
             isLoading={isLoading}
             isError={isError}
             employees={employees}
-            onDelete={onDelete}
+            hasSearch={Boolean(search.trim())}
+            onDelete={setPendingDeleteId}
             onSendInvite={onSendInvite}
           />
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={Boolean(pendingDeleteId)}
+        onOpenChange={(open) => !open && setPendingDeleteId(null)}
+        title="Remove employee?"
+        description="This action cannot be undone. The employee record will be permanently deleted."
+        confirmLabel="Remove"
+        onConfirm={() => onDelete(pendingDeleteId)}
+        isDestructive
+      />
     </div>
   )
 }

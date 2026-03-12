@@ -7,19 +7,11 @@ import {
   useEditAttendanceEntry,
   useFlagAttendanceEntry,
 } from "@query/attendance.query"
+import { useFetchEmployees } from "@query/employee-management.query"
 
 import AdminLogsUI from "./logs.ui"
 
 const PAGE_SIZE = 20
-
-/** Known employees list — in production you'd query the employees API instead. */
-const KNOWN_EMPLOYEES = [
-  { id: 1, name: "Jane Smith" },
-  { id: 2, name: "Bob Jones" },
-  { id: 3, name: "Alice Chen" },
-  { id: 4, name: "David Kim" },
-  { id: 5, name: "Sara Patel" },
-]
 
 const DEFAULT_FILTERS = { status: "ALL", date: "" }
 
@@ -40,6 +32,12 @@ const AdminLogs = () => {
   const { data: logsData, isLoading } = useAdminAttendanceLogs(activeFilters)
   const logs = logsData?.results ?? []
   const totalCount = logsData?.count ?? 0
+
+  const { data: employeesData } = useFetchEmployees()
+  const employees = (employeesData?.employees ?? []).map((emp) => ({
+    id: emp.id,
+    name: emp.name,
+  }))
 
   const handleFilterChange = (key, value) => {
     setFilters((previous) => ({ ...previous, [key]: value }))
@@ -147,7 +145,7 @@ const AdminLogs = () => {
       onManualOpen={() => setManualOpen(true)}
       onManualClose={() => setManualOpen(false)}
       onManualSave={handleManualSave}
-      employees={KNOWN_EMPLOYEES}
+      employees={employees}
       // view
       viewEntry={viewEntry}
       onViewOpen={handleViewOpen}

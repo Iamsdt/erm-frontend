@@ -7,10 +7,12 @@ import {
   Users,
 } from "lucide-react"
 import PropTypes from "prop-types"
+import { useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import ConfirmDialog from "@/components/ui/confirm-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -431,45 +433,59 @@ const DepartmentListUI = ({
   onEdit,
   onDelete,
   onNew,
-}) => (
-  <div className="space-y-6 p-6">
-    {/* Header */}
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Departments</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Manage your organisation&apos;s departments
-        </p>
+}) => {
+  const [pendingDeleteId, setPendingDeleteId] = useState(null)
+
+  return (
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Departments</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Manage your organisation&apos;s departments
+          </p>
+        </div>
+        <Button size="sm" onClick={onNew}>
+          <Plus className="mr-1.5 h-4 w-4" />
+          New Department
+        </Button>
       </div>
-      <Button size="sm" onClick={onNew}>
-        <Plus className="mr-1.5 h-4 w-4" />
-        New Department
-      </Button>
+
+      {/* Stats */}
+      <DeptStatsCards isLoading={isLoading} stats={stats} />
+
+      {/* Grid */}
+      <DeptGridSection
+        isLoading={isLoading}
+        isError={isError}
+        departments={departments}
+        onEdit={onEdit}
+        onDelete={setPendingDeleteId}
+      />
+
+      {/* Add / Edit Sheet */}
+      <DeptSheet
+        open={sheetOpen}
+        onOpenChange={onSheetOpenChange}
+        form={form}
+        onSubmit={onSubmit}
+        isSubmitting={isSubmitting}
+        editingDept={editingDept}
+      />
+
+      <ConfirmDialog
+        open={Boolean(pendingDeleteId)}
+        onOpenChange={(open) => !open && setPendingDeleteId(null)}
+        title="Delete department?"
+        description="This action cannot be undone. All employees in this department will be unassigned."
+        confirmLabel="Delete"
+        onConfirm={() => onDelete(pendingDeleteId)}
+        isDestructive
+      />
     </div>
-
-    {/* Stats */}
-    <DeptStatsCards isLoading={isLoading} stats={stats} />
-
-    {/* Grid */}
-    <DeptGridSection
-      isLoading={isLoading}
-      isError={isError}
-      departments={departments}
-      onEdit={onEdit}
-      onDelete={onDelete}
-    />
-
-    {/* Add / Edit Sheet */}
-    <DeptSheet
-      open={sheetOpen}
-      onOpenChange={onSheetOpenChange}
-      form={form}
-      onSubmit={onSubmit}
-      isSubmitting={isSubmitting}
-      editingDept={editingDept}
-    />
-  </div>
-)
+  )
+}
 
 DepartmentListUI.propTypes = {
   departments: PropTypes.array.isRequired,

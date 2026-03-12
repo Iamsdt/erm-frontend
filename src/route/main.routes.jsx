@@ -7,7 +7,6 @@ import ct from "@constants/"
 
 // Lazy load route components for code splitting
 const Dashboard = lazy(() => import("@pages/dashboard"))
-const Comments = lazy(() => import("@pages/comments"))
 const LeaveCalendar = lazy(() => import("@pages/leave-dashboard"))
 const AdminDashboard = lazy(() => import("@pages/leave-admin"))
 const ApprovalsPage = lazy(() => import("@pages/leave-admin/approvals"))
@@ -79,7 +78,6 @@ const attendanceGuard = (element, allowedRoles) => (
 
 const mainRoutes = [
   { path: ct.route.ROOT, element: <Dashboard /> },
-  { path: "/comments", element: <Comments /> },
   { path: ct.route.leave.CALENDAR, element: <LeaveCalendar /> },
 
   // Leave — admin-only routes
