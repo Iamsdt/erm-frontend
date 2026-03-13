@@ -1,19 +1,27 @@
 import { useQuery, useMutation } from "@tanstack/react-query"
 
+import { toast } from "@/components/ui/use-toast"
+
 import {
   getProjectById,
   getProjects,
   getSprints,
   getTasks,
   getTaskById,
+  createTask,
   updateTask,
+  deleteTask,
   addTaskComment,
+  getProjectSettings,
+  updateProjectSettings,
   getAIInsights,
   getWorkflows,
   getWorkflowById,
   updateWorkflow,
   getSprintAnalytics,
 } from "../api/project.api"
+
+const GENERIC_ERROR_DESCRIPTION = "Something went wrong. Please try again."
 
 export const projectKeys = {
   all: ["projects"],
@@ -51,6 +59,7 @@ export const projectKeys = {
     ...projectKeys.workflows(projectId),
     workflowId,
   ],
+  settings: (projectId) => [...projectKeys.detail(projectId), "settings"],
   analytics: (projectId, sprintId) => [
     ...projectKeys.detail(projectId),
     "sprints",
@@ -97,10 +106,63 @@ export const useGetTaskById = (projectId, sprintId, taskId) => {
   })
 }
 
+export const useCreateTask = () => {
+  return useMutation({
+    mutationFn: ({ projectId, sprintId, data }) =>
+      createTask(projectId, sprintId, data),
+    onSuccess: () => {
+      toast({
+        title: "Task created",
+        description: "New task has been added to the sprint.",
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
+  })
+}
+
+export const useDeleteTask = () => {
+  return useMutation({
+    mutationFn: ({ projectId, sprintId, taskId }) =>
+      deleteTask(projectId, sprintId, taskId),
+    onSuccess: () => {
+      toast({
+        title: "Task deleted",
+        description: "Task has been removed from the sprint.",
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
+  })
+}
+
 export const useUpdateTask = () => {
   return useMutation({
     mutationFn: ({ projectId, sprintId, taskId, data }) =>
       updateTask(projectId, sprintId, taskId, data),
+    onSuccess: () => {
+      toast({
+        title: "Task updated",
+        description: "Task has been updated successfully.",
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
   })
 }
 
@@ -108,6 +170,46 @@ export const useAddTaskComment = () => {
   return useMutation({
     mutationFn: ({ projectId, sprintId, taskId, data }) =>
       addTaskComment(projectId, sprintId, taskId, data),
+    onSuccess: () => {
+      toast({
+        title: "Comment added",
+        description: "Your comment has been posted.",
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
+  })
+}
+
+export const useGetProjectSettings = (projectId) => {
+  return useQuery({
+    queryKey: projectKeys.settings(projectId),
+    queryFn: () => getProjectSettings(projectId),
+    enabled: !!projectId,
+  })
+}
+
+export const useUpdateProjectSettings = () => {
+  return useMutation({
+    mutationFn: ({ projectId, data }) => updateProjectSettings(projectId, data),
+    onSuccess: () => {
+      toast({
+        title: "Settings saved",
+        description: "Project settings have been updated.",
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
   })
 }
 
@@ -139,6 +241,19 @@ export const useUpdateWorkflow = () => {
   return useMutation({
     mutationFn: ({ projectId, workflowId, data }) =>
       updateWorkflow(projectId, workflowId, data),
+    onSuccess: () => {
+      toast({
+        title: "Workflow updated",
+        description: "Workflow has been updated successfully.",
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
   })
 }
 

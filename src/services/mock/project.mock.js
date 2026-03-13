@@ -350,6 +350,36 @@ const mockAnalytics = {
   },
 }
 
+const mockProjectSettings = {
+  1: {
+    members: [
+      { id: 1, name: "Alice Johnson", role: "Product Manager", avatar: "https://i.pravatar.cc/150?u=1" },
+      { id: 2, name: "Bob Smith", role: "Lead Developer", avatar: "https://i.pravatar.cc/150?u=2" },
+      { id: 3, name: "Charlie Davis", role: "UI/UX Designer", avatar: "https://i.pravatar.cc/150?u=3" },
+    ],
+    levels: [
+      { id: 1, name: "High", color: "destructive" },
+      { id: 2, name: "Medium", color: "warning" },
+      { id: 3, name: "Low", color: "default" },
+    ],
+    estimates: [
+      { id: 1, points: 1, meaning: "Trivial, takes less than an hour" },
+      { id: 2, points: 2, meaning: "Simple, takes a few hours" },
+      { id: 3, points: 3, meaning: "Moderate, takes half a day" },
+      { id: 4, points: 5, meaning: "Complex, takes a full day" },
+      { id: 5, points: 8, meaning: "Very complex, takes multiple days" },
+    ],
+    workflowStages: [
+      { id: 1, name: "To Do", description: "Tasks that have not been started yet" },
+      { id: 2, name: "In Progress", description: "Tasks currently being worked on" },
+      { id: 3, name: "Code Review", description: "Tasks waiting for peer review" },
+      { id: 4, name: "QA", description: "Tasks in testing phase" },
+      { id: 5, name: "Done", description: "Completed tasks" },
+      { id: 6, name: "Prod", description: "Deployed to production" },
+    ],
+  },
+}
+
 export const projectHandlers = [
   http.get("*/projects/", () => {
     return HttpResponse.json({
@@ -417,6 +447,41 @@ export const projectHandlers = [
     }
   ),
 
+  // Create task
+  http.post(
+    "*/projects/:projectId/sprints/:sprintId/tasks/",
+    async ({ params, request }) => {
+      const body = await request.json()
+      const tasks = mockTasks[params.sprintId] || []
+      const newTask = {
+        id: `task-${Date.now()}`,
+        status: "todo",
+        priority: "medium",
+        createdAt: new Date().toISOString().split("T")[0],
+        subtasks: [],
+        comments: [],
+        ...body,
+      }
+      tasks.push(newTask)
+      mockTasks[params.sprintId] = tasks
+      return HttpResponse.json(newTask, { status: 201 })
+    }
+  ),
+
+  // Delete task
+  http.delete(
+    "*/projects/:projectId/sprints/:sprintId/tasks/:taskId/",
+    ({ params }) => {
+      const tasks = mockTasks[params.sprintId] || []
+      const taskIndex = tasks.findIndex((t) => t.id === params.taskId)
+      if (taskIndex === -1) {
+        return new HttpResponse(null, { status: 404 })
+      }
+      tasks.splice(taskIndex, 1)
+      return new HttpResponse(null, { status: 204 })
+    }
+  ),
+
   http.post(
     "*/projects/:projectId/sprints/:sprintId/tasks/:taskId/comments/",
     async ({ params, request }) => {
@@ -439,6 +504,20 @@ export const projectHandlers = [
       return HttpResponse.json(newComment, { status: 201 })
     }
   ),
+
+  // Project settings
+  http.get("*/projects/:projectId/settings/", ({ params }) => {
+    const settings = mockProjectSettings[params.projectId] || mockProjectSettings[1]
+    return HttpResponse.json(settings)
+  }),
+
+  http.patch("*/projects/:projectId/settings/", async ({ params, request }) => {
+    const body = await request.json()
+    const existing = mockProjectSettings[params.projectId] || mockProjectSettings[1]
+    const updated = { ...existing, ...body }
+    mockProjectSettings[params.projectId] = updated
+    return HttpResponse.json(updated)
+  }),
 
   // AI Insights endpoints
   http.get(

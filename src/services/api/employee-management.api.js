@@ -110,3 +110,30 @@ export const getEmployee360Profile = async (id, { signal } = {}) => {
   const config = { headers: { "Content-Type": "application/json" }, signal }
   return api.get(`${ct.api.employeeManagement.profile360}/${id}/`, config)
 }
+
+/**
+ * Bulk-update the status of multiple employees.
+ * @async
+ * @function
+ * @param {Array<string|number>} ids - Employee IDs to update
+ * @param {string} status - New status value (active | inactive)
+ * @returns {Promise} The response from the API
+ */
+export const patchBulkEmployeeStatus = async (ids, status) => {
+  return api.patch(ct.api.employeeManagement.bulkStatus, { ids, status })
+}
+
+/**
+ * Bulk-update the department of multiple employees.
+ * @async
+ * @function
+ * @param {Array<string|number>} ids - Employee IDs to update
+ * @param {string} department - New department name
+ * @returns {Promise} The response from the API
+ */
+export const patchBulkEmployeeDepartment = async (ids, department) => {
+  return api.patch(ct.api.employeeManagement.bulkDepartment, {
+    ids,
+    department,
+  })
+}

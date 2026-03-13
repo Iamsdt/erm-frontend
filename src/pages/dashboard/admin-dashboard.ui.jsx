@@ -4,6 +4,7 @@ import {
   Calendar,
   Clock,
   TrendingUp,
+  TrendingDown,
   Activity,
   CheckCircle2,
   AlertCircle,
@@ -12,6 +13,11 @@ import {
   ArrowRight,
   UserCheck,
   Home,
+  Sparkles,
+  X,
+  UserPlus,
+  FileBarChart,
+  ClipboardList,
 } from "lucide-react"
 import PropTypes from "prop-types"
 import { Link } from "react-router-dom"
@@ -44,9 +50,12 @@ import {
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
+import routes from "@constants/route.constant"
 
 const CHART_COLORS = ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6"]
 const CLR_GREEN = "text-green-500"
+const CLR_GREEN_600 = "text-green-600"
+const CLR_RED = CLR_RED
 const CLR_ORANGE = "text-orange-500"
 const STAT_KEYS = ["s1", "s2", "s3", "s4", "s5", "s6"]
 const CHART_KEYS = ["c1", "c2", "c3"]
@@ -102,8 +111,38 @@ const QUICK_LINKS = [
   },
 ]
 
+/* ─── Trend Indicator ───────────────────────────────────────── */
+const TrendIndicator = ({ trend, trendPositive }) => {
+  if (!trend) return null
+  const TrendIcon = trendPositive ? TrendingUp : TrendingDown
+  const colorClass = trendPositive ? CLR_GREEN_600 : CLR_RED
+  return (
+    <span
+      className={`flex items-center gap-0.5 text-xs font-medium ${colorClass}`}
+    >
+      <TrendIcon className="h-3 w-3" />
+      {trend}
+    </span>
+  )
+}
+
+TrendIndicator.propTypes = {
+  trend: PropTypes.string,
+  trendPositive: PropTypes.bool,
+}
+TrendIndicator.defaultProps = { trend: null, trendPositive: true }
+
 /* ─── Stat Card ─────────────────────────────────────────────── */
-const StatCard = ({ label, value, sub, icon: Icon, color, to }) => (
+const StatCard = ({
+  label,
+  value,
+  sub,
+  icon: Icon,
+  color,
+  to,
+  trend,
+  trendPositive,
+}) => (
   <Card className="hover:shadow-md transition-shadow">
     <CardContent className="pt-5 pb-4">
       <div className="flex items-start justify-between">
@@ -111,6 +150,7 @@ const StatCard = ({ label, value, sub, icon: Icon, color, to }) => (
           <p className="text-sm text-muted-foreground">{label}</p>
           <p className="text-3xl font-bold mt-1">{value}</p>
           {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+          <TrendIndicator trend={trend} trendPositive={trendPositive} />
         </div>
         <div className={`rounded-xl p-3 ${color}`}>
           <Icon className="h-5 w-5" />
@@ -135,69 +175,98 @@ StatCard.propTypes = {
   icon: PropTypes.elementType.isRequired,
   color: PropTypes.string.isRequired,
   to: PropTypes.string,
+  trend: PropTypes.string,
+  trendPositive: PropTypes.bool,
 }
-StatCard.defaultProps = { sub: null, to: null }
+StatCard.defaultProps = {
+  sub: null,
+  to: null,
+  trend: null,
+  trendPositive: true,
+}
 
 /* ─── Admin Stats Grid ──────────────────────────────────────── */
 const countActive = (list) =>
   Array.isArray(list) ? list.filter((p) => p.status === "Active").length : 0
 
+const safeLength = (array) => (Array.isArray(array) ? array.length : 0)
+
+const extractMonthStat = (summary, key) => summary?.thisMonth?.[key] ?? 0
+
 const getAdminStats = (employees, projects, leaveSummary) => ({
-  totalEmp: employees?.length ?? 0,
+  totalEmp: safeLength(employees),
   activeProjects: countActive(projects),
-  pending: leaveSummary?.pendingApprovals?.length ?? 0,
-  avgPresent: leaveSummary?.thisMonth?.avgDailyPresent ?? 0,
-  wfh: leaveSummary?.thisMonth?.totalWFH ?? 0,
-  onLeave: leaveSummary?.thisMonth?.avgDailyOnLeave ?? 0,
+  pending: safeLength(leaveSummary?.pendingApprovals),
+  avgPresent: extractMonthStat(leaveSummary, "avgDailyPresent"),
+  wfh: extractMonthStat(leaveSummary, "totalWFH"),
+  onLeave: extractMonthStat(leaveSummary, "avgDailyOnLeave"),
 })
 
+const buildStatCards = (stats) => [
+  {
+    label: "Total Employees",
+    value: stats.totalEmp,
+    icon: Users,
+    color: "bg-indigo-100 text-indigo-600",
+    to: routes.employeeManagement.LIST,
+    trend: "+12% vs last month",
+    trendPositive: true,
+  },
+  {
+    label: "Active Projects",
+    value: stats.activeProjects,
+    icon: FolderOpen,
+    color: "bg-purple-100 text-purple-600",
+    to: routes.project.LIST,
+    trend: "+3% vs last month",
+    trendPositive: true,
+  },
+  {
+    label: "Pending Leaves",
+    value: stats.pending,
+    icon: AlertCircle,
+    color: "bg-orange-100 text-orange-600",
+    to: routes.leave.ADMIN_APPROVALS,
+    trend: "-5% vs last month",
+    trendPositive: false,
+  },
+  {
+    label: "Avg Daily Present",
+    value: stats.avgPresent,
+    icon: UserCheck,
+    color: "bg-green-100 text-green-600",
+    to: routes.attendance.ADMIN_SUMMARY,
+    trend: "+8% vs last month",
+    trendPositive: true,
+  },
+  {
+    label: "WFH This Month",
+    value: stats.wfh,
+    icon: Home,
+    color: "bg-cyan-100 text-cyan-600",
+    trend: "+2% vs last month",
+    trendPositive: true,
+  },
+  {
+    label: "Avg On Leave",
+    value: stats.onLeave,
+    icon: Calendar,
+    color: "bg-rose-100 text-rose-600",
+    to: routes.leave.ADMIN_DASHBOARD,
+    trend: "-3% vs last month",
+    trendPositive: false,
+  },
+]
+
 const AdminStatsGrid = ({ employees, projects, leaveSummary }) => {
-  const { totalEmp, activeProjects, pending, avgPresent, wfh, onLeave } =
-    getAdminStats(employees, projects, leaveSummary)
+  const stats = getAdminStats(employees, projects, leaveSummary)
+  const cards = buildStatCards(stats)
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-      <StatCard
-        label="Total Employees"
-        value={totalEmp}
-        icon={Users}
-        color="bg-indigo-100 text-indigo-600"
-        to="/employee-management"
-      />
-      <StatCard
-        label="Active Projects"
-        value={activeProjects}
-        icon={FolderOpen}
-        color="bg-purple-100 text-purple-600"
-        to="/projects"
-      />
-      <StatCard
-        label="Pending Leaves"
-        value={pending}
-        icon={AlertCircle}
-        color="bg-orange-100 text-orange-600"
-        to="/leave/admin/approvals"
-      />
-      <StatCard
-        label="Avg Daily Present"
-        value={avgPresent}
-        icon={UserCheck}
-        color="bg-green-100 text-green-600"
-        to="/attendance/admin/summary"
-      />
-      <StatCard
-        label="WFH This Month"
-        value={wfh}
-        icon={Home}
-        color="bg-cyan-100 text-cyan-600"
-      />
-      <StatCard
-        label="Avg On Leave"
-        value={onLeave}
-        icon={Calendar}
-        color="bg-rose-100 text-rose-600"
-        to="/leave/admin"
-      />
+      {cards.map((card) => (
+        <StatCard key={card.label} {...card} />
+      ))}
     </div>
   )
 }
@@ -666,6 +735,146 @@ const AdminHeader = ({ userName }) => {
 AdminHeader.propTypes = { userName: PropTypes.string }
 AdminHeader.defaultProps = { userName: null }
 
+/* ─── Welcome Card ──────────────────────────────────────────── */
+const formatCurrentDate = () =>
+  new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })
+
+const WelcomeCard = ({
+  userName,
+  pendingLeaves,
+  activeProjects,
+  onDismiss,
+}) => (
+  <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border">
+    <CardContent className="pt-5 pb-4">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3">
+          <Sparkles className="h-6 w-6 text-primary mt-0.5 shrink-0" />
+          <div>
+            <h2 className="text-lg font-semibold">
+              Welcome back, {userName ?? "Admin"}!
+            </h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Here&apos;s what needs your attention today
+            </p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <Badge variant="secondary" className="text-xs">
+                {pendingLeaves} leaves pending
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {activeProjects} active projects
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                {formatCurrentDate()}
+              </Badge>
+            </div>
+          </div>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 shrink-0"
+          onClick={onDismiss}
+          aria-label="Dismiss welcome card"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+)
+
+WelcomeCard.propTypes = {
+  userName: PropTypes.string,
+  pendingLeaves: PropTypes.number,
+  activeProjects: PropTypes.number,
+  onDismiss: PropTypes.func.isRequired,
+}
+WelcomeCard.defaultProps = {
+  userName: null,
+  pendingLeaves: 0,
+  activeProjects: 0,
+}
+
+/* ─── Quick Actions ─────────────────────────────────────────── */
+const QUICK_ACTIONS = [
+  {
+    label: "Approve Leaves",
+    icon: CheckCircle2,
+    to: routes.leave.ADMIN_APPROVALS,
+    color: "text-emerald-600",
+    badgeKey: "pendingLeaves",
+  },
+  {
+    label: "Add Employee",
+    icon: UserPlus,
+    to: routes.employeeManagement.CREATE,
+    color: "text-indigo-600",
+  },
+  {
+    label: "View Reports",
+    icon: FileBarChart,
+    to: routes.ai.ANALYTICS,
+    color: "text-blue-600",
+  },
+  {
+    label: "Activity Log",
+    icon: ClipboardList,
+    to: routes.audit.LOG,
+    color: "text-purple-600",
+  },
+]
+
+const QuickActionButton = ({ action, pendingLeaves }) => (
+  <Button
+    asChild
+    variant="outline"
+    className="h-auto py-3 px-4 justify-start gap-3"
+  >
+    <Link to={action.to}>
+      <action.icon className={`h-5 w-5 ${action.color}`} />
+      <span className="text-sm font-medium">{action.label}</span>
+      {action.badgeKey && pendingLeaves > 0 && (
+        <Badge className="ml-auto text-xs" variant="destructive">
+          {pendingLeaves}
+        </Badge>
+      )}
+    </Link>
+  </Button>
+)
+
+QuickActionButton.propTypes = {
+  action: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    icon: PropTypes.elementType.isRequired,
+    to: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+    badgeKey: PropTypes.string,
+  }).isRequired,
+  pendingLeaves: PropTypes.number,
+}
+QuickActionButton.defaultProps = { pendingLeaves: 0 }
+
+const QuickActionsRow = ({ pendingLeaves }) => (
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    {QUICK_ACTIONS.map((action) => (
+      <QuickActionButton
+        key={action.label}
+        action={action}
+        pendingLeaves={pendingLeaves}
+      />
+    ))}
+  </div>
+)
+
+QuickActionsRow.propTypes = { pendingLeaves: PropTypes.number }
+QuickActionsRow.defaultProps = { pendingLeaves: 0 }
+
 /* ─── Clock + Summary Cards Row ─────────────────────────────── */
 const AttendanceSummaryCards = ({ leaveSummary }) => {
   const stats = leaveSummary?.thisMonth
@@ -678,7 +887,7 @@ const AttendanceSummaryCards = ({ leaveSummary }) => {
     {
       label: "Total Absent",
       value: stats?.totalAbsent ?? 0,
-      color: "text-red-500",
+      color: CLR_RED,
     },
     {
       label: "Total Present",
@@ -708,13 +917,35 @@ const AttendanceSummaryCards = ({ leaveSummary }) => {
 AttendanceSummaryCards.propTypes = { leaveSummary: PropTypes.object }
 AttendanceSummaryCards.defaultProps = { leaveSummary: null }
 
+/* ─── Loading Skeleton ───────────────────────────────────────── */
+const AdminDashboardSkeleton = () => (
+  <div className="p-6 space-y-6">
+    <div className="h-12 bg-muted rounded-lg animate-pulse" />
+    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+      {STAT_KEYS.map((key) => (
+        <div key={key} className="h-28 bg-muted rounded-xl animate-pulse" />
+      ))}
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {CHART_KEYS.map((key) => (
+        <div key={key} className="h-64 bg-muted rounded-xl animate-pulse" />
+      ))}
+    </div>
+  </div>
+)
+
 /* ─── Main Admin Dashboard UI ────────────────────────────────── */
+const CLOCK_DEFAULTS = {
+  isClocked: false,
+  clockedInAt: null,
+  elapsedSeconds: 0,
+  willAutoExpire: false,
+  todayTotalMinutes: 0,
+}
+
 const getClockProperties = (status) => ({
-  isClocked: status?.isClocked ?? false,
-  clockedInAt: status?.clockedInAt ?? null,
-  elapsedSeconds: status?.elapsedSeconds ?? 0,
-  willAutoExpire: status?.willAutoExpire ?? false,
-  todayTotalMinutes: status?.todayTotalMinutes ?? 0,
+  ...CLOCK_DEFAULTS,
+  ...status,
 })
 
 const AdminDashboardUI = ({
@@ -723,31 +954,33 @@ const AdminDashboardUI = ({
   projects,
   leaveSummary,
   attendanceStatus,
+  showWelcome,
+  onDismissWelcome,
   isLoading,
 }) => {
   const clockProperties = getClockProperties(attendanceStatus)
+  const pendingLeaves = leaveSummary?.pendingApprovals?.length ?? 0
+  const activeProjects = countActive(projects)
+
   if (isLoading) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="h-12 bg-muted rounded-lg animate-pulse" />
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-          {STAT_KEYS.map((key) => (
-            <div key={key} className="h-28 bg-muted rounded-xl animate-pulse" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {CHART_KEYS.map((key) => (
-            <div key={key} className="h-64 bg-muted rounded-xl animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
+    return <AdminDashboardSkeleton />
   }
 
   return (
     <div className="p-4 md:p-6 space-y-6">
       <AdminHeader userName={userName} />
       <Separator />
+
+      {showWelcome && (
+        <WelcomeCard
+          userName={userName}
+          pendingLeaves={pendingLeaves}
+          activeProjects={activeProjects}
+          onDismiss={onDismissWelcome}
+        />
+      )}
+
+      <QuickActionsRow pendingLeaves={pendingLeaves} />
 
       <AdminStatsGrid
         employees={employees}
@@ -803,6 +1036,8 @@ AdminDashboardUI.propTypes = {
   projects: PropTypes.array,
   leaveSummary: PropTypes.object,
   attendanceStatus: PropTypes.object,
+  showWelcome: PropTypes.bool,
+  onDismissWelcome: PropTypes.func,
   isLoading: PropTypes.bool,
 }
 AdminDashboardUI.defaultProps = {
@@ -811,6 +1046,8 @@ AdminDashboardUI.defaultProps = {
   projects: [],
   leaveSummary: null,
   attendanceStatus: null,
+  showWelcome: false,
+  onDismissWelcome: () => {},
   isLoading: false,
 }
 

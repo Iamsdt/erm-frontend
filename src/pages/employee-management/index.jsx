@@ -2,24 +2,28 @@ import { useMemo, useState } from "react"
 
 import { toast } from "@/components/ui/use-toast"
 import useDebounce from "@/hooks/use-debounce"
+import { resetPassword } from "@/lib/firebase"
 import {
+  useBulkUpdateDepartment,
+  useBulkUpdateStatus,
   useDeleteEmployee,
   useFetchEmployees,
 } from "@query/employee-management.query"
 
 import EmployeeListUI from "./employee-list.ui"
 
-import { resetPassword } from "@/lib/firebase"
-
 /**
- * EmployeeList container — fetches the employee list and handles search/delete.
+ * EmployeeList container — fetches the employee list and handles search/delete/bulk ops.
  */
 const EmployeeList = () => {
   const [search, setSearch] = useState("")
+  const [selectedIds, setSelectedIds] = useState([])
   const debouncedSearch = useDebounce(search, 300)
 
   const { data, isLoading, isError, error } = useFetchEmployees()
   const { mutate: deleteEmployee } = useDeleteEmployee()
+  const { mutate: bulkUpdateStatus } = useBulkUpdateStatus()
+  const { mutate: bulkUpdateDepartment } = useBulkUpdateDepartment()
 
   const employees = useMemo(() => {
     const list = data?.employees ?? []
@@ -63,6 +67,20 @@ const EmployeeList = () => {
     })
   }
 
+  const handleBulkStatusChange = (status) => {
+    bulkUpdateStatus(
+      { ids: selectedIds, status },
+      { onSuccess: () => setSelectedIds([]) }
+    )
+  }
+
+  const handleBulkDepartmentChange = (department) => {
+    bulkUpdateDepartment(
+      { ids: selectedIds, department },
+      { onSuccess: () => setSelectedIds([]) }
+    )
+  }
+
   return (
     <EmployeeListUI
       employees={employees}
@@ -73,6 +91,10 @@ const EmployeeList = () => {
       onSearchChange={setSearch}
       onSendInvite={handleSendInvite}
       onDelete={handleDelete}
+      selectedIds={selectedIds}
+      onSelectedIdsChange={setSelectedIds}
+      onBulkStatusChange={handleBulkStatusChange}
+      onBulkDepartmentChange={handleBulkDepartmentChange}
     />
   )
 }

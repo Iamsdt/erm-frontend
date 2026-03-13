@@ -47,7 +47,7 @@ import {
   Legend,
 } from "recharts"
 
-const VELOCITY_DATA = [
+const DEFAULT_VELOCITY_DATA = [
   { name: "Sprint 1", points: 45 },
   { name: "Sprint 2", points: 52 },
   { name: "Sprint 3", points: 48 },
@@ -56,7 +56,7 @@ const VELOCITY_DATA = [
   { name: "Sprint 6", points: 68 },
 ]
 
-const BURNDOWN_DATA = [
+const DEFAULT_BURNDOWN_DATA = [
   { day: "Day 1", remaining: 100, ideal: 100 },
   { day: "Day 2", remaining: 90, ideal: 90 },
   { day: "Day 3", remaining: 85, ideal: 80 },
@@ -69,7 +69,16 @@ const BURNDOWN_DATA = [
   { day: "Day 10", remaining: 5, ideal: 10 },
 ]
 
-const ISSUE_STATUS_DATA = [
+const STATUS_COLORS = {
+  "To Do": "#facc15",
+  "In Progress": "#3b82f6",
+  "In Review": "#a855f7",
+  Review: "#a855f7",
+  Done: "#22c55e",
+  Todo: "#facc15",
+}
+
+const DEFAULT_ISSUE_STATUS_DATA = [
   { name: "To Do", value: 15, color: "#facc15" },
   { name: "In Progress", value: 25, color: "#3b82f6" },
   { name: "Review", value: 10, color: "#a855f7" },
@@ -1462,7 +1471,20 @@ NotesTab.propTypes = {
 /**
  * ProjectDetailsUI - Displays detailed information about a project and its sprints.
  */
-const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
+const ProjectDetailsUI = ({
+  project,
+  sprints,
+  isLoading,
+  error,
+  velocityData,
+  burndownData,
+  issueStatusData,
+}) => {
+  const VELOCITY_DATA = velocityData?.length ? velocityData : DEFAULT_VELOCITY_DATA
+  const BURNDOWN_DATA = burndownData?.length ? burndownData : DEFAULT_BURNDOWN_DATA
+  const ISSUE_STATUS_DATA = issueStatusData?.length
+    ? issueStatusData
+    : DEFAULT_ISSUE_STATUS_DATA
   if (isLoading) return <LoadingState />
   if (error || !project) return <ErrorState />
 
@@ -1653,11 +1675,17 @@ ProjectDetailsUI.propTypes = {
   ).isRequired,
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.oneOf([PropTypes.bool, PropTypes.object]),
+  velocityData: PropTypes.arrayOf(PropTypes.object),
+  burndownData: PropTypes.arrayOf(PropTypes.object),
+  issueStatusData: PropTypes.arrayOf(PropTypes.object),
 }
 
 ProjectDetailsUI.defaultProps = {
   project: null,
   error: null,
+  velocityData: [],
+  burndownData: [],
+  issueStatusData: [],
 }
 
 export default ProjectDetailsUI

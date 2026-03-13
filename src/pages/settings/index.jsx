@@ -1,26 +1,29 @@
 import i18n from "i18next"
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { toast } from "@/components/ui/use-toast"
 import { useTheme } from "@/lib/context/theme-provider"
+import { useFetchSettings, useUpdateSettings } from "@query/settings.query"
 
 import SettingsUI from "./settings.ui"
 
 /**
- * Settings container — manages app preferences.
+ * Settings container — manages app preferences backed by API.
  */
 const SettingsPage = () => {
   const { t } = useTranslation()
   const { theme, setTheme } = useTheme()
 
-  const [notifications, setNotifications] = useState({
+  const { data: settings } = useFetchSettings()
+  const { mutate: saveSettings } = useUpdateSettings()
+
+  const notifications = settings?.notifications ?? {
     emailAlerts: true,
     leaveUpdates: true,
     projectUpdates: true,
     attendanceReminders: false,
     weeklyDigest: true,
-  })
+  }
 
   const currentLanguage = i18n.language?.startsWith("hi") ? "hi" : "en"
 
@@ -41,14 +44,8 @@ const SettingsPage = () => {
   }
 
   const handleNotificationToggle = (key) => {
-    setNotifications((previous) => {
-      const updated = { ...previous, [key]: !previous[key] }
-      toast({
-        title: "Notification settings updated",
-        description: `${key} has been ${updated[key] ? "enabled" : "disabled"}.`,
-      })
-      return updated
-    })
+    const updated = { ...notifications, [key]: !notifications[key] }
+    saveSettings({ notifications: updated })
   }
 
   return (

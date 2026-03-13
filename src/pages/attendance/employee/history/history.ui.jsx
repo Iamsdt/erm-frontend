@@ -135,11 +135,12 @@ const deriveHistory = (data) => ({
 
 /**
  * HistoryUI — presenter for the employee attendance history page.
- * @param {{ data: object, isLoading: boolean, year: number, month: number, onYearChange: (y: number) => void, onMonthChange: (m: number) => void }} props - Component props.
+ * @param {{ data: object, isLoading: boolean, isError: boolean, year: number, month: number, onYearChange: (y: number) => void, onMonthChange: (m: number) => void }} props - Component props.
  */
 const HistoryUI = ({
   data,
   isLoading,
+  isError,
   year,
   month,
   onYearChange,
@@ -160,6 +161,14 @@ const HistoryUI = ({
   }
 
   const { entries, totalDays, totalMins, avgMins } = deriveHistory(data)
+
+  if (isError) {
+    return (
+      <div className="max-w-3xl mx-auto p-4 md:p-6 text-center text-sm text-destructive">
+        Failed to load attendance history. Please try again.
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl mx-auto p-4 md:p-6 flex flex-col gap-4">
@@ -265,6 +274,7 @@ const HistoryUI = ({
 HistoryUI.propTypes = {
   data: PropTypes.object,
   isLoading: PropTypes.bool.isRequired,
+  isError: PropTypes.bool.isRequired,
   year: PropTypes.number.isRequired,
   month: PropTypes.number.isRequired,
   onYearChange: PropTypes.func.isRequired,

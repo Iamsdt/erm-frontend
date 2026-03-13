@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
+import { toast } from "@/components/ui/use-toast"
 import {
   deletePolicy,
   getPolicies,
@@ -10,6 +11,7 @@ import {
 
 const QUERY_KEY_POLICIES = "policies-list"
 const QUERY_KEY_POLICY_DETAIL = "policy-detail"
+const ERROR_DESCRIPTION = "Something went wrong. Please try again."
 
 /**
  * React Query hook to fetch all policies.
@@ -54,7 +56,18 @@ export const useCreatePolicy = () => {
   return useMutation({
     mutationFn: (payload) => postPolicy(payload),
     onSuccess: () => {
+      toast({
+        title: "Policy created",
+        description: "New policy has been created.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_POLICIES] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -68,8 +81,19 @@ export const useUpdatePolicy = () => {
   return useMutation({
     mutationFn: ({ id, ...payload }) => patchPolicy(id, payload),
     onSuccess: (_, { id }) => {
+      toast({
+        title: "Policy updated",
+        description: "Policy has been updated.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_POLICIES] })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_POLICY_DETAIL, id] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -83,7 +107,18 @@ export const useDeletePolicy = () => {
   return useMutation({
     mutationFn: (id) => deletePolicy(id),
     onSuccess: () => {
+      toast({
+        title: "Policy deleted",
+        description: "Policy has been removed.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_POLICIES] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }

@@ -16,6 +16,7 @@ const EmployeeDashboard = lazy(() => import("@pages/leave-employee"))
 const RequestLeavePage = lazy(() => import("@pages/leave-employee/request"))
 
 // Attendance pages
+const AttendanceClock = lazy(() => import("@pages/attendance/employee"))
 const AttendanceHistory = lazy(
   () => import("@pages/attendance/employee/history")
 )
@@ -43,6 +44,8 @@ const CreateNotePage = lazy(
 )
 
 // Daily Update pages
+const DailyUpdateHub = lazy(() => import("@pages/daily-update"))
+const DailyStandupPage = lazy(() => import("@pages/daily-update/standup"))
 const CreateStandupPage = lazy(
   () => import("@pages/daily-update/create-standup")
 )
@@ -50,9 +53,13 @@ const TeamUpdatesPage = lazy(() => import("@pages/daily-update/team"))
 const ProgressLogPage = lazy(() => import("@pages/daily-update/progress"))
 
 // AI & Analytics pages
+const AIHubPage = lazy(() => import("@pages/ai"))
 const AIInsightsPage = lazy(() => import("@pages/ai/insights"))
 const AIRecommendationsPage = lazy(() => import("@pages/ai/recommendations"))
 const AIAnalyticsPage = lazy(() => import("@pages/ai/analytics"))
+
+// Audit / Activity Log
+const AuditPage = lazy(() => import("@pages/audit"))
 
 // Notifications
 const NotificationsPage = lazy(() => import("@pages/notifications"))
@@ -108,7 +115,11 @@ const mainRoutes = [
     element: leaveGuard(<RequestLeavePage />, ["employee"]),
   },
 
-  // Attendance — employee routes (accessible to authenticated users)
+  // Attendance — employee routes
+  {
+    path: ct.route.attendance.EMPLOYEE_CLOCK,
+    element: attendanceGuard(<AttendanceClock />, ["admin", "employee"]),
+  },
   {
     path: ct.route.attendance.EMPLOYEE_HISTORY,
     element: attendanceGuard(<AttendanceHistory />, ["admin", "employee"]),
@@ -178,48 +189,66 @@ const mainRoutes = [
 
   // Daily Updates routes
   {
-    path: "/daily-update/standup/new",
+    path: ct.route.dailyUpdate.HUB,
+    element: <DailyUpdateHub />,
+  },
+  {
+    path: ct.route.dailyUpdate.STANDUP,
+    element: <DailyStandupPage />,
+  },
+  {
+    path: ct.route.dailyUpdate.CREATE_STANDUP,
     element: <CreateStandupPage />,
   },
   {
-    path: "/daily-update/team",
+    path: ct.route.dailyUpdate.TEAM,
     element: <TeamUpdatesPage />,
   },
   {
-    path: "/daily-update/progress",
+    path: ct.route.dailyUpdate.PROGRESS,
     element: <ProgressLogPage />,
   },
 
   // AI & Analytics routes
   {
-    path: "/ai/insights",
+    path: ct.route.ai.HUB,
+    element: <AIHubPage />,
+  },
+  {
+    path: ct.route.ai.INSIGHTS,
     element: <AIInsightsPage />,
   },
   {
-    path: "/ai/recommendations",
+    path: ct.route.ai.RECOMMENDATIONS,
     element: <AIRecommendationsPage />,
   },
   {
-    path: "/ai/analytics",
+    path: ct.route.ai.ANALYTICS,
     element: <AIAnalyticsPage />,
+  },
+
+  // Audit / Activity Log
+  {
+    path: ct.route.audit.LOG,
+    element: <AuditPage />,
   },
 
   // Notifications
   {
-    path: "/notifications",
+    path: ct.route.notifications.INDEX,
     element: <NotificationsPage />,
   },
 
-  // Profile & Settings (merged)
+  // Profile
   {
     path: ct.route.profile.MY_PROFILE,
     element: <ProfilePage />,
   },
 
-  // Policy Management (admin)
+  // Policy Management (all authenticated users)
   {
     path: ct.route.policy.INDEX,
-    element: empGuard(<PolicyPage />),
+    element: <PolicyPage />,
   },
 
   // Rewards

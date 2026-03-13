@@ -6,6 +6,7 @@ import { z } from "zod"
 
 import { toast } from "@/components/ui/use-toast"
 import ct from "@constants/"
+import { useFetchDepartments } from "@query/department.query"
 import {
   useFetchEmployee,
   useUpdateEmployee,
@@ -44,6 +45,8 @@ const EditEmployee = () => {
 
   const { data, isLoading } = useFetchEmployee(id)
   const { mutate: updateEmployee, isPending } = useUpdateEmployee()
+  const { data: departmentsData } = useFetchDepartments()
+  const departments = (departmentsData?.departments ?? []).map((d) => d.name)
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -90,6 +93,7 @@ const EditEmployee = () => {
   return (
     <EditEmployeeUI
       form={form}
+      departments={departments}
       onSubmit={handleSubmit}
       isSubmitting={isPending}
       isLoading={isLoading}

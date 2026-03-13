@@ -1,16 +1,24 @@
 import {
+  Award,
+  Bell,
+  Bot,
   Building2,
   CalendarDays,
   ChevronRight,
   Clock,
   ClipboardList,
+  FileText,
   FolderOpen,
   Home,
   LayoutDashboard,
   Layers,
   MailPlus,
+  MessageSquare,
   Plus,
+  ScrollText,
   Settings,
+  Sparkles,
+  TrendingUp,
   UserCircle2,
   Users,
 } from "lucide-react"
@@ -43,50 +51,123 @@ import ct from "@constants/"
 const mainItems = [{ title: "Home", url: "/", icon: Home }]
 
 const leaveSharedItems = [
-  { title: "Calendar View", url: "/leave/calendar", icon: CalendarDays },
+  { title: "Calendar View", url: ct.route.leave.CALENDAR, icon: CalendarDays },
 ]
 
 const adminLeaveItems = [
-  { title: "Admin Dashboard", url: "/leave/admin", icon: LayoutDashboard },
-  { title: "Approvals", url: "/leave/admin/approvals", icon: ClipboardList },
-  { title: "Settings", url: "/leave/admin/settings", icon: Settings },
+  {
+    title: "Admin Dashboard",
+    url: ct.route.leave.ADMIN_DASHBOARD,
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Approvals",
+    url: ct.route.leave.ADMIN_APPROVALS,
+    icon: ClipboardList,
+  },
+  { title: "Settings", url: ct.route.leave.ADMIN_SETTINGS, icon: Settings },
 ]
 
 const employeeLeaveItems = [
-  { title: "My Dashboard", url: "/leave/employee", icon: UserCircle2 },
+  {
+    title: "My Dashboard",
+    url: ct.route.leave.EMPLOYEE_DASHBOARD,
+    icon: UserCircle2,
+  },
 ]
 
 const employeeManagementItems = [
-  { title: "All Employees", url: "/employee-management", icon: Users },
+  {
+    title: "All Employees",
+    url: ct.route.employeeManagement.LIST,
+    icon: Users,
+  },
   {
     title: "Departments",
-    url: "/employee-management/departments",
+    url: ct.route.employeeManagement.DEPARTMENTS,
     icon: Building2,
   },
-  { title: "New Employee", url: "/employee-management/create", icon: Plus },
-  { title: "Invite User", url: "/employee-management/invite", icon: MailPlus },
+  {
+    title: "New Employee",
+    url: ct.route.employeeManagement.CREATE,
+    icon: Plus,
+  },
+  {
+    title: "Invite User",
+    url: ct.route.employeeManagement.INVITE,
+    icon: MailPlus,
+  },
 ]
 
 const employeeAttendanceItems = [
-  { title: "My History", url: "/attendance/history", icon: ClipboardList },
+  {
+    title: "Clock In/Out",
+    url: ct.route.attendance.EMPLOYEE_CLOCK,
+    icon: Clock,
+  },
+  {
+    title: "My History",
+    url: ct.route.attendance.EMPLOYEE_HISTORY,
+    icon: ClipboardList,
+  },
 ]
 
 const adminAttendanceItems = [
   {
     title: "Activity Logs",
-    url: "/attendance/admin/logs",
+    url: ct.route.attendance.ADMIN_LOGS,
     icon: ClipboardList,
   },
-  { title: "Live Status", url: "/attendance/admin/live", icon: Clock },
-  { title: "Summary", url: "/attendance/admin/summary", icon: LayoutDashboard },
+  {
+    title: "Live Status",
+    url: ct.route.attendance.ADMIN_LIVE,
+    icon: Clock,
+  },
+  {
+    title: "Summary",
+    url: ct.route.attendance.ADMIN_SUMMARY,
+    icon: LayoutDashboard,
+  },
 ]
 
 const projectManagementItems = [
-  { title: "All Projects", url: "/projects", icon: FolderOpen },
-  { title: "Reports", url: "/projects/reports", icon: ClipboardList },
+  { title: "All Projects", url: ct.route.project.LIST, icon: FolderOpen },
+]
+
+const dailyUpdateItems = [
+  {
+    title: "Daily Standup",
+    url: ct.route.dailyUpdate.STANDUP,
+    icon: MessageSquare,
+  },
+  { title: "Team Updates", url: ct.route.dailyUpdate.TEAM, icon: Users },
+  {
+    title: "Progress Log",
+    url: ct.route.dailyUpdate.PROGRESS,
+    icon: TrendingUp,
+  },
+]
+
+const aiItems = [
+  { title: "Insights", url: ct.route.ai.INSIGHTS, icon: Sparkles },
+  { title: "Recommendations", url: ct.route.ai.RECOMMENDATIONS, icon: Bot },
+  { title: "Analytics", url: ct.route.ai.ANALYTICS, icon: TrendingUp },
+]
+
+const quickAccessItems = [
+  { title: "Notifications", url: ct.route.notifications.INDEX, icon: Bell },
+  { title: "Activity Log", url: ct.route.audit.LOG, icon: ScrollText },
+  { title: "Policies", url: ct.route.policy.INDEX, icon: FileText },
+  { title: "Rewards", url: ct.route.rewards.INDEX, icon: Award },
 ]
 
 // ─── Simple nav group (Application) ──────────────────────────────────────────
+
+const navItemShape = PropTypes.shape({
+  title: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
+})
 
 const NavGroup = ({ label, items }) => (
   <SidebarGroup>
@@ -110,13 +191,7 @@ const NavGroup = ({ label, items }) => (
 
 NavGroup.propTypes = {
   label: PropTypes.string.isRequired,
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-      icon: PropTypes.elementType.isRequired,
-    })
-  ).isRequired,
+  items: PropTypes.arrayOf(navItemShape).isRequired,
 }
 
 // ─── Reusable collapsible module group ───────────────────────────────────────
@@ -155,13 +230,7 @@ const CollapsibleNavGroup = ({ title, icon: Icon, items }) => (
 CollapsibleNavGroup.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.elementType.isRequired,
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-      icon: PropTypes.elementType.isRequired,
-    })
-  ).isRequired,
+  items: PropTypes.arrayOf(navItemShape).isRequired,
 }
 
 // ─── Modules section ──────────────────────────────────────────────────────────
@@ -260,6 +329,17 @@ const AppSidebar = () => {
           isAttendanceEmployee={attendanceRole === "employee"}
         />
         <NavGroup label="Projects" items={projectManagementItems} />
+        <CollapsibleNavGroup
+          title="Daily Updates"
+          icon={CalendarDays}
+          items={dailyUpdateItems}
+        />
+        <CollapsibleNavGroup
+          title="AI & Analytics"
+          icon={Sparkles}
+          items={aiItems}
+        />
+        <NavGroup label="Quick Access" items={quickAccessItems} />
       </SidebarContent>
     </Sidebar>
   )

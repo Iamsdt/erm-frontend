@@ -129,6 +129,11 @@ StatCard.propTypes = {
 StatCard.defaultProps = { sub: null, to: null }
 
 /* ─── Employee Stats Grid ────────────────────────────────────── */
+const WORK_DAY_GOAL_MINUTES = 480
+const CONSISTENCY_THRESHOLD = 80
+const LEAVE_GREEN_THRESHOLD = 10
+const LEAVE_AMBER_THRESHOLD = 5
+
 const formatWorkHours = (minutes) => {
   if (!minutes) return "0h 0m"
   return `${Math.floor(minutes / 60)}h ${minutes % 60}m`
@@ -140,40 +145,142 @@ const getEmployeeStats = (leaveProfile, todayAttendance) => ({
     (sum, b) => sum + (b.remaining ?? 0),
     0
   ),
+  todayMinutes: todayAttendance?.totalWorkMinutes ?? 0,
   todayHours: formatWorkHours(todayAttendance?.totalWorkMinutes ?? 0),
 })
 
+const getConsistencyMessage = (presentDays) => {
+  const workingDays = 22
+  const percentage = workingDays > 0 ? (presentDays / workingDays) * 100 : 0
+  if (percentage >= CONSISTENCY_THRESHOLD) return "Great consistency!"
+  return null
+}
+
+const getLeaveInsight = (remaining) => {
+  if (remaining >= LEAVE_GREEN_THRESHOLD) {
+    return { color: "text-green-600", message: "You're in good shape" }
+  }
+  if (remaining >= LEAVE_AMBER_THRESHOLD) {
+    return { color: "text-amber-600", message: "Plan ahead" }
+  }
+  return { color: "text-red-600", message: "Book soon!" }
+}
+
+/* ─── Enhanced Stat Cards for Employee ─────────────────────── */
+const TodayHoursCard = ({ todayHours, todayMinutes }) => {
+  const progressPercent = Math.min(
+    (todayMinutes / WORK_DAY_GOAL_MINUTES) * 100,
+    100
+  )
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">Today&apos;s Hours</p>
+            <p className="text-3xl font-bold mt-1">{todayHours}</p>
+          </div>
+          <div className="rounded-xl p-3 bg-indigo-100 text-indigo-600">
+            <Clock className="h-5 w-5" />
+          </div>
+        </div>
+        <Progress value={progressPercent} className="h-1.5 mt-3" />
+        <p className="text-xs text-muted-foreground mt-1">
+          {Math.round(progressPercent)}% of 8h goal
+        </p>
+        <Link
+          to="/attendance"
+          className="mt-2 flex items-center gap-1 text-xs text-primary hover:underline"
+        >
+          View details <ArrowRight className="h-3 w-3" />
+        </Link>
+      </CardContent>
+    </Card>
+  )
+}
+
+TodayHoursCard.propTypes = {
+  todayHours: PropTypes.string.isRequired,
+  todayMinutes: PropTypes.number.isRequired,
+}
+
+const PresentThisMonthCard = ({ presentDays }) => {
+  const consistencyMessage = getConsistencyMessage(presentDays)
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">Present This Month</p>
+            <p className="text-3xl font-bold mt-1">{presentDays}</p>
+            <p className="text-xs text-muted-foreground mt-1">days</p>
+            {consistencyMessage && (
+              <p className="text-xs font-medium text-green-600 mt-1">
+                {consistencyMessage}
+              </p>
+            )}
+          </div>
+          <div className="rounded-xl p-3 bg-green-100 text-green-600">
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+        </div>
+        <Link
+          to="/attendance/history"
+          className="mt-3 flex items-center gap-1 text-xs text-primary hover:underline"
+        >
+          View details <ArrowRight className="h-3 w-3" />
+        </Link>
+      </CardContent>
+    </Card>
+  )
+}
+
+PresentThisMonthCard.propTypes = { presentDays: PropTypes.number }
+PresentThisMonthCard.defaultProps = { presentDays: 0 }
+
+const LeaveRemainingCard = ({ totalRemaining }) => {
+  const { color, message } = getLeaveInsight(totalRemaining)
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">Leave Remaining</p>
+            <p className={`text-3xl font-bold mt-1 ${color}`}>
+              {totalRemaining}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">days available</p>
+            <p className={`text-xs font-medium mt-1 ${color}`}>{message}</p>
+          </div>
+          <div className="rounded-xl p-3 bg-orange-100 text-orange-600">
+            <Calendar className="h-5 w-5" />
+          </div>
+        </div>
+        <Link
+          to="/leave/employee"
+          className="mt-3 flex items-center gap-1 text-xs text-primary hover:underline"
+        >
+          View details <ArrowRight className="h-3 w-3" />
+        </Link>
+      </CardContent>
+    </Card>
+  )
+}
+
+LeaveRemainingCard.propTypes = { totalRemaining: PropTypes.number }
+LeaveRemainingCard.defaultProps = { totalRemaining: 0 }
+
 const EmployeeStatsGrid = ({ leaveProfile, todayAttendance }) => {
-  const { month, totalRemaining, todayHours } = getEmployeeStats(
+  const { month, totalRemaining, todayHours, todayMinutes } = getEmployeeStats(
     leaveProfile,
     todayAttendance
   )
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <StatCard
-        label="Today's Hours"
-        value={todayHours}
-        icon={Clock}
-        color="bg-indigo-100 text-indigo-600"
-        to="/attendance"
-      />
-      <StatCard
-        label="Present This Month"
-        value={month?.presentDays ?? 0}
-        sub="days"
-        icon={CheckCircle2}
-        color="bg-green-100 text-green-600"
-        to="/attendance/history"
-      />
-      <StatCard
-        label="Leave Remaining"
-        value={totalRemaining}
-        sub="days available"
-        icon={Calendar}
-        color="bg-orange-100 text-orange-600"
-        to="/leave/employee"
-      />
+      <TodayHoursCard todayHours={todayHours} todayMinutes={todayMinutes} />
+      <PresentThisMonthCard presentDays={month?.presentDays ?? 0} />
+      <LeaveRemainingCard totalRemaining={totalRemaining} />
       <StatCard
         label="WFH Days"
         value={month?.wfhDays ?? 0}

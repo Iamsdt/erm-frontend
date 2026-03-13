@@ -11,8 +11,10 @@ import {
   Plus,
   Phone,
   ShieldCheck,
+  Trash2,
   UserRound,
   Users,
+  X,
 } from "lucide-react"
 import PropTypes from "prop-types"
 import { useState } from "react"
@@ -560,7 +562,7 @@ AssetsSection.defaultProps = { assets: null }
 // ─── Documents Section ────────────────────────────────────────────────────────
 
 const DocumentsSection = ({ documents }) => {
-  const docs = documents ?? []
+  const documentList = documents ?? []
 
   return (
     <Card>
@@ -571,13 +573,13 @@ const DocumentsSection = ({ documents }) => {
         <CardDescription>Uploaded documents and files</CardDescription>
       </CardHeader>
       <CardContent>
-        {docs.length === 0 ? (
+        {documentList.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No documents uploaded.
           </p>
         ) : (
           <div className="space-y-2">
-            {docs.map((document_) => (
+            {documentList.map((document_) => (
               <div
                 key={document_.id}
                 className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
@@ -620,7 +622,7 @@ DocumentsSection.defaultProps = { documents: null }
 
 // ─── Assets & Documents Tab Content ───────────────────────────────────────────
 
-const AssetsAndDocsContent = ({ assets, documents }) => (
+const AssetsAndDocumentsContent = ({ assets, documents }) => (
   <div className="space-y-4 p-4 md:p-6">
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <AssetsSection assets={assets} />
@@ -629,12 +631,12 @@ const AssetsAndDocsContent = ({ assets, documents }) => (
   </div>
 )
 
-AssetsAndDocsContent.propTypes = {
+AssetsAndDocumentsContent.propTypes = {
   assets: PropTypes.array,
   documents: PropTypes.array,
 }
 
-AssetsAndDocsContent.defaultProps = {
+AssetsAndDocumentsContent.defaultProps = {
   assets: null,
   documents: null,
 }
@@ -660,8 +662,8 @@ const TimelineContent = ({ timeline }) => {
             </p>
           ) : (
             <div className="relative space-y-4 pl-6 before:absolute before:left-2 before:top-2 before:h-[calc(100%-16px)] before:w-0.5 before:bg-border">
-              {events.map((event, index) => (
-                <div key={index} className="relative">
+              {events.map((event) => (
+                <div key={`${event.type}-${event.date}`} className="relative">
                   <div
                     className={`absolute -left-6 top-1 w-4 h-4 rounded-full ${
                       TIMELINE_ICON_STYLE[event.type] ??
@@ -851,7 +853,12 @@ const renderTeamSetup = ({
   </Card>
 )
 
-const renderTeamDirectory = ({ teams, selectedTeamId, onTeamSelect }) => (
+const renderTeamDirectory = ({
+  teams,
+  selectedTeamId,
+  onTeamSelect,
+  onDeleteTeam,
+}) => (
   <Card className="lg:col-span-1">
     <CardHeader>
       <CardTitle className="text-base">Teams</CardTitle>
@@ -863,27 +870,50 @@ const renderTeamDirectory = ({ teams, selectedTeamId, onTeamSelect }) => (
       {teams.map((team) => {
         const isSelected = team.id === selectedTeamId
         return (
-          <button
-            type="button"
+          <div
             key={team.id}
-            onClick={() => onTeamSelect(team.id)}
-            className={`w-full text-left rounded-lg border px-3 py-2.5 transition-colors ${
+            className={`relative rounded-lg border px-3 py-2.5 transition-colors cursor-pointer ${
               isSelected
                 ? "bg-primary text-primary-foreground border-primary"
                 : "hover:bg-muted"
             }`}
+            role="button"
+            tabIndex={0}
+            onClick={() => onTeamSelect(team.id)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") onTeamSelect(team.id)
+            }}
           >
-            <p className="text-sm font-medium">{team.name}</p>
-            <p
-              className={`text-xs ${
-                isSelected
-                  ? "text-primary-foreground/80"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {team.memberIds.length} members
-            </p>
-          </button>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">{team.name}</p>
+                <p
+                  className={`text-xs ${
+                    isSelected
+                      ? "text-primary-foreground/80"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {team.memberIds.length} members
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-7 w-7 shrink-0 ${
+                  isSelected
+                    ? "hover:bg-primary-foreground/20 text-primary-foreground"
+                    : "hover:bg-destructive/10 text-destructive"
+                }`}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onDeleteTeam(team.id)
+                }}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
         )
       })}
     </CardContent>
@@ -894,11 +924,19 @@ const renderResponsibilityPanel = ({
   selectedTeam,
   employees,
   onTeamResponsibilityChange,
+  onRemoveTeamMember,
   onSaveRoles,
 }) => {
   const leadName =
     employees.find((employee) => String(employee.id) === selectedTeam?.leadId)
       ?.name ?? "Not assigned"
+
+  const memberNames = (selectedTeam?.memberIds ?? []).map((memberId) => {
+    const employee = employees.find(
+      (emp) => String(emp.id) === String(memberId)
+    )
+    return { id: memberId, name: employee?.name ?? memberId }
+  })
 
   return (
     <Card className="lg:col-span-2">
@@ -921,6 +959,29 @@ const renderResponsibilityPanel = ({
                 Members: {selectedTeam.memberIds.length}
               </Badge>
             </div>
+
+            {memberNames.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {memberNames.map((member) => (
+                  <Badge
+                    key={member.id}
+                    variant="outline"
+                    className="gap-1 pr-1"
+                  >
+                    {member.name}
+                    <button
+                      type="button"
+                      className="ml-1 rounded-full hover:bg-destructive/10 p-0.5"
+                      onClick={() =>
+                        onRemoveTeamMember(selectedTeam.id, member.id)
+                      }
+                    >
+                      <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
 
             {MODULE_ROLE_CONFIG.map((module) => (
               <div
@@ -984,6 +1045,8 @@ const RolesAndResponsibilities = ({
   onTeamDraftChange,
   onToggleTeamMember,
   onCreateTeam,
+  onDeleteTeam,
+  onRemoveTeamMember,
   onTeamResponsibilityChange,
   onSaveRoles,
 }) => {
@@ -1002,11 +1065,17 @@ const RolesAndResponsibilities = ({
       })}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {renderTeamDirectory({ teams, selectedTeamId, onTeamSelect })}
+        {renderTeamDirectory({
+          teams,
+          selectedTeamId,
+          onTeamSelect,
+          onDeleteTeam,
+        })}
         {renderResponsibilityPanel({
           selectedTeam,
           employees,
           onTeamResponsibilityChange,
+          onRemoveTeamMember,
           onSaveRoles,
         })}
       </div>
@@ -1024,6 +1093,8 @@ RolesAndResponsibilities.propTypes = {
   onTeamDraftChange: PropTypes.func.isRequired,
   onToggleTeamMember: PropTypes.func.isRequired,
   onCreateTeam: PropTypes.func.isRequired,
+  onDeleteTeam: PropTypes.func.isRequired,
+  onRemoveTeamMember: PropTypes.func.isRequired,
   onTeamResponsibilityChange: PropTypes.func.isRequired,
   onSaveRoles: PropTypes.func.isRequired,
 }
@@ -1069,6 +1140,8 @@ const ProfileUI = ({
   onTeamDraftChange,
   onToggleTeamMember,
   onCreateTeam,
+  onDeleteTeam,
+  onRemoveTeamMember,
   onTeamResponsibilityChange,
   onSaveRoles,
 }) => {
@@ -1151,7 +1224,7 @@ const ProfileUI = ({
           {profileContent()}
         </TabsContent>
         <TabsContent value="assets" className="mt-0">
-          <AssetsAndDocsContent
+          <AssetsAndDocumentsContent
             assets={profile?.assets}
             documents={profile?.documents}
           />
@@ -1180,6 +1253,8 @@ const ProfileUI = ({
             onTeamDraftChange={onTeamDraftChange}
             onToggleTeamMember={onToggleTeamMember}
             onCreateTeam={onCreateTeam}
+            onDeleteTeam={onDeleteTeam}
+            onRemoveTeamMember={onRemoveTeamMember}
             onTeamResponsibilityChange={onTeamResponsibilityChange}
             onSaveRoles={onSaveRoles}
           />
@@ -1220,6 +1295,8 @@ ProfileUI.propTypes = {
   onTeamDraftChange: PropTypes.func.isRequired,
   onToggleTeamMember: PropTypes.func.isRequired,
   onCreateTeam: PropTypes.func.isRequired,
+  onDeleteTeam: PropTypes.func.isRequired,
+  onRemoveTeamMember: PropTypes.func.isRequired,
   onTeamResponsibilityChange: PropTypes.func.isRequired,
   onSaveRoles: PropTypes.func.isRequired,
 }

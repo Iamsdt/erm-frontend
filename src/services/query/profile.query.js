@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
+import { toast } from "@/components/ui/use-toast"
 import {
   getMyProfile,
   patchMyProfile,
@@ -7,6 +8,7 @@ import {
 } from "@api/profile.api"
 
 const QUERY_KEY_PROFILE = "my-profile"
+const MUTATION_ERROR_DESCRIPTION = "Something went wrong. Please try again."
 
 /**
  * React Query hook to fetch the current user's profile.
@@ -34,7 +36,18 @@ export const useUpdateMyProfile = () => {
   return useMutation({
     mutationFn: (payload) => patchMyProfile(payload),
     onSuccess: () => {
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_PROFILE] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -46,5 +59,18 @@ export const useUpdateMyProfile = () => {
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: (payload) => postChangePassword(payload),
+    onSuccess: () => {
+      toast({
+        title: "Password changed",
+        description: "Your password has been updated.",
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
   })
 }

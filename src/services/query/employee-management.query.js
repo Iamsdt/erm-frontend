@@ -1,11 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
+import { toast } from "@/components/ui/use-toast"
 import {
   deleteEmployee,
   getEmployee,
   getEmployee360Profile,
   getEmployeePerformance,
   getEmployees,
+  patchBulkEmployeeDepartment,
+  patchBulkEmployeeStatus,
   patchEmployee,
   postEmployee,
   postInviteUser,
@@ -15,6 +18,7 @@ const QUERY_KEY_EMPLOYEES = "employee-management-list"
 const QUERY_KEY_EMPLOYEE_DETAIL = "employee-management-detail"
 const QUERY_KEY_EMPLOYEE_PERFORMANCE = "employee-performance"
 const QUERY_KEY_EMPLOYEE_360 = "employee-360-profile"
+const MUTATION_ERROR_DESCRIPTION = "Something went wrong. Please try again."
 
 /**
  * React Query hook for fetching the full employee list.
@@ -60,7 +64,18 @@ export const useCreateEmployee = () => {
   return useMutation({
     mutationFn: (payload) => postEmployee(payload),
     onSuccess: () => {
+      toast({
+        title: "Employee created",
+        description: "New employee has been added.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEES] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -75,9 +90,20 @@ export const useUpdateEmployee = () => {
   return useMutation({
     mutationFn: ({ id, ...payload }) => patchEmployee(id, payload),
     onSuccess: (_data, variables) => {
+      toast({
+        title: "Employee updated",
+        description: "Employee details have been updated.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEES] })
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEY_EMPLOYEE_DETAIL, variables.id],
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
       })
     },
   })
@@ -93,7 +119,18 @@ export const useDeleteEmployee = () => {
   return useMutation({
     mutationFn: (id) => deleteEmployee(id),
     onSuccess: () => {
+      toast({
+        title: "Employee deleted",
+        description: "Employee has been removed.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEES] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -107,8 +144,19 @@ export const useInviteUser = () => {
   return useMutation({
     mutationFn: (payload) => postInviteUser(payload),
     onSuccess: () => {
+      toast({
+        title: "Invitation sent",
+        description: "User invitation has been sent.",
+      })
       // Invited users may appear in the employee list as "invited"
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEES] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -145,5 +193,56 @@ export const useFetchEmployee360 = (id) => {
     staleTime: 5 * 60 * 1000,
     retry: 2,
     enabled: Boolean(id),
+  })
+}
+
+/**
+ * Mutation hook to bulk-update the status of multiple employees.
+ * @returns {import("@tanstack/react-query").UseMutationResult} The mutation result
+ */
+export const useBulkUpdateStatus = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ ids, status }) => patchBulkEmployeeStatus(ids, status),
+    onSuccess: () => {
+      toast({
+        title: "Status updated",
+        description: "Selected employees have been updated.",
+      })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEES] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
+  })
+}
+
+/**
+ * Mutation hook to bulk-update the department of multiple employees.
+ * @returns {import("@tanstack/react-query").UseMutationResult} The mutation result
+ */
+export const useBulkUpdateDepartment = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ ids, department }) =>
+      patchBulkEmployeeDepartment(ids, department),
+    onSuccess: () => {
+      toast({
+        title: "Department updated",
+        description: "Selected employees have been moved.",
+      })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEES] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
   })
 }

@@ -13,12 +13,13 @@ const AttendanceHistory = () => {
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
 
-  const { data, isLoading } = useAttendanceHistory(year, month)
+  const { data, isLoading, isError } = useAttendanceHistory(year, month)
 
   return (
     <HistoryUI
       data={data}
       isLoading={isLoading}
+      isError={isError}
       year={year}
       month={month}
       onYearChange={setYear}

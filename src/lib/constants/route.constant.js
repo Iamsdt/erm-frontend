@@ -3,6 +3,7 @@ const routes = {
   auth: {
     LOGIN: "login",
     SINGUP: "signup",
+    FORGOT_PASSWORD: "forgot-password",
   },
   leave: {
     CALENDAR: "/leave/calendar",
@@ -32,9 +33,24 @@ const routes = {
     LIST: "/projects",
     DETAIL: "/projects/:projectId",
     SPRINT: "/projects/:projectId/sprints/:sprintId",
-    REPORTS: "/projects/reports",
     SETTINGS: "/projects/:projectId/settings",
     NOTE_CREATE: "/projects/:projectId/notes/new",
+  },
+  dailyUpdate: {
+    HUB: "/daily-update",
+    STANDUP: "/daily-update/standup",
+    CREATE_STANDUP: "/daily-update/standup/new",
+    TEAM: "/daily-update/team",
+    PROGRESS: "/daily-update/progress",
+  },
+  ai: {
+    HUB: "/ai",
+    INSIGHTS: "/ai/insights",
+    RECOMMENDATIONS: "/ai/recommendations",
+    ANALYTICS: "/ai/analytics",
+  },
+  notifications: {
+    INDEX: "/notifications",
   },
   profile: {
     MY_PROFILE: "/profile",
@@ -44,6 +60,9 @@ const routes = {
   },
   rewards: {
     INDEX: "/rewards",
+  },
+  audit: {
+    LOG: "/audit-log",
   },
 }
 

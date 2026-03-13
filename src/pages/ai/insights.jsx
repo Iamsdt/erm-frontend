@@ -1,77 +1,232 @@
 import {
+  AlertCircle,
   ArrowLeft,
+  BarChart3,
+  TrendingUp,
+  Zap,
+} from "lucide-react"
+import PropTypes from "prop-types"
+import { Link, useNavigate } from "react-router"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "@/components/ui/use-toast"
+import ct from "@constants/"
+import { useFetchInsights } from "@query/ai.query"
+
+// ─── Icon map (icons can't be serialized in API responses) ───────────────────
+
+const ICON_MAP = {
   TrendingUp,
   AlertCircle,
   Zap,
   BarChart3,
-} from "lucide-react"
-import { Link } from "react-router"
+}
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+const CATEGORY_COLOR = {
+  Productivity: "bg-blue-100 text-blue-800",
+  Process: "bg-red-100 text-red-800",
+  Resources: "bg-yellow-100 text-yellow-800",
+  Quality: "bg-green-100 text-green-800",
+}
 
-/**
- * AI Insights Page - AI-powered insights and predictions
- */
-const AIInsightsPage = () => {
-  const insights = [
-    {
-      id: 1,
-      title: "Team Productivity Peak",
-      icon: TrendingUp,
-      description:
-        "Your team's productivity peaks on Tuesday and Wednesday mornings. Consider scheduling critical tasks during these times.",
-      confidence: "92%",
-      category: "Productivity",
-      actionable: true,
-    },
-    {
-      id: 2,
-      title: "Bottleneck Detected",
-      icon: AlertCircle,
-      description:
-        "Code review process is taking longer than usual. Average time increased by 35%. Consider pairing reviewers to speed up.",
-      confidence: "88%",
-      category: "Process",
-      actionable: true,
-    },
-    {
-      id: 3,
-      title: "Resource Allocation Opportunity",
-      icon: Zap,
-      description:
-        "Backend team is operating at 65% capacity. Frontend team at 95%. Recommend task rebalancing.",
-      confidence: "85%",
-      category: "Resources",
-      actionable: true,
-    },
-    {
-      id: 4,
-      title: "Quality Trend Analysis",
-      icon: BarChart3,
-      description:
-        "Code quality metrics improved by 22% over the last sprint. Bug detection rate up by 15%.",
-      confidence: "91%",
-      category: "Quality",
-      actionable: false,
-    },
-  ]
+const STATS_CONFIG = [
+  { key: "totalInsights", label: "Active Insights", color: "text-blue-600" },
+  { key: "avgConfidence", label: "Avg Confidence", color: "text-green-600" },
+  {
+    key: "actionableCount",
+    label: "Actionable Items",
+    color: "text-yellow-600",
+  },
+  {
+    key: "updateFrequency",
+    label: "Update Frequency",
+    color: "text-purple-600",
+  },
+]
 
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case "Productivity":
-        return "bg-blue-100 text-blue-800"
-      case "Process":
-        return "bg-red-100 text-red-800"
-      case "Resources":
-        return "bg-yellow-100 text-yellow-800"
-      case "Quality":
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
+const InsightCardSkeleton = () => (
+  <Card>
+    <CardContent className="pt-6">
+      <div className="flex gap-4">
+        <Skeleton className="h-12 w-12 rounded-lg" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-3/4" />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+)
+
+// ─── InsightStatsGrid ────────────────────────────────────────────────────────
+
+const InsightStatsGrid = ({ stats, isLoading }) => (
+  <div className="grid gap-4 md:grid-cols-4">
+    {STATS_CONFIG.map((stat) => (
+      <Card key={stat.label}>
+        <CardContent className="pt-6">
+          <div className="text-center">
+            {isLoading ? (
+              <Skeleton className="h-8 w-12 mx-auto mb-1" />
+            ) : (
+              <p className={`text-3xl font-bold ${stat.color}`}>
+                {stats[stat.key] ?? "\u2014"}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+          </div>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+)
+
+InsightStatsGrid.propTypes = {
+  stats: PropTypes.shape({
+    totalInsights: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    avgConfidence: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    actionableCount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    updateFrequency: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }),
+  isLoading: PropTypes.bool,
+}
+
+InsightStatsGrid.defaultProps = {
+  stats: {},
+  isLoading: false,
+}
+
+// ─── InsightCard ─────────────────────────────────────────────────────────────
+
+const InsightCard = ({ insight }) => {
+  const IconComponent = ICON_MAP[insight.icon] ?? BarChart3
+  const navigate = useNavigate()
+
+  const handleTakeAction = () => {
+    navigate(ct.route.ai.RECOMMENDATIONS)
+    toast({
+      title: "Insight flagged",
+      description: `"${insight.title}" has been added to your recommendations.`,
+    })
   }
+
+  const handleLearnMore = () => {
+    navigate(ct.route.ai.ANALYTICS)
+  }
+
+  return (
+    <Card className="hover:shadow-lg transition-shadow overflow-hidden">
+      <CardContent className="pt-6">
+        <div className="flex gap-4">
+          <div className="flex-shrink-0">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
+              <IconComponent className="h-6 w-6 text-slate-600" />
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-start justify-between mb-2">
+              <div>
+                <h3 className="font-semibold text-lg">{insight.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {insight.description}
+                </p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <Badge
+                  className={
+                    CATEGORY_COLOR[insight.category] ??
+                    "bg-gray-100 text-gray-800"
+                  }
+                >
+                  {insight.category}
+                </Badge>
+                <p className="text-sm font-semibold text-gray-600 mt-2">
+                  {insight.confidence} confident
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center gap-2 pt-4 border-t">
+              {insight.actionable && (
+                <Button size="sm" variant="default" onClick={handleTakeAction}>
+                  Take Action
+                </Button>
+              )}
+              <Button size="sm" variant="outline" onClick={handleLearnMore}>
+                Learn More
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+InsightCard.propTypes = {
+  insight: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    icon: PropTypes.string,
+    category: PropTypes.string,
+    confidence: PropTypes.string,
+    actionable: PropTypes.bool,
+  }).isRequired,
+}
+
+// ─── InsightsList ────────────────────────────────────────────────────────────
+
+const InsightsList = ({ insights, isLoading, isError }) => (
+  <div className="space-y-4">
+    <h2 className="text-xl font-semibold">Your Insights</h2>
+
+    {isLoading && (
+      <div className="grid gap-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <InsightCardSkeleton key={index} />
+        ))}
+      </div>
+    )}
+
+    {!isLoading && !isError && insights.length === 0 && (
+      <p className="text-sm text-center text-muted-foreground py-6">
+        No insights available yet.
+      </p>
+    )}
+
+    {!isLoading && !isError && (
+      <div className="grid gap-4">
+        {insights.map((insight) => (
+          <InsightCard key={insight.id} insight={insight} />
+        ))}
+      </div>
+    )}
+  </div>
+)
+
+InsightsList.propTypes = {
+  insights: PropTypes.arrayOf(InsightCard.propTypes.insight),
+  isLoading: PropTypes.bool,
+  isError: PropTypes.bool,
+}
+
+InsightsList.defaultProps = {
+  insights: [],
+  isLoading: false,
+  isError: false,
+}
+
+// ─── AIInsightsPage ──────────────────────────────────────────────────────────
+
+const AIInsightsPage = () => {
+  const { data, isLoading, isError } = useFetchInsights()
+  const insights = data?.insights ?? []
+  const stats = data?.stats ?? {}
 
   return (
     <div className="space-y-6 p-6">
@@ -85,110 +240,23 @@ const AIInsightsPage = () => {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Insights</h1>
         <p className="mt-2 text-muted-foreground">
-          Machine learning-powered insights about your team's performance and
-          workflows
+          Machine learning-powered insights about your team&apos;s performance
+          and workflows
         </p>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-blue-600">4</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Active Insights
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-green-600">89%</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Avg Confidence
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-yellow-600">3</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Actionable Items
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-purple-600">Last 24h</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Update Frequency
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {isError && (
+        <p className="text-sm text-center text-destructive py-6">
+          Failed to load insights. Please try again.
+        </p>
+      )}
 
-      {/* Insights Cards */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Your Insights</h2>
-        <div className="grid gap-4">
-          {insights.map((insight) => {
-            const IconComponent = insight.icon
-            return (
-              <Card
-                key={insight.id}
-                className="hover:shadow-lg transition-shadow overflow-hidden"
-              >
-                <CardContent className="pt-6">
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
-                        <IconComponent className="h-6 w-6 text-slate-600" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-lg">
-                            {insight.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {insight.description}
-                          </p>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <Badge className={getCategoryColor(insight.category)}>
-                            {insight.category}
-                          </Badge>
-                          <p className="text-sm font-semibold text-gray-600 mt-2">
-                            {insight.confidence} confident
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex items-center gap-2 pt-4 border-t">
-                        {insight.actionable && (
-                          <Button size="sm" variant="default">
-                            Take Action
-                          </Button>
-                        )}
-                        <Button size="sm" variant="outline">
-                          Learn More
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-      </div>
+      <InsightStatsGrid stats={stats} isLoading={isLoading} />
+      <InsightsList
+        insights={insights}
+        isLoading={isLoading}
+        isError={isError}
+      />
     </div>
   )
 }

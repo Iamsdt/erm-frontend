@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
+import { toast } from "@/components/ui/use-toast"
 import {
   getAdminAttendanceLogs,
   getAdminAttendanceSummary,
@@ -13,6 +14,8 @@ import {
   postClockIn,
   postClockOut,
 } from "@api/attendance.api"
+
+const GENERIC_ERROR_DESCRIPTION = "Something went wrong. Please try again."
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 
@@ -84,8 +87,19 @@ export const useClockIn = () => {
   return useMutation({
     mutationFn: postClockIn,
     onSuccess: () => {
+      toast({
+        title: "Clocked in",
+        description: "You have been clocked in successfully.",
+      })
       qc.invalidateQueries({ queryKey: [QK_STATUS] })
       qc.invalidateQueries({ queryKey: [QK_TODAY] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -98,8 +112,19 @@ export const useClockOut = () => {
   return useMutation({
     mutationFn: postClockOut,
     onSuccess: () => {
+      toast({
+        title: "Clocked out",
+        description: "You have been clocked out successfully.",
+      })
       qc.invalidateQueries({ queryKey: [QK_STATUS] })
       qc.invalidateQueries({ queryKey: [QK_TODAY] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -148,7 +173,18 @@ export const useEditAttendanceEntry = () => {
   return useMutation({
     mutationFn: ({ id, data }) => patchAdminAttendanceEntry(id, data),
     onSuccess: () => {
+      toast({
+        title: "Entry updated",
+        description: "Attendance entry has been updated.",
+      })
       qc.invalidateQueries({ queryKey: [QK_ADMIN_LOGS] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -161,7 +197,18 @@ export const useFlagAttendanceEntry = () => {
   return useMutation({
     mutationFn: ({ id, data }) => patchAdminFlagEntry(id, data),
     onSuccess: () => {
+      toast({
+        title: "Entry flagged",
+        description: "Attendance entry flag has been updated.",
+      })
       qc.invalidateQueries({ queryKey: [QK_ADMIN_LOGS] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -174,8 +221,19 @@ export const useAddManualAttendanceEntry = () => {
   return useMutation({
     mutationFn: postAdminManualEntry,
     onSuccess: () => {
+      toast({
+        title: "Entry added",
+        description: "Manual attendance entry has been added.",
+      })
       qc.invalidateQueries({ queryKey: [QK_ADMIN_LOGS] })
       qc.invalidateQueries({ queryKey: [QK_ADMIN_LIVE] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }

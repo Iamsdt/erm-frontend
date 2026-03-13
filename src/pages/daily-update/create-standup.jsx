@@ -1,25 +1,28 @@
 import {
-  ArrowLeft,
-  Send,
-  Plus,
-  Trash2,
-  Check,
-  Clock,
   AlertCircle,
+  ArrowLeft,
+  Check,
+  CheckCircle2,
+  Clock,
+  Lightbulb,
+  Plus,
+  Send,
   Sparkles,
+  Trash2,
 } from "lucide-react"
-import { useState } from "react"
+import PropTypes from "prop-types"
+import { useRef, useState } from "react"
 import { useDispatch } from "react-redux"
-import { Link, useNavigate } from "react-router"
+import { Link } from "react-router"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -33,71 +36,139 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { setStandupStatus } from "@/services/store/slices/app.slice"
+import {
+  useAiReview,
+  useFetchStandupProjects,
+  useFetchUserStories,
+  useSubmitStandup,
+} from "@query/daily-update.query"
 
-// Mock data for projects and user stories
-const MOCK_PROJECTS = [
-  { id: "p1", name: "ERM Frontend Redesign" },
-  { id: "p2", name: "Backend API v2" },
-  { id: "p3", name: "Mobile App MVP" },
-]
+// ─── Constants ───────────────────────────────────────────────────────────────
 
-const MOCK_USER_STORIES = {
-  p1: [
-    { id: "us1", title: "ERM-101: Implement new dashboard layout" },
-    { id: "us2", title: "ERM-105: Add dark mode support" },
-    { id: "us3", title: "ERM-112: Refactor authentication flow" },
-  ],
-  p2: [
-    { id: "us4", title: "API-201: Create user management endpoints" },
-    { id: "us5", title: "API-205: Implement rate limiting" },
-  ],
-  p3: [
-    { id: "us6", title: "MOB-301: Setup React Native project" },
-    { id: "us7", title: "MOB-305: Implement push notifications" },
-  ],
+const STANDUP_NOT_SUBMITTED = "Not Submitted"
+
+const STATUS_MAP = {
+  pending: {
+    icon: Clock,
+    iconColor: "text-yellow-600",
+    bg: "bg-yellow-50 border-yellow-200",
+    label: "Pending Submission",
+  },
+  reviewing: {
+    icon: Sparkles,
+    iconColor: "text-blue-600",
+    bg: "bg-blue-50 border-blue-200",
+    label: "AI Reviewing",
+  },
+  approved: {
+    icon: Check,
+    iconColor: "text-green-600",
+    bg: "bg-green-50 border-green-200",
+    label: "Approved",
+  },
+  rejected: {
+    icon: AlertCircle,
+    iconColor: "text-red-600",
+    bg: "bg-red-50 border-red-200",
+    label: "Needs Revision",
+  },
+}
+
+const EMPTY_UPDATE_FIELDS = {
+  projectId: "",
+  userStoryIds: [],
+  yesterday: "",
+  today: "",
+  blockers: "",
+}
+
+const createEmptyUpdate = () => ({
+  ...EMPTY_UPDATE_FIELDS,
+  id: globalThis.crypto.randomUUID(),
+})
+
+// ─── Submission Status Component ──────────────────────────────────────────────
+
+/**
+ * Renders the approved state with a success celebration card and optional suggestions.
+ */
+const ApprovedFeedback = ({ feedback }) => (
+  <div className="space-y-3">
+    <Card className="border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30">
+      <CardContent className="flex items-start gap-3 p-4">
+        <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 mt-0.5" />
+        <div>
+          <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+            Great update! Your standup has been reviewed and looks good.
+          </p>
+          {feedback && (
+            <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-400">
+              {feedback}
+            </p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+    <Button variant="outline" size="sm" asChild className="w-full gap-2">
+      <Link to="/ai/recommendations">
+        <Sparkles className="h-4 w-4" />
+        View AI Recommendations
+      </Link>
+    </Button>
+  </div>
+)
+
+ApprovedFeedback.propTypes = {
+  feedback: PropTypes.string,
+}
+
+ApprovedFeedback.defaultProps = {
+  feedback: null,
 }
 
 /**
- * Submission Status Component - Shows the status of the standup submission
+ * Renders the rejected state with suggestions in an amber card.
  */
-const SubmissionStatus = ({ status, feedback, aiApproved }) => {
-  const getStatusColor = () => {
-    if (status === "pending") return "bg-yellow-50 border-yellow-200"
-    if (status === "reviewing") return "bg-blue-50 border-blue-200"
-    if (status === "approved") return "bg-green-50 border-green-200"
-    if (status === "rejected") return "bg-red-50 border-red-200"
-    return "bg-gray-50 border-gray-200"
-  }
+const RejectedFeedback = ({ feedback }) => (
+  <div className="space-y-3">
+    {feedback && (
+      <Card className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+        <CardContent className="flex items-start gap-3 p-4">
+          <Lightbulb className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+              Suggestions for improvement
+            </p>
+            <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+              {feedback}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )}
+    <Button variant="outline" size="sm" className="w-full">
+      Edit &amp; Resubmit
+    </Button>
+  </div>
+)
 
-  const getStatusIcon = () => {
-    if (status === "pending") {
-      return <Clock className="h-4 w-4 text-yellow-600" />
-    }
-    if (status === "reviewing") {
-      return <Sparkles className="h-4 w-4 text-blue-600" />
-    }
-    if (status === "approved") {
-      return <Check className="h-4 w-4 text-green-600" />
-    }
-    if (status === "rejected") {
-      return <AlertCircle className="h-4 w-4 text-red-600" />
-    }
-    return null
-  }
+RejectedFeedback.propTypes = {
+  feedback: PropTypes.string,
+}
 
-  const getStatusText = () => {
-    if (status === "pending") return "Pending Submission"
-    if (status === "reviewing") return "AI Reviewing"
-    if (status === "approved") return "Approved"
-    if (status === "rejected") return "Needs Revision"
-    return "Unknown"
-  }
+RejectedFeedback.defaultProps = {
+  feedback: null,
+}
+
+const SubmissionStatus = ({ status, feedback }) => {
+  const config = STATUS_MAP[status] ?? STATUS_MAP.pending
+  const StatusIcon = config.icon
 
   return (
-    <Card className={`border ${getStatusColor()}`}>
+    <Card className={`border ${config.bg}`}>
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
-          {getStatusIcon()}
+          <StatusIcon className={`h-4 w-4 ${config.iconColor}`} />
           Submission Status
         </CardTitle>
       </CardHeader>
@@ -114,7 +185,7 @@ const SubmissionStatus = ({ status, feedback, aiApproved }) => {
                     : "secondary"
               }
             >
-              {getStatusText()}
+              {config.label}
             </Badge>
           </div>
           {status === "reviewing" && (
@@ -124,40 +195,9 @@ const SubmissionStatus = ({ status, feedback, aiApproved }) => {
           )}
         </div>
 
-        {feedback && (
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">AI Feedback</Label>
-            <div className="bg-background/50 rounded-md p-3 text-sm text-muted-foreground border">
-              {feedback}
-            </div>
-          </div>
-        )}
+        {status === "approved" && <ApprovedFeedback feedback={feedback} />}
 
-        {status === "approved" && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 p-2 rounded">
-              <Check className="h-4 w-4" />
-              Great job! Your standup has been approved by AI.
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="w-full gap-2"
-            >
-              <Link to="/ai/recommendations">
-                <Sparkles className="h-4 w-4" />
-                View AI Recommendations
-              </Link>
-            </Button>
-          </div>
-        )}
-
-        {status === "rejected" && (
-          <Button variant="outline" size="sm" className="w-full">
-            Edit & Resubmit
-          </Button>
-        )}
+        {status === "rejected" && <RejectedFeedback feedback={feedback} />}
 
         {status !== "pending" && (
           <Button variant="outline" size="sm" asChild className="w-full gap-2">
@@ -172,117 +212,316 @@ const SubmissionStatus = ({ status, feedback, aiApproved }) => {
   )
 }
 
+SubmissionStatus.propTypes = {
+  status: PropTypes.oneOf(["pending", "reviewing", "approved", "rejected"])
+    .isRequired,
+  feedback: PropTypes.string,
+}
+
+SubmissionStatus.defaultProps = {
+  feedback: null,
+}
+
+// ─── User Story Picker ───────────────────────────────────────────────────────
+
+const UserStoryPicker = ({ projectId, selectedIds, onToggle }) => {
+  const { data, isLoading } = useFetchUserStories(projectId)
+  const stories = data?.stories ?? []
+
+  if (isLoading) {
+    return (
+      <div className="border rounded-md p-4 text-sm text-muted-foreground">
+        Loading stories...
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      <Label>User Stories / Tasks (Select Multiple)</Label>
+      <div className="border rounded-md p-4 space-y-2">
+        {stories.map((story) => (
+          <div key={story.id} className="flex items-center space-x-2">
+            <Checkbox
+              id={`story-${projectId}-${story.id}`}
+              checked={selectedIds.includes(story.id)}
+              onCheckedChange={() => onToggle(story.id)}
+            />
+            <Label
+              htmlFor={`story-${projectId}-${story.id}`}
+              className="cursor-pointer text-sm font-normal"
+            >
+              {story.title}
+            </Label>
+          </div>
+        ))}
+        <div className="flex items-center space-x-2 pt-2">
+          <Checkbox
+            id={`story-${projectId}-other`}
+            checked={selectedIds.includes("other")}
+            onCheckedChange={() => onToggle("other")}
+          />
+          <Label
+            htmlFor={`story-${projectId}-other`}
+            className="cursor-pointer text-sm font-normal"
+          >
+            Other / General Task
+          </Label>
+        </div>
+      </div>
+      {selectedIds.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {selectedIds.map((storyId) => (
+            <Badge key={storyId} variant="outline" className="text-xs">
+              {storyId === "other"
+                ? "Other"
+                : stories.find((s) => s.id === storyId)?.title || storyId}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+UserStoryPicker.propTypes = {
+  projectId: PropTypes.string.isRequired,
+  selectedIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onToggle: PropTypes.func.isRequired,
+}
+
+// ─── Standup Update Card ─────────────────────────────────────────────────────
+
+const StandupUpdateCard = ({
+  update,
+  index,
+  projects,
+  showRemove,
+  onRemove,
+  onChange,
+  onStoryToggle,
+}) => (
+  <Card className="relative overflow-hidden">
+    {showRemove && (
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
+        onClick={() => onRemove(update.id)}
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    )}
+    <CardHeader className="pb-4">
+      <CardTitle className="text-lg">Update #{index + 1}</CardTitle>
+      <CardDescription>
+        Select the project and stories you are working on
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor={`project-${update.id}`}>
+          Project <span className="text-destructive">*</span>
+        </Label>
+        <Select
+          value={update.projectId}
+          onValueChange={(value) => onChange(update.id, "projectId", value)}
+        >
+          <SelectTrigger id={`project-${update.id}`}>
+            <SelectValue placeholder="Select a project" />
+          </SelectTrigger>
+          <SelectContent>
+            {projects.map((project) => (
+              <SelectItem key={project.id} value={project.id}>
+                {project.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {update.projectId && (
+        <UserStoryPicker
+          projectId={update.projectId}
+          selectedIds={update.userStoryIds}
+          onToggle={(storyId) => onStoryToggle(update.id, storyId)}
+        />
+      )}
+
+      <Separator />
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor={`yesterday-${update.id}`}>
+            What did you accomplish yesterday?
+          </Label>
+          <Textarea
+            id={`yesterday-${update.id}`}
+            placeholder="Briefly describe what you completed..."
+            value={update.yesterday}
+            onChange={(event) =>
+              onChange(update.id, "yesterday", event.target.value)
+            }
+            rows={2}
+            className="resize-none"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor={`today-${update.id}`}>
+            What will you do today? <span className="text-destructive">*</span>
+          </Label>
+          <Textarea
+            id={`today-${update.id}`}
+            placeholder="What are your goals for today?"
+            value={update.today}
+            onChange={(event) =>
+              onChange(update.id, "today", event.target.value)
+            }
+            rows={2}
+            className="resize-none"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor={`blockers-${update.id}`}>
+            Are there any blockers in your way?
+          </Label>
+          <Textarea
+            id={`blockers-${update.id}`}
+            placeholder="List any impediments or dependencies (leave blank if none)..."
+            value={update.blockers}
+            onChange={(event) =>
+              onChange(update.id, "blockers", event.target.value)
+            }
+            rows={2}
+            className="resize-none"
+          />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+)
+
+const updatePropertyType = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  projectId: PropTypes.string.isRequired,
+  userStoryIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+  yesterday: PropTypes.string.isRequired,
+  today: PropTypes.string.isRequired,
+  blockers: PropTypes.string.isRequired,
+})
+
+const projectPropertyType = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+})
+
+StandupUpdateCard.propTypes = {
+  update: updatePropertyType.isRequired,
+  index: PropTypes.number.isRequired,
+  projects: PropTypes.arrayOf(projectPropertyType).isRequired,
+  showRemove: PropTypes.bool.isRequired,
+  onRemove: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onStoryToggle: PropTypes.func.isRequired,
+}
+
+// ─── Main Page ───────────────────────────────────────────────────────────────
+
 /**
- * CreateStandupPage - Form for developers to submit their daily standup
+ * CreateStandupPage — form for developers to submit their daily standup.
  */
 const CreateStandupPage = () => {
-  const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { data: projectsData } = useFetchStandupProjects()
+  const submitMutation = useSubmitStandup()
+  const aiReviewMutation = useAiReview()
+
+  const projects = projectsData?.projects ?? []
+
   const [submissionStatus, setSubmissionStatus] = useState("pending")
   const [aiFeedback, setAiFeedback] = useState(null)
+  const [updates, setUpdates] = useState(() => [createEmptyUpdate()])
 
-  // A user can work on multiple projects/stories in a day
-  const [updates, setUpdates] = useState([
-    {
-      id: Date.now().toString(),
-      projectId: "",
-      userStoryIds: [],
-      yesterday: "",
-      today: "",
-      blockers: "",
-    },
-  ])
+  const idCounterReference = useRef(0)
+  const generateId = () => {
+    idCounterReference.current += 1
+    return globalThis.crypto.randomUUID()
+  }
 
   const handleAddUpdate = () => {
-    setUpdates([
-      ...updates,
-      {
-        id: Date.now().toString(),
-        projectId: "",
-        userStoryIds: [],
-        yesterday: "",
-        today: "",
-        blockers: "",
-      },
+    setUpdates((previous) => [
+      ...previous,
+      { ...EMPTY_UPDATE_FIELDS, id: generateId() },
     ])
   }
 
   const handleRemoveUpdate = (idToRemove) => {
-    if (updates.length > 1) {
-      setUpdates(updates.filter((update) => update.id !== idToRemove))
-    }
+    setUpdates((previous) => {
+      if (previous.length <= 1) return previous
+      return previous.filter((update) => update.id !== idToRemove)
+    })
   }
 
   const handleUpdateChange = (id, field, value) => {
-    setUpdates(
-      updates.map((update) => {
-        if (update.id === id) {
-          const newUpdate = { ...update, [field]: value }
-          // Reset user stories if project changes
-          if (field === "projectId") {
-            newUpdate.userStoryIds = []
-          }
-          return newUpdate
+    setUpdates((previous) =>
+      previous.map((update) => {
+        if (update.id !== id) return update
+        const newUpdate = { ...update, [field]: value }
+        if (field === "projectId") {
+          newUpdate.userStoryIds = []
         }
-        return update
+        return newUpdate
       })
     )
   }
 
   const handleUserStoryToggle = (updateId, storyId) => {
-    setUpdates(
-      updates.map((update) => {
-        if (update.id === updateId) {
-          const newUserStoryIds = update.userStoryIds.includes(storyId)
-            ? update.userStoryIds.filter((id) => id !== storyId)
-            : [...update.userStoryIds, storyId]
-          return { ...update, userStoryIds: newUserStoryIds }
-        }
-        return update
+    setUpdates((previous) =>
+      previous.map((update) => {
+        if (update.id !== updateId) return update
+        const newUserStoryIds = update.userStoryIds.includes(storyId)
+          ? update.userStoryIds.filter((id) => id !== storyId)
+          : [...update.userStoryIds, storyId]
+        return { ...update, userStoryIds: newUserStoryIds }
       })
     )
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleSubmit = (event) => {
+    event.preventDefault()
 
-    // Validate form (basic validation)
-    const isValid = updates.every((u) => u.projectId && u.today)
-    if (!isValid) {
-      alert(
-        "Please fill in at least the Project and Today's plan for all entries."
-      )
-      setIsSubmitting(false)
-      return
-    }
+    const isValid = updates.every((u) => u.projectId && u.today?.trim())
+    if (!isValid) return
 
-    // Simulate API call and AI review
-    setTimeout(() => {
-      setSubmissionStatus("reviewing")
-      dispatch(setStandupStatus("In Review"))
-      setIsSubmitting(false)
+    setSubmissionStatus("reviewing")
+    dispatch(setStandupStatus("In Review"))
 
-      // Simulate AI review after 2 seconds
-      setTimeout(() => {
-        // Randomly decide approval status
-        const approved = Math.random() > 0.3
-        if (approved) {
-          setSubmissionStatus("approved")
-          dispatch(setStandupStatus("Done"))
-          setAiFeedback(
-            "Your standup is well-structured with clear goals and blockers identified. Keep up the good work!"
-          )
-        } else {
+    submitMutation.mutate({ updates })
+
+    aiReviewMutation.mutate(
+      { updates },
+      {
+        onSuccess: (response) => {
+          const result = response.data
+          if (result.approved) {
+            setSubmissionStatus("approved")
+            dispatch(setStandupStatus("Done"))
+          } else {
+            setSubmissionStatus("rejected")
+            dispatch(setStandupStatus(STANDUP_NOT_SUBMITTED))
+          }
+          setAiFeedback(result.feedback)
+        },
+        onError: () => {
           setSubmissionStatus("rejected")
-          dispatch(setStandupStatus("Not Submitted"))
-          setAiFeedback(
-            "Please provide more details about blockers you're facing. Also, consider breaking down your tasks into smaller milestones."
-          )
-        }
-      }, 2000)
-    }, 1000)
+          dispatch(setStandupStatus(STANDUP_NOT_SUBMITTED))
+          setAiFeedback("AI review failed. Please try resubmitting.")
+        },
+      }
+    )
   }
 
   const dateLabel = new Date().toLocaleDateString("en-US", {
@@ -292,11 +531,17 @@ const CreateStandupPage = () => {
     day: "numeric",
   })
 
+  const isSubmitting = submitMutation.isPending || aiReviewMutation.isPending
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
         <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/daily-update">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold tracking-tight">
               Post Daily Standup
@@ -321,187 +566,20 @@ const CreateStandupPage = () => {
 
         <Separator />
 
-        {/* Main Content - Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Form */}
           <div className="lg:col-span-2 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {updates.map((update, index) => (
-                <Card key={update.id} className="relative overflow-hidden">
-                  {updates.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
-                      onClick={() => handleRemoveUpdate(update.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg">
-                      Update #{index + 1}
-                    </CardTitle>
-                    <CardDescription>
-                      Select the project and stories you are working on
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Project Selection */}
-                    <div className="space-y-2">
-                      <Label htmlFor={`project-${update.id}`}>
-                        Project <span className="text-destructive">*</span>
-                      </Label>
-                      <Select
-                        value={update.projectId}
-                        onValueChange={(value) =>
-                          handleUpdateChange(update.id, "projectId", value)
-                        }
-                      >
-                        <SelectTrigger id={`project-${update.id}`}>
-                          <SelectValue placeholder="Select a project" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {MOCK_PROJECTS.map((project) => (
-                            <SelectItem key={project.id} value={project.id}>
-                              {project.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Multiple User Story Selection */}
-                    {update.projectId && (
-                      <div className="space-y-3">
-                        <Label>User Stories / Tasks (Select Multiple)</Label>
-                        <div className="border rounded-md p-4 space-y-2">
-                          {MOCK_USER_STORIES[update.projectId]?.map((story) => (
-                            <div
-                              key={story.id}
-                              className="flex items-center space-x-2"
-                            >
-                              <Checkbox
-                                id={`story-${update.id}-${story.id}`}
-                                checked={update.userStoryIds.includes(story.id)}
-                                onCheckedChange={() =>
-                                  handleUserStoryToggle(update.id, story.id)
-                                }
-                              />
-                              <Label
-                                htmlFor={`story-${update.id}-${story.id}`}
-                                className="cursor-pointer text-sm font-normal"
-                              >
-                                {story.title}
-                              </Label>
-                            </div>
-                          ))}
-                          <div className="flex items-center space-x-2 pt-2">
-                            <Checkbox
-                              id={`story-${update.id}-other`}
-                              checked={update.userStoryIds.includes("other")}
-                              onCheckedChange={() =>
-                                handleUserStoryToggle(update.id, "other")
-                              }
-                            />
-                            <Label
-                              htmlFor={`story-${update.id}-other`}
-                              className="cursor-pointer text-sm font-normal"
-                            >
-                              Other / General Task
-                            </Label>
-                          </div>
-                        </div>
-                        {update.userStoryIds.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {update.userStoryIds.map((storyId) => (
-                              <Badge
-                                key={storyId}
-                                variant="outline"
-                                className="text-xs"
-                              >
-                                {storyId === "other"
-                                  ? "Other"
-                                  : MOCK_USER_STORIES[update.projectId]?.find(
-                                      (s) => s.id === storyId
-                                    )?.title || storyId}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    <Separator />
-
-                    <div className="space-y-4">
-                      {/* Yesterday */}
-                      <div className="space-y-2">
-                        <Label htmlFor={`yesterday-${update.id}`}>
-                          What did you accomplish yesterday?
-                        </Label>
-                        <Textarea
-                          id={`yesterday-${update.id}`}
-                          placeholder="Briefly describe what you completed..."
-                          value={update.yesterday}
-                          onChange={(e) =>
-                            handleUpdateChange(
-                              update.id,
-                              "yesterday",
-                              e.target.value
-                            )
-                          }
-                          rows={2}
-                          className="resize-none"
-                        />
-                      </div>
-
-                      {/* Today */}
-                      <div className="space-y-2">
-                        <Label htmlFor={`today-${update.id}`}>
-                          What will you do today?{" "}
-                          <span className="text-destructive">*</span>
-                        </Label>
-                        <Textarea
-                          id={`today-${update.id}`}
-                          placeholder="What are your goals for today?"
-                          value={update.today}
-                          onChange={(e) =>
-                            handleUpdateChange(
-                              update.id,
-                              "today",
-                              e.target.value
-                            )
-                          }
-                          rows={2}
-                          className="resize-none"
-                        />
-                      </div>
-
-                      {/* Blockers */}
-                      <div className="space-y-2">
-                        <Label htmlFor={`blockers-${update.id}`}>
-                          Are there any blockers in your way?
-                        </Label>
-                        <Textarea
-                          id={`blockers-${update.id}`}
-                          placeholder="List any impediments or dependencies (leave blank if none)..."
-                          value={update.blockers}
-                          onChange={(e) =>
-                            handleUpdateChange(
-                              update.id,
-                              "blockers",
-                              e.target.value
-                            )
-                          }
-                          rows={2}
-                          className="resize-none"
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <StandupUpdateCard
+                  key={update.id}
+                  update={update}
+                  index={index}
+                  projects={projects}
+                  showRemove={updates.length > 1}
+                  onRemove={handleRemoveUpdate}
+                  onChange={handleUpdateChange}
+                  onStoryToggle={handleUserStoryToggle}
+                />
               ))}
 
               <div className="flex items-center justify-between pt-2">
@@ -536,13 +614,8 @@ const CreateStandupPage = () => {
             </form>
           </div>
 
-          {/* Right Column - Submission Status */}
           <div className="lg:col-span-1">
-            <SubmissionStatus
-              status={submissionStatus}
-              feedback={aiFeedback}
-              aiApproved={submissionStatus === "approved"}
-            />
+            <SubmissionStatus status={submissionStatus} feedback={aiFeedback} />
           </div>
         </div>
       </div>

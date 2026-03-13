@@ -4,7 +4,11 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { toast } from "@/components/ui/use-toast"
-import { usePostLeaveRequest } from "@query/leave.query"
+import { useFetchHolidays } from "@query/holidays.query"
+import {
+  useFetchEmployeeLeaveProfile,
+  usePostLeaveRequest,
+} from "@query/leave.query"
 
 import RequestLeaveUI from "./request-leave.ui"
 
@@ -39,6 +43,13 @@ const schema = z
  * RequestLeavePage container — employee leave application form.
  */
 const RequestLeavePage = () => {
+  const { data: leaveProfile } = useFetchEmployeeLeaveProfile()
+  const { data: holidayData } = useFetchHolidays()
+  const leaveBalances = leaveProfile?.leaveBalance ?? []
+  const holidayDates = new Set(
+    (holidayData?.holidays ?? []).map((h) => h.date)
+  )
+
   const {
     mutate: submitRequest,
     isPending: isSubmitting,
@@ -83,6 +94,41 @@ const RequestLeavePage = () => {
   }, [isSuccess, form, resetMutation])
 
   const onSubmit = (values) => {
+    // Check for overlapping leave (approved or pending)
+    const leaveHistory = leaveProfile?.leaveHistory ?? []
+    const requestFrom = new Date(values.fromDate)
+    const requestTo = new Date(values.toDate)
+    const overlap = leaveHistory.find((leave) => {
+      if (leave.status === "rejected") return false
+      const existFrom = new Date(leave.from)
+      const existTo = new Date(leave.to)
+      return requestFrom <= existTo && requestTo >= existFrom
+    })
+    if (overlap) {
+      toast({
+        title: "Date conflict",
+        description: `You already have a ${overlap.status} ${overlap.type} leave from ${overlap.from} to ${overlap.to}.`,
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Validate leave balance before submitting
+    const balance = leaveBalances.find(
+      (b) => b.type.toLowerCase() === values.leaveType.toLowerCase()
+    )
+    if (balance) {
+      const requestedDays = calcDays()
+      if (requestedDays > balance.remaining) {
+        toast({
+          title: "Insufficient leave balance",
+          description: `You have ${balance.remaining} ${values.leaveType} day(s) remaining but requested ${requestedDays}.`,
+          variant: "destructive",
+        })
+        return
+      }
+    }
+
     submitRequest(values, {
       onError: () => {
         toast({
@@ -94,17 +140,18 @@ const RequestLeavePage = () => {
     })
   }
 
-  // Calculate number of working days selected
+  // Calculate working days excluding weekends and public holidays
   const calcDays = () => {
     if (!fromDate || !toDate) return 0
+    if (subType === "halfday") return 0.5
     const from = new Date(fromDate)
     const to = new Date(toDate)
-    if (subType === "halfday") return 0.5
     let count = 0
     const current = new Date(from)
     while (current <= to) {
       const day = current.getDay()
-      if (day !== 0 && day !== 6) count++
+      const dateString = current.toISOString().split("T")[0]
+      if (day !== 0 && day !== 6 && !holidayDates.has(dateString)) count++
       current.setDate(current.getDate() + 1)
     }
     return count

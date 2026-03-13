@@ -399,12 +399,25 @@ const RewardsUI = ({
           ))}
         </div>
       ) : rewards.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <Trophy className="h-12 w-12 mx-auto mb-3 opacity-30" />
-          <p className="font-medium">No rewards yet</p>
-          {isAdmin && (
-            <p className="text-sm mt-1">
-              Click &quot;Grant Reward&quot; to recognize an employee.
+        <div className="text-center py-16">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+            <Trophy className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+          </div>
+          <p className="text-lg font-semibold">
+            The recognition wall is waiting
+          </p>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
+            Start celebrating your team&apos;s wins — every small recognition
+            builds a culture of appreciation.
+          </p>
+          {isAdmin ? (
+            <Button onClick={onOpenGrant} className="mt-5">
+              <Award className="mr-2 h-4 w-4" />
+              Grant Reward
+            </Button>
+          ) : (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Ask your manager about the rewards program
             </p>
           )}
         </div>

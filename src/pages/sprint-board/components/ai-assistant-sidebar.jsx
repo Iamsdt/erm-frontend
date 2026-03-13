@@ -1,12 +1,19 @@
 import { Bot, Send, X, AlertCircle } from "lucide-react"
 import PropTypes from "prop-types"
-import { useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useAiChat } from "@query/ai.query"
+
+const QUICK_ACTIONS = [
+  { label: "Summarize Standup", message: "Summarize today's standup updates" },
+  { label: "Find Blockers", message: "What are the current blockers?" },
+  { label: "Estimate Tasks", message: "Analyze velocity and estimates" },
+]
 
 const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
   const [messages, setMessages] = useState([
@@ -27,32 +34,54 @@ const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
     },
   ])
   const [inputValue, setInputValue] = useState("")
+  const { mutate: sendChat, isPending } = useAiChat()
+  const idCounter = useRef(100)
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return
+  const nextId = useCallback(() => {
+    idCounter.current += 1
+    return idCounter.current
+  }, [])
 
-    const newMessage = {
-      id: Date.now(),
+  const sendMessage = (text) => {
+    if (!text.trim()) return
+
+    const userMessage = {
+      id: nextId(),
       role: "user",
-      content: inputValue,
+      content: text,
       type: "text",
     }
-
-    setMessages((previous) => [...previous, newMessage])
+    setMessages((previous) => [...previous, userMessage])
     setInputValue("")
 
-    // Simulate AI response
-    setTimeout(() => {
-      setMessages((previous) => [
-        ...previous,
-        {
-          id: Date.now() + 1,
-          role: "assistant",
-          content: "I'm analyzing the sprint data to help you with that...",
-          type: "text",
+    sendChat(
+      { message: text, sprintId },
+      {
+        onSuccess: (response) => {
+          setMessages((previous) => [
+            ...previous,
+            {
+              id: nextId(),
+              role: "assistant",
+              content:
+                response.data?.reply || "I couldn't process that request.",
+              type: "text",
+            },
+          ])
         },
-      ])
-    }, 1000)
+        onError: () => {
+          setMessages((previous) => [
+            ...previous,
+            {
+              id: nextId(),
+              role: "assistant",
+              content: "Sorry, something went wrong. Please try again.",
+              type: "text",
+            },
+          ])
+        },
+      }
+    )
   }
 
   if (!isOpen) return null
@@ -119,6 +148,9 @@ const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
                       size="sm"
                       variant="secondary"
                       className="h-7 text-xs"
+                      onClick={() =>
+                        sendMessage("Tell me more about the at-risk tasks")
+                      }
                     >
                       View Details
                     </Button>
@@ -130,34 +162,38 @@ const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
               </div>
             </div>
           ))}
+          {isPending && (
+            <div className="flex gap-3">
+              <Avatar className="h-8 w-8 shrink-0 border border-primary/20">
+                <AvatarFallback className="bg-primary/10">
+                  <Bot className="h-4 w-4 text-primary" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="rounded-lg p-3 bg-muted/50 text-sm text-muted-foreground">
+                Thinking...
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
 
       <div className="p-4 border-t bg-muted/10">
         <div className="flex gap-2 mb-3 overflow-x-auto pb-2 custom-scrollbar">
-          <Badge
-            variant="outline"
-            className="cursor-pointer hover:bg-muted whitespace-nowrap text-xs"
-          >
-            Summarize Standup
-          </Badge>
-          <Badge
-            variant="outline"
-            className="cursor-pointer hover:bg-muted whitespace-nowrap text-xs"
-          >
-            Find Blockers
-          </Badge>
-          <Badge
-            variant="outline"
-            className="cursor-pointer hover:bg-muted whitespace-nowrap text-xs"
-          >
-            Estimate Tasks
-          </Badge>
+          {QUICK_ACTIONS.map((action) => (
+            <Badge
+              key={action.label}
+              variant="outline"
+              className="cursor-pointer hover:bg-muted whitespace-nowrap text-xs"
+              onClick={() => sendMessage(action.message)}
+            >
+              {action.label}
+            </Badge>
+          ))}
         </div>
         <form
           onSubmit={(event) => {
             event.preventDefault()
-            handleSend()
+            sendMessage(inputValue)
           }}
           className="flex items-center gap-2"
         >
@@ -166,12 +202,13 @@ const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
             className="flex-1 text-sm h-9"
+            disabled={isPending}
           />
           <Button
             type="submit"
             size="icon"
             className="h-9 w-9 shrink-0"
-            disabled={!inputValue.trim()}
+            disabled={!inputValue.trim() || isPending}
           >
             <Send className="h-4 w-4" />
           </Button>

@@ -408,7 +408,51 @@ const getEmployee360Profile = http.get(
   }
 )
 
+// ─── PATCH /v1/employees/bulk-status ──────────────────────────────────────────
+
+const bulkUpdateStatus = http.patch(
+  "*/v1/employee-management/bulk-status",
+  async ({ request }) => {
+    const { ids, status } = await request.json()
+    let updatedCount = 0
+    for (const id of ids) {
+      const index = employees.findIndex((emp) => emp.id === Number(id))
+      if (index !== -1) {
+        employees[index] = { ...employees[index], status }
+        updatedCount += 1
+      }
+    }
+    return HttpResponse.json({
+      detail: `${updatedCount} employee(s) updated to "${status}".`,
+      updatedCount,
+    })
+  }
+)
+
+// ─── PATCH /v1/employees/bulk-department ──────────────────────────────────────
+
+const bulkUpdateDepartment = http.patch(
+  "*/v1/employee-management/bulk-department",
+  async ({ request }) => {
+    const { ids, department } = await request.json()
+    let updatedCount = 0
+    for (const id of ids) {
+      const index = employees.findIndex((emp) => emp.id === Number(id))
+      if (index !== -1) {
+        employees[index] = { ...employees[index], department }
+        updatedCount += 1
+      }
+    }
+    return HttpResponse.json({
+      detail: `${updatedCount} employee(s) moved to "${department}".`,
+      updatedCount,
+    })
+  }
+)
+
 const handlers = [
+  bulkUpdateStatus,
+  bulkUpdateDepartment,
   listEmployees,
   getEmployee,
   createEmployee,

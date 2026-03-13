@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
@@ -20,11 +20,13 @@ import { useGetProjects } from "@query/project.query"
 import AdminDashboardUI from "./admin-dashboard.ui"
 import EmployeeDashboardUI from "./employee-dashboard.ui"
 
+const WELCOME_STORAGE_KEY = "erm-welcome-dismissed"
+
 /**
  * Extract array from various API response shapes.
- * @param {*} data - Raw API data
+ * @param {object} data - Raw API data
  * @param {string} [key] - Object key to extract from
- * @returns {Array}
+ * @returns {Array} extracted array
  */
 const extractArray = (data, key) => {
   if (Array.isArray(data)) return data
@@ -41,6 +43,15 @@ const Dashboard = () => {
     (state) => state.user
   )
   const isAdmin = empRole === "admin"
+
+  const [showWelcome, setShowWelcome] = useState(
+    () => globalThis.localStorage.getItem(WELCOME_STORAGE_KEY) !== "true"
+  )
+
+  const handleDismissWelcome = useCallback(() => {
+    setShowWelcome(false)
+    globalThis.localStorage.setItem(WELCOME_STORAGE_KEY, "true")
+  }, [])
 
   const { data: attendanceStatus, isLoading: statusLoading } =
     useAttendanceStatus()
@@ -86,6 +97,8 @@ const Dashboard = () => {
         leaveSummary={leaveSummary}
         attendanceStatus={attendanceStatus}
         todayAttendance={todayAttendance}
+        showWelcome={showWelcome}
+        onDismissWelcome={handleDismissWelcome}
         isLoading={
           statusLoading ||
           todayLoading ||

@@ -158,17 +158,35 @@ All prefixed with `/api/v1/`. See `src/lib/constants/api.constant.js` for full l
 9. Add sidebar entry in `src/components/layout/app-sidebar.jsx`
 
 ## Current Focus
-- **Phase 1:** Polish existing pages to production quality
+- **Phase 1:** Polish existing pages to production quality — DONE
   - Sidebar `<a href>` → `<Link>` fix (SPA navigation)
   - useDebounce hook for employee search
   - Admin logs: replace hardcoded KNOWN_EMPLOYEES with API fetch
   - Attendance history: dynamic year range
   - Remove legacy Comments page from routes
-- **Phase 2:** Wire Daily Updates + AI pages to MSW API layers
-- **Phase 3:** SaaS readiness — org setup, onboarding, role management UI
+- **Phase 2:** Wire Daily Updates + AI + Notifications pages to MSW API layers — DONE
+- **Phase 3:** SaaS readiness — org setup, onboarding, role management UI — DONE (team management wired)
+- **Phase 4:** Production hardening — DONE
+  - Route-level error boundaries — DONE
+  - Toast notifications on all mutations — DONE
+  - Employee export (CSV/JSON) — DONE
+  - Holiday-aware leave day calculation — DONE
+  - Sprint board task CRUD wiring — DONE
+  - AI chat assistant API wiring — DONE
+  - Profile team delete/member remove — DONE
+- **Phase 5:** Feature completion — DONE
+  - Bulk operations (employee bulk status/department change) — DONE
+  - Audit trail / activity log page with API layer — DONE
+  - Settings/Profile notification sync fix (API-backed) — DONE
+- **Phase 6:** UX Psychology enhancements — DONE
+  - Empty states with engaging copy + CTAs (rewards, notifications, standup, employees, leave) — DONE
+  - Admin dashboard welcome card + quick actions + stat trend indicators — DONE
+  - Employee dashboard motivational insights (goal progress, consistency praise, leave urgency) — DONE
+  - Notification urgency system (priority badges, filter tabs, action-required banner) — DONE
+  - Attendance daily goal progress bar with contextual encouragement — DONE
+  - Standup streak counter + team completion bar (gamification) — DONE
+  - AI review celebration cards (approved/suggestions feedback) — DONE
 
 ## Known Issues / TODOs
-- `src/pages/daily-update/` pages have hardcoded data — need API layer
-- `src/pages/ai/` pages have hardcoded data — need API layer
-- `src/pages/notifications/` has hardcoded notification count
-- `src/components/layout/app-sidebar.jsx` `listOfProjects` data is wrong (copied leave admin items — needs fix)
+- No major issues remaining for V1 MVP
+- Future considerations: real backend integration, E2E tests, accessibility audit, mobile responsiveness polish

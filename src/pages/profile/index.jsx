@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import { useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useSelector } from "react-redux"
 
@@ -11,32 +11,23 @@ import {
   useFetchMyProfile,
   useUpdateMyProfile,
 } from "@query/profile.query"
+import { useFetchSettings, useUpdateSettings } from "@query/settings.query"
+import {
+  useCreateTeam,
+  useDeleteTeam,
+  useFetchTeams,
+  useRemoveTeamMember,
+  useUpdateTeamResponsibilities,
+} from "@query/team.query"
 
 import ProfileUI from "./profile.ui"
 
-const DEFAULT_VIEWER_ROLE = "viewer"
-const INITIAL_TEAM_ID = "team-core-engineering"
 const EMPTY_TEAM_DRAFT = {
   name: "",
   leadId: "",
   memberIds: [],
 }
-const INITIAL_TEAMS = [
-  {
-    id: INITIAL_TEAM_ID,
-    name: "Core Engineering",
-    leadId: "",
-    memberIds: [],
-    responsibilities: {
-      attendance: "manager",
-      leaveManagement: "manager",
-      employeeManagement: DEFAULT_VIEWER_ROLE,
-      projectManagement: "admin",
-      policyManagement: "editor",
-      rewardsManagement: "editor",
-    },
-  },
-]
+const DESTRUCTIVE_VARIANT = "destructive"
 
 const createTeamId = (name) => {
   const normalizedName = name
@@ -47,14 +38,147 @@ const createTeamId = (name) => {
   return `team-${normalizedName || "new-team"}`
 }
 
-const getDefaultResponsibilities = () => ({
-  attendance: DEFAULT_VIEWER_ROLE,
-  leaveManagement: DEFAULT_VIEWER_ROLE,
-  employeeManagement: "none",
-  projectManagement: DEFAULT_VIEWER_ROLE,
-  policyManagement: DEFAULT_VIEWER_ROLE,
-  rewardsManagement: DEFAULT_VIEWER_ROLE,
-})
+/**
+ * Custom hook encapsulating all team management logic —
+ * fetching, creating, editing responsibilities, and local draft state.
+ * @returns {object} Team state and handlers
+ */
+const useTeamManagement = () => {
+  const { data: teamsData } = useFetchTeams()
+  const teams = useMemo(() => teamsData?.teams ?? [], [teamsData])
+  const createTeamMutation = useCreateTeam()
+  const deleteTeamMutation = useDeleteTeam()
+  const removeTeamMemberMutation = useRemoveTeamMember()
+  const updateResponsibilitiesMutation = useUpdateTeamResponsibilities()
+
+  const [selectedTeamId, setSelectedTeamId] = useState("")
+  const [teamDraft, setTeamDraft] = useState(EMPTY_TEAM_DRAFT)
+  const [localResponsibilities, setLocalResponsibilities] = useState({})
+  const previousTeamIdReference = useRef("")
+
+  // Derive selectedTeamId from fetched data without useEffect
+  const firstTeamId = teams.length > 0 ? teams[0].id : ""
+  const resolvedTeamId = selectedTeamId || firstTeamId
+
+  // Sync local responsibilities when the resolved team changes
+  if (resolvedTeamId !== previousTeamIdReference.current) {
+    previousTeamIdReference.current = resolvedTeamId
+    const selectedTeam = teams.find((team) => team.id === resolvedTeamId)
+    if (selectedTeam) {
+      setLocalResponsibilities(selectedTeam.responsibilities)
+    }
+  }
+
+  const teamsWithLocalEdits = useMemo(
+    () =>
+      teams.map((team) => {
+        if (team.id !== resolvedTeamId) return team
+        return {
+          ...team,
+          responsibilities: {
+            ...team.responsibilities,
+            ...localResponsibilities,
+          },
+        }
+      }),
+    [teams, resolvedTeamId, localResponsibilities]
+  )
+
+  const handleTeamDraftChange = (field, value) => {
+    setTeamDraft((previous) => ({ ...previous, [field]: value }))
+  }
+
+  const handleToggleTeamMember = (memberId) => {
+    setTeamDraft((previous) => {
+      const exists = previous.memberIds.includes(memberId)
+      return {
+        ...previous,
+        memberIds: exists
+          ? previous.memberIds.filter((currentId) => currentId !== memberId)
+          : [...previous.memberIds, memberId],
+      }
+    })
+  }
+
+  const handleCreateTeam = () => {
+    const normalizedName = teamDraft.name.trim()
+    if (!normalizedName) {
+      toast({
+        title: "Team name required",
+        description: "Please enter a valid team name.",
+        variant: DESTRUCTIVE_VARIANT,
+      })
+      return
+    }
+
+    const newTeamId = createTeamId(normalizedName)
+    const existingTeam = teams.some((team) => team.id === newTeamId)
+    if (existingTeam) {
+      toast({
+        title: "Team already exists",
+        description: "Use a different team name.",
+        variant: DESTRUCTIVE_VARIANT,
+      })
+      return
+    }
+
+    createTeamMutation.mutate(
+      {
+        name: normalizedName,
+        leadId: teamDraft.leadId,
+        memberIds: teamDraft.memberIds,
+      },
+      {
+        onSuccess: () => {
+          setSelectedTeamId(newTeamId)
+          setTeamDraft(EMPTY_TEAM_DRAFT)
+        },
+      }
+    )
+  }
+
+  const handleTeamResponsibilityChange = (_teamId, moduleKey, value) => {
+    setLocalResponsibilities((previous) => ({
+      ...previous,
+      [moduleKey]: value,
+    }))
+  }
+
+  const handleSaveRoles = () => {
+    updateResponsibilitiesMutation.mutate({
+      id: resolvedTeamId,
+      responsibilities: localResponsibilities,
+    })
+  }
+
+  const handleDeleteTeam = (teamId) => {
+    deleteTeamMutation.mutate(teamId, {
+      onSuccess: () => {
+        if (resolvedTeamId === teamId) {
+          setSelectedTeamId("")
+        }
+      },
+    })
+  }
+
+  const handleRemoveTeamMember = (teamId, memberId) => {
+    removeTeamMemberMutation.mutate({ teamId, memberId })
+  }
+
+  return {
+    teams: teamsWithLocalEdits,
+    selectedTeamId: resolvedTeamId,
+    teamDraft,
+    onTeamSelect: setSelectedTeamId,
+    onTeamDraftChange: handleTeamDraftChange,
+    onToggleTeamMember: handleToggleTeamMember,
+    onCreateTeam: handleCreateTeam,
+    onDeleteTeam: handleDeleteTeam,
+    onRemoveTeamMember: handleRemoveTeamMember,
+    onTeamResponsibilityChange: handleTeamResponsibilityChange,
+    onSaveRoles: handleSaveRoles,
+  }
+}
 
 /**
  * Profile + Settings container — fetches the current user profile, handles
@@ -90,7 +214,7 @@ const ProfilePage = () => {
         toast({
           title: "Error",
           description: "Failed to update profile.",
-          variant: "destructive",
+          variant: DESTRUCTIVE_VARIANT,
         })
       },
     })
@@ -110,7 +234,7 @@ const ProfilePage = () => {
           title: "Error",
           description:
             "Failed to change password. Check your current password.",
-          variant: "destructive",
+          variant: DESTRUCTIVE_VARIANT,
         })
       },
     })
@@ -118,16 +242,18 @@ const ProfilePage = () => {
 
   // ── Settings state ─────────────────────────────────────────────────────────
   const { theme, setTheme } = useTheme()
-  const [notifications, setNotifications] = useState({
+  const { data: settingsData } = useFetchSettings()
+  const { mutate: saveSettings } = useUpdateSettings()
+
+  const notifications = settingsData?.notifications ?? {
     emailAlerts: true,
     leaveUpdates: true,
     projectUpdates: true,
     attendanceReminders: false,
     weeklyDigest: true,
-  })
-  const [teams, setTeams] = useState(INITIAL_TEAMS)
-  const [selectedTeamId, setSelectedTeamId] = useState(INITIAL_TEAM_ID)
-  const [teamDraft, setTeamDraft] = useState(EMPTY_TEAM_DRAFT)
+  }
+
+  const teamState = useTeamManagement()
 
   const currentLanguage = i18n.language?.startsWith("hi") ? "hi" : "en"
   const isAdmin = employeeRole === "admin" || userRole === "admin"
@@ -152,93 +278,8 @@ const ProfilePage = () => {
   }
 
   const handleNotificationToggle = (key) => {
-    setNotifications((previous) => {
-      const updated = { ...previous, [key]: !previous[key] }
-      toast({
-        title: "Notification settings updated",
-        description: `${key} has been ${updated[key] ? "enabled" : "disabled"}.`,
-      })
-      return updated
-    })
-  }
-
-  const handleTeamDraftChange = (field, value) => {
-    setTeamDraft((previous) => ({ ...previous, [field]: value }))
-  }
-
-  const handleToggleTeamMember = (memberId) => {
-    setTeamDraft((previous) => {
-      const exists = previous.memberIds.includes(memberId)
-      return {
-        ...previous,
-        memberIds: exists
-          ? previous.memberIds.filter((currentId) => currentId !== memberId)
-          : [...previous.memberIds, memberId],
-      }
-    })
-  }
-
-  const handleCreateTeam = () => {
-    const normalizedName = teamDraft.name.trim()
-    if (!normalizedName) {
-      toast({
-        title: "Team name required",
-        description: "Please enter a valid team name.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    const newTeamId = createTeamId(normalizedName)
-    const existingTeam = teams.some((team) => team.id === newTeamId)
-    if (existingTeam) {
-      toast({
-        title: "Team already exists",
-        description: "Use a different team name.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    const nextTeam = {
-      id: newTeamId,
-      name: normalizedName,
-      leadId: teamDraft.leadId,
-      memberIds: teamDraft.memberIds,
-      responsibilities: getDefaultResponsibilities(),
-    }
-
-    setTeams((previous) => [...previous, nextTeam])
-    setSelectedTeamId(newTeamId)
-    setTeamDraft(EMPTY_TEAM_DRAFT)
-
-    toast({
-      title: "Team created",
-      description: `${normalizedName} is ready for responsibility assignments.`,
-    })
-  }
-
-  const handleTeamResponsibilityChange = (teamId, moduleKey, value) => {
-    setTeams((previous) =>
-      previous.map((team) => {
-        if (team.id !== teamId) return team
-        return {
-          ...team,
-          responsibilities: {
-            ...team.responsibilities,
-            [moduleKey]: value,
-          },
-        }
-      })
-    )
-  }
-
-  const handleSaveRoles = () => {
-    const selectedTeam = teams.find((team) => team.id === selectedTeamId)
-    toast({
-      title: "Roles updated",
-      description: `${selectedTeam?.name ?? "Selected team"} responsibilities have been saved.`,
-    })
+    const updated = { ...notifications, [key]: !notifications[key] }
+    saveSettings({ notifications: updated })
   }
 
   return (
@@ -262,19 +303,11 @@ const ProfilePage = () => {
       currentLanguage={currentLanguage}
       notifications={notifications}
       isAdmin={isAdmin}
-      teams={teams}
-      selectedTeamId={selectedTeamId}
-      teamDraft={teamDraft}
       employees={employees}
       onThemeChange={handleThemeChange}
       onLanguageChange={handleLanguageChange}
       onNotificationToggle={handleNotificationToggle}
-      onTeamSelect={setSelectedTeamId}
-      onTeamDraftChange={handleTeamDraftChange}
-      onToggleTeamMember={handleToggleTeamMember}
-      onCreateTeam={handleCreateTeam}
-      onTeamResponsibilityChange={handleTeamResponsibilityChange}
-      onSaveRoles={handleSaveRoles}
+      {...teamState}
     />
   )
 }

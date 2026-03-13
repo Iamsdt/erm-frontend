@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
+import { toast } from "@/components/ui/use-toast"
 import {
   deleteDepartment,
   getDepartments,
@@ -8,6 +9,7 @@ import {
 } from "@api/department.api"
 
 const QUERY_KEY = "departments"
+const MUTATION_ERROR_DESCRIPTION = "Something went wrong. Please try again."
 
 /**
  * React Query hook for fetching the department list.
@@ -32,7 +34,18 @@ export const useCreateDepartment = () => {
   return useMutation({
     mutationFn: (payload) => postDepartment(payload),
     onSuccess: () => {
+      toast({
+        title: "Department created",
+        description: "New department has been created.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -45,7 +58,18 @@ export const useUpdateDepartment = () => {
   return useMutation({
     mutationFn: ({ id, ...payload }) => patchDepartment(id, payload),
     onSuccess: () => {
+      toast({
+        title: "Department updated",
+        description: "Department has been updated.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -58,7 +82,18 @@ export const useDeleteDepartment = () => {
   return useMutation({
     mutationFn: (id) => deleteDepartment(id),
     onSuccess: () => {
+      toast({
+        title: "Department deleted",
+        description: "Department has been removed.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: MUTATION_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }

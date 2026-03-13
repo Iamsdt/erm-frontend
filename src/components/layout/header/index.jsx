@@ -38,7 +38,7 @@ const Navbar = () => {
             asChild
             className="hidden sm:flex gap-2"
           >
-            <Link to="/daily-update/standup/new">
+            <Link to={ct.route.dailyUpdate.CREATE_STANDUP}>
               <CalendarDays className="h-4 w-4" />
               Standup: {standupStatus}
             </Link>
@@ -50,7 +50,7 @@ const Navbar = () => {
             asChild
             className="hidden sm:flex gap-2"
           >
-            <Link to="/daily-update/standup/new">
+            <Link to={ct.route.attendance.EMPLOYEE_CLOCK}>
               <Clock className="h-4 w-4" />
               Clock IN
             </Link>

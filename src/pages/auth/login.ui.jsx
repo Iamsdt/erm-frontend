@@ -1,4 +1,5 @@
 import PropTypes from "prop-types"
+import { Link } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -93,7 +94,18 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
               )}
             />
 
-            <Button type="submit" className="w-full" size="lg" disabled={loading}>
+            <div className="flex justify-end">
+              <Button variant="link" asChild className="px-0 text-xs h-auto">
+                <Link to="/forgot-password">Forgot password?</Link>
+              </Button>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              size="lg"
+              disabled={loading}
+            >
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>

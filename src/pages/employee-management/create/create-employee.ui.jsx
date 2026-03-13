@@ -28,24 +28,13 @@ import {
 } from "@/components/ui/select"
 import ct from "@constants/"
 
-const DEPARTMENTS = [
-  "Engineering",
-  "Design",
-  "Product",
-  "HR",
-  "Finance",
-  "Marketing",
-  "Operations",
-  "Sales",
-]
-
 const EMPLOYEE_ROLES = [
   { value: "employee", label: "Employee" },
   { value: "manager", label: "Manager" },
   { value: "admin", label: "Admin" },
 ]
 
-const CreateEmployeeUI = ({ form, onSubmit, isSubmitting }) => (
+const CreateEmployeeUI = ({ form, departments, onSubmit, isSubmitting }) => (
   <div className="space-y-6 p-6 max-w-2xl mx-auto">
     {/* Header */}
     <div className="flex items-center gap-3">
@@ -140,7 +129,7 @@ const CreateEmployeeUI = ({ form, onSubmit, isSubmitting }) => (
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {DEPARTMENTS.map((d) => (
+                        {departments.map((d) => (
                           <SelectItem key={d} value={d}>
                             {d}
                           </SelectItem>
@@ -217,8 +206,13 @@ const CreateEmployeeUI = ({ form, onSubmit, isSubmitting }) => (
 
 CreateEmployeeUI.propTypes = {
   form: PropTypes.object.isRequired,
+  departments: PropTypes.arrayOf(PropTypes.string),
   onSubmit: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
+}
+
+CreateEmployeeUI.defaultProps = {
+  departments: [],
 }
 
 export default CreateEmployeeUI

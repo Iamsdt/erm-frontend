@@ -82,6 +82,31 @@ export const getSprintAnalytics = async (projectId, sprintId) => {
   )
   return response.data
 }
+export const createTask = async (projectId, sprintId, data) => {
+  const response = await api.post(
+    apiConstant.project.tasks(projectId, sprintId),
+    data
+  )
+  return response.data
+}
+
+export const deleteTask = async (projectId, sprintId, taskId) => {
+  const response = await api.delete(
+    `${apiConstant.project.tasks(projectId, sprintId)}${taskId}/`
+  )
+  return response.data
+}
+
+export const getProjectSettings = async (projectId) => {
+  const response = await api.get(`projects/${projectId}/settings/`)
+  return response.data
+}
+
+export const updateProjectSettings = async (projectId, data) => {
+  const response = await api.patch(`projects/${projectId}/settings/`, data)
+  return response.data
+}
+
 export const addTaskComment = async (projectId, sprintId, taskId, data) => {
   const response = await api.post(
     `${apiConstant.project.tasks(projectId, sprintId)}${taskId}/comments/`,

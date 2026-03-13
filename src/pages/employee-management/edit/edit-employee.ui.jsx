@@ -30,17 +30,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import ct from "@constants/"
 
-const DEPARTMENTS = [
-  "Engineering",
-  "Design",
-  "Product",
-  "HR",
-  "Finance",
-  "Marketing",
-  "Operations",
-  "Sales",
-]
-
 const EMPLOYEE_ROLES = [
   { value: "employee", label: "Employee" },
   { value: "manager", label: "Manager" },
@@ -77,10 +66,11 @@ const EditFormSkeleton = () => (
  * EditEmployeeForm — renders the employee edit form with all employee fields.
  * @param {object} props - Component props.
  * @param {object} props.form - React Hook Form instance with methods and control.
+ * @param {string[]} props.departments - List of department names for the dropdown.
  * @param {(data: object) => void} props.onSubmit - Callback when form is submitted with employee data.
  * @param {boolean} props.isSubmitting - Whether the form submission is in progress.
  */
-const EditEmployeeForm = ({ form, onSubmit, isSubmitting }) => (
+const EditEmployeeForm = ({ form, departments, onSubmit, isSubmitting }) => (
   <Card>
     <CardHeader>
       <CardTitle className="text-base">Employee Details</CardTitle>
@@ -156,7 +146,7 @@ const EditEmployeeForm = ({ form, onSubmit, isSubmitting }) => (
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {DEPARTMENTS.map((d) => (
+                      {departments.map((d) => (
                         <SelectItem key={d} value={d}>
                           {d}
                         </SelectItem>
@@ -257,14 +247,20 @@ const EditEmployeeForm = ({ form, onSubmit, isSubmitting }) => (
 
 EditEmployeeForm.propTypes = {
   form: PropTypes.object.isRequired,
+  departments: PropTypes.arrayOf(PropTypes.string),
   onSubmit: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
+}
+
+EditEmployeeForm.defaultProps = {
+  departments: [],
 }
 
 // ─── Main UI ──────────────────────────────────────────────────────────────────
 
 const EditEmployeeUI = ({
   form,
+  departments,
   onSubmit,
   isSubmitting,
   isLoading,
@@ -298,6 +294,7 @@ const EditEmployeeUI = ({
     ) : (
       <EditEmployeeForm
         form={form}
+        departments={departments}
         onSubmit={onSubmit}
         isSubmitting={isSubmitting}
       />
@@ -307,10 +304,15 @@ const EditEmployeeUI = ({
 
 EditEmployeeUI.propTypes = {
   form: PropTypes.object.isRequired,
+  departments: PropTypes.arrayOf(PropTypes.string),
   onSubmit: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   employeeId: PropTypes.string.isRequired,
+}
+
+EditEmployeeUI.defaultProps = {
+  departments: [],
 }
 
 export default EditEmployeeUI

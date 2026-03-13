@@ -1,9 +1,28 @@
+import { Target } from "lucide-react"
 import PropTypes from "prop-types"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const DAILY_GOAL_HOURS = 8
+const DAILY_GOAL_SECONDS = DAILY_GOAL_HOURS * 3600
+
+const COLOR_PRIMARY = "bg-primary"
+const COLOR_EMERALD = "bg-emerald-500"
+
+const PROGRESS_THRESHOLDS = [
+  { max: 25, label: "Just getting started", color: COLOR_PRIMARY },
+  { max: 50, label: "Making good progress", color: COLOR_PRIMARY },
+  { max: 75, label: "Past the halfway mark!", color: "bg-amber-500" },
+  { max: 100, label: "Almost there, keep going!", color: COLOR_EMERALD },
+]
+
+const GOAL_REACHED_LABEL = "Daily goal reached!"
+const GOAL_REACHED_COLOR = COLOR_EMERALD
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -37,6 +56,54 @@ const formatMinutes = (minutes) => {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+/**
+ * Resolves the progress bar label and color based on completion percentage.
+ * @param {number} percent - Progress percentage (0-100+).
+ * @returns {{ label: string, color: string }} Display config for the progress bar.
+ */
+const getProgressConfig = (percent) => {
+  if (percent >= 100) {
+    return { label: GOAL_REACHED_LABEL, color: GOAL_REACHED_COLOR }
+  }
+  const threshold = PROGRESS_THRESHOLDS.find((t) => percent < t.max)
+  return threshold ?? PROGRESS_THRESHOLDS.at(-1)
+}
+
+/**
+ * DailyGoalProgress — shows an 8-hour daily goal progress bar with contextual copy.
+ * @param {{ elapsedSeconds: number }} props - Component props.
+ */
+const DailyGoalProgress = ({ elapsedSeconds }) => {
+  const percent = Math.min(
+    Math.round((elapsedSeconds / DAILY_GOAL_SECONDS) * 100),
+    100
+  )
+  const { label, color } = getProgressConfig(percent)
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <Target className="h-3 w-3" />
+          Goal: {DAILY_GOAL_HOURS}h
+        </span>
+        <span className="tabular-nums">{percent}%</span>
+      </div>
+      <div className="bg-muted rounded-full h-2">
+        <div
+          className={`${color} rounded-full h-2 transition-all duration-500`}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+    </div>
+  )
+}
+
+DailyGoalProgress.propTypes = {
+  elapsedSeconds: PropTypes.number.isRequired,
+}
+
 /** @param {{ elapsed: number, clockedInAt: string|null, willAutoExpire: boolean, isMutating: boolean, onClockOut: () => void }} props - Sub-component props. */
 const ClockedInBody = ({
   elapsed,
@@ -65,6 +132,7 @@ const ClockedInBody = ({
         </span>
         <span className="text-sm text-muted-foreground">elapsed today</span>
       </div>
+      <DailyGoalProgress elapsedSeconds={elapsed} />
       <Button
         variant="destructive"
         size="lg"
@@ -110,6 +178,7 @@ const ClockedOutBody = ({ todayMinutes, isMutating, onClockIn }) => {
           {todayMinutes > 0 ? "worked today" : "no sessions today"}
         </span>
       </div>
+      <DailyGoalProgress elapsedSeconds={todayMinutes * 60} />
       <Button
         size="lg"
         className="w-full text-base bg-emerald-600 hover:bg-emerald-700"

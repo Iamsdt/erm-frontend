@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
+import { toast } from "@/components/ui/use-toast"
 import {
   getAdminApprovals,
   getAdminEmployees,
@@ -13,6 +14,8 @@ import {
   postLeaveRequest,
   postManualRecord,
 } from "@api/leave.api"
+
+const GENERIC_ERROR_DESCRIPTION = "Something went wrong. Please try again."
 
 const QUERY_KEY_ADMIN_SUMMARY = "leave-admin-summary"
 const QUERY_KEY_EMPLOYEE_PROFILE = "leave-employee-profile"
@@ -110,8 +113,19 @@ export const useApproveLeave = () => {
   return useMutation({
     mutationFn: ({ id, status, note }) => patchLeaveApproval(id, status, note),
     onSuccess: () => {
+      toast({
+        title: "Leave updated",
+        description: "Leave request has been processed.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_APPROVALS] })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_SUMMARY] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -123,6 +137,19 @@ export const useApproveLeave = () => {
 export const usePostManualRecord = () => {
   return useMutation({
     mutationFn: (payload) => postManualRecord(payload),
+    onSuccess: () => {
+      toast({
+        title: "Record saved",
+        description: "Manual record has been saved.",
+      })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
+    },
   })
 }
 
@@ -136,7 +163,18 @@ export const usePostLeaveRequest = () => {
   return useMutation({
     mutationFn: (payload) => postLeaveRequest(payload),
     onSuccess: () => {
+      toast({
+        title: "Request submitted",
+        description: "Your leave request has been submitted.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_EMPLOYEE_PROFILE] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }
@@ -169,7 +207,18 @@ export const useUpdateLeaveSettings = () => {
   return useMutation({
     mutationFn: (payload) => patchLeaveSettings(payload),
     onSuccess: () => {
+      toast({
+        title: "Settings saved",
+        description: "Leave settings have been updated.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_LEAVE_SETTINGS] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: GENERIC_ERROR_DESCRIPTION,
+        variant: "destructive",
+      })
     },
   })
 }

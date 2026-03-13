@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
+import { toast } from "@/components/ui/use-toast"
 import { getMyRewards, getRewards, postReward } from "@api/rewards.api"
 
 const QUERY_KEY_REWARDS = "rewards-list"
@@ -46,7 +47,18 @@ export const useGrantReward = () => {
   return useMutation({
     mutationFn: (payload) => postReward(payload),
     onSuccess: () => {
+      toast({
+        title: "Reward granted",
+        description: "Reward has been granted to the employee.",
+      })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_REWARDS] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      })
     },
   })
 }

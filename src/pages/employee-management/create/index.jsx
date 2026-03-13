@@ -5,6 +5,7 @@ import { z } from "zod"
 
 import { toast } from "@/components/ui/use-toast"
 import ct from "@constants/"
+import { useFetchDepartments } from "@query/department.query"
 import { useCreateEmployee } from "@query/employee-management.query"
 
 import CreateEmployeeUI from "./create-employee.ui"
@@ -36,6 +37,8 @@ const schema = z.object({
 const CreateEmployee = () => {
   const navigate = useNavigate()
   const { mutate: createEmployee, isPending } = useCreateEmployee()
+  const { data: departmentsData } = useFetchDepartments()
+  const departments = (departmentsData?.departments ?? []).map((d) => d.name)
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -71,6 +74,7 @@ const CreateEmployee = () => {
   return (
     <CreateEmployeeUI
       form={form}
+      departments={departments}
       onSubmit={handleSubmit}
       isSubmitting={isPending}
     />

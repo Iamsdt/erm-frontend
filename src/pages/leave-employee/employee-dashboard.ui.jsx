@@ -1,3 +1,4 @@
+import { CalendarDays } from "lucide-react"
 import PropTypes from "prop-types"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -383,6 +384,17 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
               {Array.from({ length: 4 }).map((_, index) => (
                 <Skeleton key={index} className="h-12 rounded-lg" />
               ))}
+            </div>
+          ) : history.length === 0 ? (
+            <div className="text-center py-10">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <CalendarDays className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+              </div>
+              <p className="text-base font-semibold">No leave requests yet</p>
+              <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
+                When you need time off, we&apos;ve got you covered. Your leave
+                balance is ready to use.
+              </p>
             </div>
           ) : (
             <div className="space-y-1">
