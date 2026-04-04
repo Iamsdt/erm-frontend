@@ -38,7 +38,7 @@ const extractArray = (data, key) => {
 const Dashboard = () => {
   const navigate = useNavigate()
   const { userName, employee_management_role: empRole } = useSelector(
-    (state) => state.user
+    (state) => state.user,
   )
   const isAdmin = empRole === "admin"
 
@@ -47,23 +47,28 @@ const Dashboard = () => {
   const { data: todayAttendance, isLoading: todayLoading } =
     useTodayAttendance()
   const { data: projectsRaw, isLoading: projectsLoading } = useGetProjects()
+
+  // Admin-only queries — disabled for employees
   const { data: leaveSummary, isLoading: leaveLoading } =
-    useFetchAdminLeaveSummary()
-  const { data: employeesRaw, isLoading: employeesLoading } =
-    useFetchEmployees()
+    useFetchAdminLeaveSummary({ enabled: isAdmin })
+  const { data: employeesRaw, isLoading: employeesLoading } = useFetchEmployees(
+    { enabled: isAdmin },
+  )
+
+  // Employee-only queries — disabled for admins
   const { data: leaveProfile, isLoading: profileLoading } =
-    useFetchEmployeeLeaveProfile()
+    useFetchEmployeeLeaveProfile({ enabled: !isAdmin })
   const { data: employeePerformance, isLoading: performanceLoading } =
-    useFetchEmployeePerformance()
+    useFetchEmployeePerformance({ enabled: !isAdmin })
   const { mutate: clockIn } = useClockIn()
 
   const projects = useMemo(
     () => extractArray(projectsRaw, "results"),
-    [projectsRaw]
+    [projectsRaw],
   )
   const employees = useMemo(
     () => extractArray(employeesRaw, "employees"),
-    [employeesRaw]
+    [employeesRaw],
   )
 
   const handleClockIn = useCallback(() => {
@@ -74,7 +79,7 @@ const Dashboard = () => {
     (path) => {
       navigate(path)
     },
-    [navigate]
+    [navigate],
   )
 
   if (isAdmin) {

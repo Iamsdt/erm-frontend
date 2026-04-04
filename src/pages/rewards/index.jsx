@@ -13,7 +13,7 @@ import RewardsUI from "./rewards.ui"
 const RewardsPage = () => {
   const userRole = useSelector((state) => state.user.userRole)
   const employeeManagementRole = useSelector(
-    (state) => state.user.employee_management_role
+    (state) => state.user.employee_management_role,
   )
 
   const [isGrantOpen, setIsGrantOpen] = useState(false)
@@ -22,7 +22,7 @@ const RewardsPage = () => {
   const isAdmin = employeeManagementRole === "admin" || userRole === "admin"
 
   const { data: rewardsData, isLoading, isError } = useFetchRewards()
-  const { data: employeesData } = useFetchEmployees()
+  const { data: employeesData } = useFetchEmployees({ enabled: isAdmin })
   const { mutate: grantReward, isPending: isGranting } = useGrantReward()
 
   const rewards = rewardsData?.rewards ?? []
@@ -41,7 +41,7 @@ const RewardsPage = () => {
 
   const handleGrantReward = (payload) => {
     const employee = employees.find(
-      (emp) => String(emp.id) === String(payload.employeeId)
+      (emp) => String(emp.id) === String(payload.employeeId),
     )
     grantReward(
       {
@@ -64,7 +64,7 @@ const RewardsPage = () => {
             variant: "destructive",
           })
         },
-      }
+      },
     )
   }
 

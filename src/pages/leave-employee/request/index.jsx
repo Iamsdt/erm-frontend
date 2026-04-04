@@ -16,7 +16,10 @@ const schema = z
     subType: z.enum(["full", "wfh", "halfday"], {
       required_error: "Select a request type",
     }),
-    halfDaySlot: z.enum(["morning", "afternoon"]).optional(),
+    halfDaySlot: z
+      .enum(["morning", "afternoon", ""])
+      .optional()
+      .transform((v) => (v === "" ? undefined : v)),
     fromDate: z.string().min(1, "Start date is required"),
     toDate: z.string().min(1, "End date is required"),
     reason: z
@@ -48,6 +51,7 @@ const RequestLeavePage = () => {
 
   const form = useForm({
     resolver: zodResolver(schema),
+    mode: "onTouched",
     defaultValues: {
       leaveType: "",
       subType: "",
@@ -67,7 +71,7 @@ const RequestLeavePage = () => {
   // Auto-lock toDate = fromDate for single-day types (wfh, halfday)
   useEffect(() => {
     if ((subType === "wfh" || subType === "halfday") && fromDate) {
-      form.setValue("toDate", fromDate)
+      form.setValue("toDate", fromDate, { shouldValidate: true })
     }
   }, [subType, fromDate, form])
 
@@ -83,7 +87,16 @@ const RequestLeavePage = () => {
   }, [isSuccess, form, resetMutation])
 
   const onSubmit = (values) => {
-    submitRequest(values, {
+    const days = calcDays()
+    const payload = {
+      leaveType: values.leaveType,
+      subType: values.subType,
+      dateFrom: values.fromDate,
+      dateTo: values.toDate,
+      days,
+      reason: values.reason || undefined,
+    }
+    submitRequest(payload, {
       onError: () => {
         toast({
           title: "Error",

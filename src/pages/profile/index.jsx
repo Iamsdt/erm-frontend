@@ -65,7 +65,7 @@ const ProfilePage = () => {
   const userName = useSelector((state) => state.user.userName)
   const userRole = useSelector((state) => state.user.userRole)
   const employeeRole = useSelector(
-    (state) => state.user.employee_management_role
+    (state) => state.user.employee_management_role,
   )
 
   // ── Profile state ──────────────────────────────────────────────────────────
@@ -132,7 +132,7 @@ const ProfilePage = () => {
   const currentLanguage = i18n.language?.startsWith("hi") ? "hi" : "en"
   const isAdmin = employeeRole === "admin" || userRole === "admin"
 
-  const { data: employeesData } = useFetchEmployees()
+  const { data: employeesData } = useFetchEmployees({ enabled: isAdmin })
   const employees = employeesData?.employees ?? []
 
   const handleThemeChange = (newTheme) => {
@@ -229,7 +229,7 @@ const ProfilePage = () => {
             [moduleKey]: value,
           },
         }
-      })
+      }),
     )
   }
 
